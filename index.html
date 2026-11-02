@@ -17,9 +17,29 @@ main{max-width:1180px;margin:22px auto;padding:0 18px}.notice{background:#fff8e8
 footer{max-width:1180px;margin:20px auto;padding:0 18px 28px;color:var(--muted);font-size:12px}footer a{color:inherit}
 .overlay{position:fixed;inset:0;background:#071321d9;z-index:99999;display:grid;place-items:center;padding:16px}.dialog{background:white;color:var(--ink);width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:16px;padding:22px}.dialog h2{margin:0 0 8px}.dialog .terms{max-height:45vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px}.dialog label{margin:14px 0;display:flex;gap:9px;align-items:start}.dialog input{width:auto;margin-top:4px}.dialog .actions{display:flex;gap:10px;justify-content:end}.dialog .actions button{width:auto;margin:0}
 @media(max-width:850px){.layout{grid-template-columns:1fr}#map{height:430px}.hero{display:block}.hero .tools{margin-top:12px}}@media(max-width:520px){header{padding:12px 15px}nav a{margin-left:8px;font-size:13px}.brand strong{font-size:15px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}#map{height:390px}}
+
+/* MEW accessible dark theme */
+body.dark{--ink:#e8eef7;--muted:#aab8ca;--line:#34465b;--bg:#0b1420;background:#0b1420;color:#e8eef7}
+body.dark .panel,body.dark .dialog{background:#142235;color:#e8eef7;border-color:#34465b}
+body.dark .panelhead{border-color:#34465b}
+body.dark input,body.dark select,body.dark textarea{background:#0d1a2a;color:#f2f6fc;border-color:#465a72}
+body.dark .notice{background:#382b14;border-color:#7a5a22;color:#ffe4a8}
+body.dark .mapnote,body.dark .hint,body.dark .report small,body.dark footer{color:#aab8ca}
+body.dark .report{border-color:#34465b}
+body.dark .status{background:#20364b;color:#d9ebff}
+body.dark .status.error{background:#492326;color:#ffd8d8}
+body.dark .status.good{background:#173d31;color:#c8f5df}
+body.dark .pill{background:#2a3e55;color:#e4edf8}
+body.dark .dialog .terms{border-color:#465a72}
+body.dark .dialog label{color:#e8eef7}
+.theme-toggle{background:#f0b429;color:#182536;border:2px solid #fff;padding:9px 13px;border-radius:10px;font-weight:800;box-shadow:0 2px 8px #0003}
+.theme-toggle:hover{filter:brightness(1.08)}
+body.dark .theme-toggle{background:#f0b429;color:#172437}
+@media(max-width:520px){.theme-toggle{padding:8px 10px;font-size:12px}}
+
 </style></head>
 <body>
-<header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a></nav></header>
+<header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
 <main>
 <div class="notice"><strong>Not an emergency service.</strong> MEW is a volunteer-run community information project, not a government agency or emergency dispatcher. For immediate danger or emergency assistance, call <strong>911</strong>. Follow official alerts and instructions.</div>
 <section class="hero"><div><h1>Know what’s happening around you.</h1><p>View community-reviewed natural hazards and share observations that may help your neighbors.</p></div><div class="tools"><button class="secondary" id="satelliteBtn">Satellite</button><button class="secondary" id="streetBtn">Street map</button><button class="secondary" id="locateBtn">My location</button></div></section>
@@ -60,6 +80,11 @@ footer{max-width:1180px;margin:20px auto;padding:0 18px 28px;color:var(--muted);
 <script>
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const themeButton=document.getElementById("themeToggle");
+function applyTheme(theme){document.body.classList.toggle("dark",theme==="dark");themeButton.textContent=theme==="dark"?"☀️ Light mode":"🌙 Dark mode";themeButton.setAttribute("aria-pressed",String(theme==="dark"));}
+applyTheme(localStorage.getItem("mew-theme")||"light");
+themeButton.addEventListener("click",()=>{const next=document.body.classList.contains("dark")?"light":"dark";localStorage.setItem("mew-theme",next);applyTheme(next);});
+
 const categories=["flooding","coastal_flooding","storm_damage","tornado_damage","fire","road_hazard","road_closure","power_outage","erosion_washout","other_hazard"];
 const $=id=>document.getElementById(id);const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
