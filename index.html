@@ -445,7 +445,8 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();setInterval(loadReports,45000);\nloadNwsAlerts();setInterval(loadNwsAlerts,60000);
+loadReports();setInterval(loadReports,45000);
+loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 // Check for newly deployed public-page updates every 3 minutes.
 // Do not reload while a visitor is entering a report or has unsaved form data.
 let mewPageCheckBusy=false;
