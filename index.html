@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">\n<meta name="mew-build" content="20261102-community-safety-features"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="mew-build" content="20261102-community-safety-features"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Melbourne Emergency Watch</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -293,7 +294,8 @@ const {data:inserted,error}=await db.from("incidents").insert(payload).select("i
 for(const f of files){const blob=await jpegBlob(f);const path=`${inserted.id}/${crypto.randomUUID()}.jpg`;const {error:upErr}=await db.storage.from("incident-photos").upload(path,blob,{contentType:"image/jpeg",upsert:false});if(upErr)throw upErr;const {error:metaErr}=await db.from("incident_photos").insert({incident_id:inserted.id,storage_path:path,status:"pending"});if(metaErr)throw metaErr}
 message(files.length?"Your report is now public as an unverified community report. Any photos remain private until an administrator reviews them.":"Your report is now public as an unverified community report.","good");e.target.reset();if(selectedLocationMarker){map.removeLayer(selectedLocationMarker);selectedLocationMarker=null;}await loadReports()
 }catch(err){message("Could not submit report: "+err.message,"error")}finally{btn.disabled=false}};
-$("mapFilter").addEventListener("change",e=>{mapFilter=e.target.value;loadReports()});\nloadReports();setInterval(loadReports,45000);
+$("mapFilter").addEventListener("change",e=>{mapFilter=e.target.value;loadReports()});
+loadReports();setInterval(loadReports,45000);
 // Check for newly deployed public-page updates every 3 minutes.
 // Do not reload while a visitor is entering a report or has unsaved form data.
 let mewPageCheckBusy=false;
