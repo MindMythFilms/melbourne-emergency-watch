@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10243a">
+<title>Melbourne Emergency Watch | Admin</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root{--navy:#10243a;--navy2:#193650;--ink:#172536;--muted:#667589;--bg:#f2f5f8;--line:#dce3ea;--blue:#1677d2;--green:#16845b;--red:#c83e45;--amber:#a76612}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(115deg,var(--navy),var(--navy2));color:white;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:40px;height:40px;border-radius:12px;background:#e8f2fb;color:var(--navy);display:grid;place-items:center;font-size:22px}.brand h1{font-size:17px;margin:0}.brand p{font-size:11px;color:#c7d7e6;margin:3px 0 0}
+.header-right{display:flex;align-items:center;gap:10px;font-size:12px}.pill{padding:6px 10px;border-radius:20px;background:#174d43;border:1px solid #327d6b;color:#d8fff1}
+button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 12px;border-radius:9px;font-weight:650;font-size:12px}.btn.primary{background:var(--blue);border-color:var(--blue);color:white}.btn.danger{background:#fff1f1;border-color:#f1c5c7;color:#a52c34}.btn.success{background:#e8f6ef;border-color:#b7e1c9;color:#126642}.btn:disabled{opacity:.5;cursor:not-allowed}
+.wrap{max-width:1450px;margin:22px auto;padding:0 18px}.login-card{max-width:430px;margin:8vh auto;background:white;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 8px 30px #172b4210}.login-card h2{margin:0 0 7px;font-size:21px}.muted{color:var(--muted);font-size:13px;line-height:1.5}.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#435165}.field input,.field select{width:100%;padding:11px;border:1px solid #d6dee7;border-radius:9px;background:white;color:var(--ink)}
+.alert{padding:11px 13px;border-radius:10px;background:#fff5e6;color:#79531d;border:1px solid #f0d8ac;font-size:12px;line-height:1.5;margin:12px 0}.alert.error{background:#fff0f0;color:#9e2931;border-color:#f0c5c7}.alert.good{background:#eaf7ef;color:#126642;border-color:#c1e5ce}
+.hidden{display:none!important}.topline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.topline h2{margin:0;font-size:22px}.topline p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.stat span{font-size:11px;color:var(--muted)}.stat strong{display:block;font-size:25px;margin-top:6px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.card-head h3{font-size:15px;margin:0}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.tab{border:1px solid var(--line);background:white;color:#536174;border-radius:20px;padding:7px 10px;font-size:11px}.tab.active{background:#eaf3fc;border-color:#a9d0f3;color:#075da8}
+#incidentMap{height:300px;border-radius:11px;overflow:hidden;background:#e4edf2;margin-bottom:13px}.report-list{display:flex;flex-direction:column;gap:9px;max-height:520px;overflow:auto}.report{border:1px solid var(--line);border-radius:11px;padding:12px}.report.selected{border-color:#5ca4e6;box-shadow:0 0 0 2px #d9edff}.report-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.report-title strong{font-size:13px}.report p{font-size:12px;color:#536174;line-height:1.45;margin:7px 0}.meta{font-size:10px;color:#8290a0}.status{font-size:10px;border-radius:20px;padding:4px 7px;background:#fff2df;color:#92570e;white-space:nowrap}.status.confirmed{background:#e6f5ed;color:#126642}.status.resolved{background:#eaf0f7;color:#42566e}.status.rejected{background:#fff0f0;color:#a52c34}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.actions .btn{padding:7px 9px;font-size:11px}
+.admin-list{display:flex;flex-direction:column;gap:9px}.admin-row{border:1px solid var(--line);border-radius:10px;padding:11px;display:flex;justify-content:space-between;align-items:center;gap:10px}.admin-row strong{font-size:12px;display:block}.admin-row small{font-size:10px;color:var(--muted)}.role{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#536174}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:12px}.section-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}.footer{text-align:center;color:#8290a0;font-size:10px;padding:22px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){header{padding:13px}.brand h1{font-size:14px}.header-right .pill{display:none}.wrap{padding:0 10px;margin:13px auto}.stats{gap:8px}.stat{padding:11px}.stat strong{font-size:21px}.topline{align-items:center}.card{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Administrator control center · Brevard County, Florida</p></div></div>
+  <div class="header-right"><span id="rolePill" class="pill hidden">ADMIN</span><button id="signOutBtn" class="btn hidden">Sign out</button></div>
+</header>
+
+<main class="wrap">
+  <section id="loginView" class="login-card">
+    <h2>Administrator sign in</h2>
+    <p class="muted">Sign in with an account that has been granted an administrator role.</p>
+    <div id="loginMessage" class="alert hidden"></div>
+    <form id="loginForm">
+      <div class="field"><label for="email">Email address</label><input id="email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit" style="width:100%;padding:12px">Sign in</button>
+    </form>
+    <p class="section-note">Administrator accounts are created by the platform owner. This page does not provide public registration.</p>
+  </section>
+
+  <section id="dashboardView" class="hidden">
+    <div class="topline"><div><h2>Operations dashboard</h2><p id="welcomeText">Manage community incident reports and administrator access.</p></div><button class="btn" id="refreshBtn">↻ Refresh</button></div>
+    <div id="pageMessage" class="alert hidden"></div>
+    <div class="stats">
+      <div class="stat"><span>Total reports loaded</span><strong id="totalCount">0</strong></div>
+      <div class="stat"><span>Unverified</span><strong id="pendingCount">0</strong></div>
+      <div class="stat"><span>Confirmed</span><strong id="confirmedCount">0</strong></div>
+      <div class="stat"><span>Resolved</span><strong id="resolvedCount">0</strong></div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-head"><h3>Incident management</h3><span class="muted" id="loadedLabel">Latest reports</span></div>
+        <div id="incidentMap"></div>
+        <div class="tabs" id="statusTabs">
+          <button class="tab active" data-status="all">All</button>
+          <button class="tab" data-status="unverified">Unverified</button>
+          <button class="tab" data-status="confirmed">Confirmed</button>
+          <button class="tab" data-status="resolved">Resolved</button>
+          <button class="tab" data-status="rejected">Rejected</button>
+        </div>
+        <div id="reportList" class="report-list"><div class="empty">Sign in to load reports.</div></div>
+      </section>
+
+      <aside style="display:flex;flex-direction:column;gap:14px">
+        <section id="adminManagement" class="card hidden">
+          <div class="card-head"><h3>Administrator management</h3><span class="role">Owner only</span></div>
+          <form id="addAdminForm">
+            <div class="field"><label for="newAdminEmail">Registered user's email</label><input id="newAdminEmail" type="email" placeholder="person@example.com" required></div>
+            <div class="field"><label for="newAdminRole">Access level</label><select id="newAdminRole"><option value="admin">Administrator</option><option value="moderator">Moderator</option></select></div>
+            <button class="btn primary" type="submit">＋ Add / update access</button>
+          </form>
+          <p class="section-note">The person must already have registered and confirmed their account on the public website. Never share your database secret key.</p>
+          <div class="card-head" style="margin-top:18px"><h3>Current team</h3><button class="btn" id="reloadAdminsBtn">Refresh</button></div>
+          <div id="adminList" class="admin-list"><div class="empty">Loading administrator list…</div></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><h3>Operational guidance</h3></div>
+          <div class="alert">This dashboard manages community-submitted information. It is not an official emergency dispatch system.</div>
+          <p class="muted">For immediate danger, call 911. Verify reports before sharing them as confirmed incidents. Do not expose personal information unnecessarily.</p>
+        </section>
+      </aside>
+    </div>
+  </section>
+</main>
+<div class="footer">Melbourne Emergency Watch · Administrative access is logged by Supabase authentication.</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(() => {
+  'use strict';
+
+  // The publishable key is designed for browser use. Never put a service_role/secret key here.
+  const SUPABASE_URL = "https://lqzxzlaxvfjuklyzxbex.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO";
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  const $ = (id) => document.getElementById(id);
+  let currentRole = null;
+  let incidents = [];
+  let activeStatus = 'all';
+  let map = null;
+  let mapMarkers = [];
+
+  function showMessage(id, message, kind='') {
+    const el = $(id);
+    el.textContent = message;
+    el.className = 'alert' + (kind ? ' ' + kind : '');
+    el.classList.remove('hidden');
+  }
+  function hideMessage(id) { $(id).classList.add('hidden'); }
+  function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+  function pretty(value) {
+    return String(value || 'other').replaceAll('_',' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  function dateText(value) {
+    if (!value) return 'Time unavailable';
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? 'Time unavailable' : d.toLocaleString();
+  }
+  function statusClass(status) {
+    return ['confirmed','resolved','rejected'].includes(status) ? status : '';
+  }
+  function setSignedInUI(signedIn) {
+    $('loginView').classList.toggle('hidden', signedIn);
+    $('dashboardView').classList.toggle('hidden', !signedIn);
+    $('signOutBtn').classList.toggle('hidden', !signedIn);
+    $('rolePill').classList.toggle('hidden', !signedIn);
+    if (signedIn) $('rolePill').textContent = currentRole.toUpperCase();
+  }
+
+  async function checkRoleAndStart(session) {
+    if (!session) {
+      currentRole = null;
+      setSignedInUI(false);
+      return;
+    }
+    const { data: role, error } = await db.rpc('get_my_admin_role');
+    if (error || !role) {
+      await db.auth.signOut();
+      setSignedInUI(false);
+      showMessage('loginMessage', 'This account does not have administrator access. Ask the platform owner to grant access.', 'error');
+      return;
+    }
+    currentRole = role;
+    setSignedInUI(true);
+    $('welcomeText').textContent = `Signed in as ${session.user.email} · ${pretty(role)}`;
+    $('adminManagement').classList.toggle('hidden', role !== 'owner');
+    await loadIncidents();
+    if (role === 'owner') await loadAdmins();
+    setTimeout(() => { if (map) map.invalidateSize(); }, 250);
+  }
+
+  async function loadIncidents() {
+    $('reportList').innerHTML = '<div class="empty">Loading reports…</div>';
+    const fields = 'id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,created_at,updated_at,expires_at';
+    const { data, error } = await db.from('incidents').select(fields).order('created_at', { ascending: false }).limit(250);
+    if (error) {
+      showMessage('pageMessage', 'Could not load incidents: ' + error.message, 'error');
+      $('reportList').innerHTML = '<div class="empty">Reports could not be loaded. Check the incidents SELECT policy.</div>';
+      return;
+    }
+    incidents = data || [];
+    hideMessage('pageMessage');
+    updateStats();
+    renderReports();
+    renderMap();
+  }
+
+  function updateStats() {
+    $('totalCount').textContent = incidents.length;
+    $('pendingCount').textContent = incidents.filter(x => x.status === 'unverified').length;
+    $('confirmedCount').textContent = incidents.filter(x => x.status === 'confirmed').length;
+    $('resolvedCount').textContent = incidents.filter(x => x.status === 'resolved').length;
+    $('loadedLabel').textContent = `${incidents.length} latest reports`;
+  }
+
+  function renderReports() {
+    const list = incidents.filter(x => activeStatus === 'all' || x.status === activeStatus);
+    if (!list.length) {
+      $('reportList').innerHTML = '<div class="empty">No reports in this category.</div>';
+      return;
+    }
+    $('reportList').innerHTML = list.map(r => {
+      const coords = Number.isFinite(Number(r.latitude)) && Number.isFinite(Number(r.longitude))
+        ? `${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}` : 'No coordinates';
+      const reporter = r.anonymous ? 'Anonymous' : (r.reporter_id ? 'Registered user' : 'Unspecified');
+      const buttons = [];
+      if (r.status !== 'confirmed') buttons.push(`<button class="btn success" data-action="confirmed" data-id="${esc(r.id)}">Confirm</button>`);
+      if (r.status !== 'resolved') buttons.push(`<button class="btn" data-action="resolved" data-id="${esc(r.id)}">Resolve</button>`);
+      if (r.status !== 'rejected') buttons.push(`<button class="btn" data-action="rejected" data-id="${esc(r.id)}">Reject</button>`);
+      if (r.status === 'rejected') buttons.push(`<button class="btn" data-action="unverified" data-id="${esc(r.id)}">Restore</button>`);
+      if (currentRole === 'owner' || currentRole === 'admin') {
+        buttons.push(`<button class="btn danger" data-action="delete" data-id="${esc(r.id)}">Delete</button>`);
+      }
+      return `<article class="report">
+        <div class="report-title"><strong>${esc(r.title || pretty(r.category))}</strong><span class="status ${statusClass(r.status)}">${esc(pretty(r.status))}</span></div>
+        <p><b>${esc(pretty(r.category))}</b>${r.address ? ' · ' + esc(r.address) : ''}<br>${esc(r.description || 'No description supplied')}</p>
+        <div class="meta">${esc(dateText(r.created_at))} · ${esc(pretty(r.severity))} · ${esc(reporter)} · ${esc(coords)}</div>
+        <div class="actions">${buttons.join('')}</div>
+      </article>`;
+    }).join('');
+  }
+
+  function initMap() {
+    if (map || !window.L) return;
+    map = L.map('incidentMap').setView([28.0836, -80.6081], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  }
+
+  function renderMap() {
+    initMap();
+    if (!map) return;
+    mapMarkers.forEach(marker => map.removeLayer(marker));
+    mapMarkers = [];
+    incidents.forEach(r => {
+      const lat = Number(r.latitude), lng = Number(r.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      if (lat < 27.5 || lat > 29.0 || lng < -81.5 || lng > -80.2) return;
+      const color = r.status === 'confirmed' ? '#16845b' : r.status === 'resolved' ? '#64748b' : r.status === 'rejected' ? '#c83e45' : '#e58b23';
+      const marker = L.circleMarker([lat,lng], {radius:8,color:'#fff',weight:2,fillColor:color,fillOpacity:.95})
+        .addTo(map)
+        .bindPopup(`<b>${esc(r.title || pretty(r.category))}</b><br>${esc(r.address || '')}<br>${esc(pretty(r.status))}<br>${esc(dateText(r.created_at))}`);
+      mapMarkers.push(marker);
+    });
+  }
+
+  async function changeStatus(id, status) {
+    if (!['unverified','confirmed','resolved','rejected'].includes(status)) return;
+    const { error } = await db.from('incidents').update({ status }).eq('id', id);
+    if (error) {
+      showMessage('pageMessage', 'Status update failed: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', `Incident status updated to ${pretty(status)}.`, 'good');
+    await loadIncidents();
+  }
+
+  async function deleteIncident(id) {
+    if (!confirm('Permanently delete this incident report? This cannot be undone.')) return;
+    const { error } = await db.from('incidents').delete().eq('id', id);
+    if (error) {
+      showMessage('pageMessage', 'Delete failed: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', 'Incident report deleted.', 'good');
+    await loadIncidents();
+  }
+
+  async function loadAdmins() {
+    $('adminList').innerHTML = '<div class="empty">Loading administrator list…</div>';
+    const { data, error } = await db.rpc('get_admin_users');
+    if (error) {
+      $('adminList').innerHTML = '<div class="empty">Could not load administrators: ' + esc(error.message) + '</div>';
+      return;
+    }
+    if (!data || !data.length) {
+      $('adminList').innerHTML = '<div class="empty">No administrator accounts found.</div>';
+      return;
+    }
+    $('adminList').innerHTML = data.map(a => {
+      const roleControl = a.role === 'owner'
+        ? '<span class="role">Protected owner</span>'
+        : `<select aria-label="Role for ${esc(a.email)}" data-role-user="${esc(a.user_id)}"><option value="admin" ${a.role === 'admin' ? 'selected' : ''}>Administrator</option><option value="moderator" ${a.role === 'moderator' ? 'selected' : ''}>Moderator</option></select>`;
+      const remove = a.role === 'owner' ? '' : `<button class="btn danger" data-remove-admin="${esc(a.user_id)}">Remove</button>`;
+      return `<div class="admin-row"><div><strong>${esc(a.email || 'Unknown email')}</strong><small>${esc(pretty(a.role))} · Added ${esc(dateText(a.created_at))}</small></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">${roleControl}${remove}</div></div>`;
+    }).join('');
+  }
+
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    hideMessage('loginMessage');
+    const { data, error } = await db.auth.signInWithPassword({
+      email: $('email').value.trim(),
+      password: $('password').value
+    });
+    if (error) {
+      showMessage('loginMessage', error.message, 'error');
+      return;
+    }
+    await checkRoleAndStart(data.session);
+  });
+
+  $('signOutBtn').addEventListener('click', async () => {
+    await db.auth.signOut();
+    currentRole = null;
+    incidents = [];
+    setSignedInUI(false);
+  });
+
+  $('refreshBtn').addEventListener('click', loadIncidents);
+  $('reloadAdminsBtn').addEventListener('click', loadAdmins);
+
+  $('statusTabs').addEventListener('click', e => {
+    const button = e.target.closest('[data-status]');
+    if (!button) return;
+    activeStatus = button.dataset.status;
+    document.querySelectorAll('#statusTabs .tab').forEach(x => x.classList.toggle('active', x === button));
+    renderReports();
+  });
+
+  $('reportList').addEventListener('click', async e => {
+    const button = e.target.closest('[data-action]');
+    if (!button) return;
+    const { action, id } = button.dataset;
+    if (action === 'delete') await deleteIncident(id);
+    else await changeStatus(id, action);
+  });
+
+  $('addAdminForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('newAdminEmail').value.trim();
+    const role = $('newAdminRole').value;
+    const { error } = await db.rpc('add_admin_by_email', { p_email: email, p_role: role });
+    if (error) {
+      showMessage('pageMessage', 'Could not add administrator: ' + error.message, 'error');
+      return;
+    }
+    $('addAdminForm').reset();
+    showMessage('pageMessage', `${email} now has ${pretty(role)} access.`, 'good');
+    await loadAdmins();
+  });
+
+  $('adminList').addEventListener('change', async e => {
+    const select = e.target.closest('[data-role-user]');
+    if (!select) return;
+    const { error } = await db.rpc('set_admin_role', {
+      p_user_id: select.dataset.roleUser,
+      p_role: select.value
+    });
+    if (error) {
+      showMessage('pageMessage', 'Role change failed: ' + error.message, 'error');
+      await loadAdmins();
+      return;
+    }
+    showMessage('pageMessage', 'Administrator role updated.', 'good');
+    await loadAdmins();
+  });
+
+  $('adminList').addEventListener('click', async e => {
+    const button = e.target.closest('[data-remove-admin]');
+    if (!button) return;
+    if (!confirm('Remove this person’s administrator access? Their public account and incident reports will remain.')) return;
+    const { error } = await db.rpc('remove_admin', { p_user_id: button.dataset.removeAdmin });
+    if (error) {
+      showMessage('pageMessage', 'Could not remove access: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', 'Administrator access removed. The user account was not deleted.', 'good');
+    await loadAdmins();
+  });
+
+  db.auth.getSession().then(({ data }) => checkRoleAndStart(data.session));
+  db.auth.onAuthStateChange((_event, session) => {
+    if (!session) {
+      currentRole = null;
+      setSignedInUI(false);
+    }
+  });
+})();
+</script>
+</body>
+</html>
