@@ -177,6 +177,16 @@ input:focus,select:focus,textarea:focus {
  .map-actions {width:100%}
  .map-actions .btn {flex:1}
 }
+
+/* Same-page photo viewer */
+.photo-lightbox{position:fixed;inset:0;z-index:99999;background:rgba(5,12,20,.92);display:none;align-items:center;justify-content:center;padding:22px}
+.photo-lightbox.open{display:flex}
+.photo-lightbox img{display:block;max-width:min(94vw,1100px);max-height:86vh;object-fit:contain;border-radius:10px;box-shadow:0 18px 60px #0008}
+.photo-lightbox button{position:absolute;top:18px;right:20px;border:1px solid #ffffff66;background:#172536;color:#fff;border-radius:999px;width:42px;height:42px;font-size:25px;line-height:1;cursor:pointer}
+.popup-photos{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;max-width:260px}
+.popup-photos img{width:76px;height:64px;object-fit:cover;border-radius:7px;border:1px solid #dce3ea;cursor:zoom-in}
+.approved-photos img{cursor:zoom-in}
+
 </style>
 </head>
 
@@ -332,6 +342,11 @@ input:focus,select:focus,textarea:focus {
 
 <div class="footer">
  Community information only · Reports may be inaccurate or outdated · Always verify conditions before traveling.
+</div>
+
+<div id="photoLightbox" class="photo-lightbox" role="dialog" aria-modal="true" aria-label="Incident photo viewer">
+ <button type="button" id="closePhotoLightbox" aria-label="Close photo">×</button>
+ <img id="photoLightboxImage" alt="Expanded incident photo">
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -536,12 +551,19 @@ function render() {
    }
   ).addTo(map);
 
+  const popupPhotos = (approvedPhotosByIncident[r.id] || []).length
+   ? `<div><b>Verified photos</b><div class="popup-photos">${approvedPhotosByIncident[r.id].map(url => `<img src="${escapeHTML(url)}" data-photo-viewer="${escapeHTML(url)}" alt="Approved incident photo" loading="lazy">`).join("")}</div></div>`
+   : "";
+
   marker.bindPopup(`
-   <b>${escapeHTML(r.title)}</b><br>
-   ${escapeHTML(r.address || "Pinned location")}<br>
-   ${escapeHTML(r.description)}<br>
-   <b>Status:</b> ${escapeHTML(statusName(r.status))}<br>
-   <small>${dateText(r.created_at)}</small>
+   <div class="incident-popup">
+    <b>${escapeHTML(r.title || categoryName(r.category))}</b><br>
+    ${escapeHTML(r.address || "Pinned location")}<br>
+    ${escapeHTML(r.description)}<br>
+    <b>Status:</b> ${escapeHTML(statusName(r.status))}<br>
+    <small>${dateText(r.created_at)}</small>
+    ${popupPhotos}
+   </div>
   `);
 
   markers.set(r.id,marker);
@@ -568,7 +590,7 @@ function render() {
    </div>
    <p>${escapeHTML(r.address || "Pinned map location")} — ${escapeHTML(r.description)}</p>
    <small>${dateText(r.created_at)} · ${escapeHTML(r.anonymous ? "Anonymous" : (r.display_name || "Community member"))} · ${escapeHTML(r.severity)}</small>
-   ${(approvedPhotosByIncident[r.id] || []).length ? `<div class="approved-photos">${approvedPhotosByIncident[r.id].map(url => `<a href="${escapeHTML(url)}" target="_blank" rel="noopener"><img src="${escapeHTML(url)}" alt="Administrator-approved incident photo" loading="lazy"></a>`).join("")}</div>` : ""}
+   ${(approvedPhotosByIncident[r.id] || []).length ? `<div class="approved-photos">${approvedPhotosByIncident[r.id].map(url => `<img src="${escapeHTML(url)}" data-photo-viewer="${escapeHTML(url)}" alt="Administrator-approved incident photo" loading="lazy">`).join("")}</div>` : ""}
   </article>
  `).join("");
 
@@ -866,6 +888,35 @@ async function initialize() {
  });
 
 }
+
+// Open approved incident photos in an overlay without leaving this website.
+function openPhotoViewer(url) {
+ const viewer = $("photoLightbox");
+ const image = $("photoLightboxImage");
+ if(!viewer || !image || !url) return;
+ image.src = url;
+ viewer.classList.add("open");
+ document.body.style.overflow = "hidden";
+}
+function closePhotoViewer() {
+ const viewer = $("photoLightbox");
+ const image = $("photoLightboxImage");
+ if(!viewer || !image) return;
+ viewer.classList.remove("open");
+ image.src = "";
+ document.body.style.overflow = "";
+}
+document.addEventListener("click",e => {
+ const photo = e.target.closest("[data-photo-viewer]");
+ if(photo) {
+  e.preventDefault();
+  e.stopPropagation();
+  openPhotoViewer(photo.getAttribute("data-photo-viewer"));
+  return;
+ }
+ if(e.target.id === "photoLightbox" || e.target.id === "closePhotoLightbox") closePhotoViewer();
+});
+document.addEventListener("keydown",e => { if(e.key === "Escape") closePhotoViewer(); });
 
 initialize();
 
