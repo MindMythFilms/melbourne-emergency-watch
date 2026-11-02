@@ -451,7 +451,7 @@ async function loadReports() {
  try {
   const {data,error} = await db
    .from("incidents")
-   .select("id,category,title,description,latitude,longitude,address,severity,status,anonymous,created_at")
+   .select("id,category,title,description,latitude,longitude,address,severity,status,anonymous,display_name,created_at")
    .in("status",["unverified","confirmed","resolved"])
    .order("created_at",{ascending:false})
    .limit(500);
@@ -536,7 +536,7 @@ function render() {
     </span>
    </div>
    <p>${escapeHTML(r.address || "Pinned map location")} — ${escapeHTML(r.description)}</p>
-   <small>${dateText(r.created_at)} · ${escapeHTML(r.anonymous ? "Anonymous" : "Community member")} · ${escapeHTML(r.severity)}</small>
+   <small>${dateText(r.created_at)} · ${escapeHTML(r.anonymous ? "Anonymous" : (r.display_name || "Community member"))} · ${escapeHTML(r.severity)}</small>
   </article>
  `).join("");
 
@@ -653,6 +653,8 @@ $("reportForm").addEventListener("submit",async e => {
 
  const reporterId = sessionData?.session?.user?.id ?? null;
 
+ const isAnonymous = displayName.length === 0;
+
  const payload = {
   category:category,
   title:categoryName(category) + " report",
@@ -663,7 +665,8 @@ $("reportForm").addEventListener("submit",async e => {
   severity:severity,
   status:"unverified",
   reporter_id:reporterId,
-  anonymous:true
+  anonymous:isAnonymous,
+  display_name:isAnonymous ? null : displayName
  };
 
  button.disabled = true;
