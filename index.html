@@ -111,11 +111,47 @@ body.dark #about a{color:#63ded2;text-decoration-thickness:1.5px}
 body.dark #about a:hover{color:#a0fff2}
 body.dark #about a:focus-visible{outline:2px solid #63ded2;outline-offset:3px;border-radius:3px}
 
+
+/* Prominent community-submitted information and safety notice */
+.mew-safety-announcement{position:relative;overflow:hidden;margin:0 0 22px;padding:25px 27px;border:1px solid #efb0a5;border-left:7px solid #d83b32;border-radius:18px;background:linear-gradient(135deg,#fff7f3 0%,#fff 58%,#fff4ed 100%);color:#243447;box-shadow:0 14px 38px rgba(105,35,25,.11)}
+.mew-announcement-top{display:flex;align-items:center;gap:15px;margin-bottom:14px}
+.mew-alert-icon{flex:0 0 43px;width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#c9362e;color:#fff;font:900 27px/1 Manrope,sans-serif;box-shadow:0 5px 14px #c9362e35}
+.mew-eyebrow{font-size:10px;letter-spacing:.15em;font-weight:900;color:#b62d27;margin-bottom:4px}
+.mew-announcement-top h2{font:900 clamp(18px,2.4vw,25px)/1.2 Manrope,sans-serif;letter-spacing:-.55px;color:#8f211e;margin:0}
+.mew-announcement-lead{font-size:15px;line-height:1.65;margin:0 0 17px;color:#3b4653}
+.mew-announcement-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mew-announcement-grid>div{padding:13px 14px;border:1px solid #f0d9d1;border-radius:12px;background:#fff9f6}
+.mew-announcement-grid strong,.mew-announcement-grid span{display:block}
+.mew-announcement-grid strong{font-size:13px;color:#812b25;margin-bottom:4px}
+.mew-announcement-grid span{font-size:12px;line-height:1.55;color:#56616d}
+.mew-announcement-footer{margin-top:15px;padding:14px 16px;border-radius:12px;background:#172b3e;color:#fff;font-size:13px;line-height:1.6}
+.mew-announcement-footer strong{color:#ffd3a4}
+.mew-announcement-disclaimer{margin-top:10px;color:#6c747e;font-size:11px;line-height:1.5}
+body.dark .mew-safety-announcement{background:linear-gradient(135deg,#351e22,#182638 72%);border-color:#87433e;border-left-color:#ff655a;color:#f3e9e8;box-shadow:0 14px 38px #0004}
+body.dark .mew-announcement-top h2{color:#ffb4aa}
+body.dark .mew-eyebrow{color:#ff9388}
+body.dark .mew-announcement-lead{color:#e4d6d5}
+body.dark .mew-announcement-grid>div{background:#202c3b;border-color:#59404a}
+body.dark .mew-announcement-grid strong{color:#ffc1b8}
+body.dark .mew-announcement-grid span,body.dark .mew-announcement-disclaimer{color:#c1cbd5}
+body.dark .mew-announcement-footer{background:#081522;color:#eef4f8}
+@media(max-width:650px){.mew-safety-announcement{padding:18px 16px;margin-bottom:15px;border-radius:15px}.mew-announcement-top{gap:11px;align-items:flex-start}.mew-alert-icon{width:36px;height:36px;flex-basis:36px;border-radius:11px;font-size:23px}.mew-announcement-grid{grid-template-columns:1fr;gap:8px}.mew-announcement-grid>div{padding:11px 12px}.mew-announcement-lead{font-size:13px}.mew-announcement-footer{font-size:12px;padding:12px}}
 </style></head>
 <body>
 <header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
 <main>
-<div class="notice"><strong>Not an emergency service.</strong> MEW is a volunteer-run community information project, not a government agency or emergency dispatcher. For immediate danger or emergency assistance, call <strong>911</strong>. Follow official alerts and instructions.</div>
+<section class="mew-safety-announcement" role="alert" aria-labelledby="mew-safety-title">
+<div class="mew-announcement-top"><span class="mew-alert-icon" aria-hidden="true">!</span><div><div class="mew-eyebrow">IMPORTANT PUBLIC SAFETY NOTICE</div><h2 id="mew-safety-title">COMMUNITY-POSTED INFORMATION — PLEASE USE CAUTION</h2></div></div>
+<p class="mew-announcement-lead"><strong>Every report displayed on Melbourne Emergency Watch (MEW) is submitted by a member of the community.</strong> MEW does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of any report.</p>
+<div class="mew-announcement-grid">
+<div><strong>Reports may be inaccurate or outdated</strong><span>Conditions can change quickly. A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div>
+<div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, blocked lanes, and other hazards. Never drive through floodwater.</span></div>
+<div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a community report.</span></div>
+<div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with the appropriate official authorities before making decisions.</span></div>
+</div>
+<div class="mew-announcement-footer"><strong>MEW IS NOT AN EMERGENCY SERVICE.</strong> It is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. <strong>For emergencies or immediate danger, call 911.</strong></div>
+<div class="mew-announcement-disclaimer">Photo screening, when performed, is limited to content and privacy suitability. Approval of a photo does not mean the reported event has been verified.</div>
+</section>
 <section class="hero"><div><h1>Know what’s happening around you.</h1><p>View community-submitted hazard reports and share observations that may help your neighbors.</p></div><div class="tools"><button class="secondary" id="satelliteBtn">Satellite</button><button class="secondary" id="streetBtn">Street map</button><button class="secondary" id="locateBtn">My location</button></div></section>
 <div class="layout">
 <section class="panel" id="map-panel"><div class="panelhead"><h2>Community hazard map</h2><span class="pill" id="countLabel">Loading…</span></div><div id="map"></div><div class="mapnote">Satellite imagery is not live and may be outdated. Map markers show unverified community submissions, not official verification. Imagery © Esri and its contributors.</div><div class="panelhead"><h2>Latest community reports</h2></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
