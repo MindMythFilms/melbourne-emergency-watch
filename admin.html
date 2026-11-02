@@ -18,7 +18,7 @@
 <div class="consent" id="consent"><div class="consentbox"><h2>Administrator terms & adult access</h2><p>MEW is a volunteer community information project, not an emergency service or government agency. Use 911 for emergencies. Reports remain private until approved. Community review is not official verification.</p><p>To the fullest extent permitted by law, use is at your own risk. This draft does not exclude non-waivable legal duties. A Florida attorney should review the complete agreement before launch.</p><label><input id="adult" type="checkbox">I confirm I am 18 or older.</label><label><input id="agree" type="checkbox">I agree to the MEW Terms of Use and Privacy Notice.</label><div id="consentMsg" class="msg error hidden"></div><button id="accept" disabled>Agree and continue</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO"),VERSION="mew-natural-hazards-2026-11-02-v4";
+const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO"),VERSION="mew-natural-hazards-2026-11-02-v3";
 const cats=["flooding","coastal_flooding","storm_damage","tornado_damage","fire","road_hazard","road_closure","power_outage","erosion_washout","other_hazard"];
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let role=null,rows=[],map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
