@@ -461,9 +461,9 @@ async function loadNwsAlerts(){
   features.forEach(feature=>{
    const p=feature.properties||{},color=nwsSeverityColor(p.severity),popup=nwsPopup(p,!feature.geometry);
    if(feature.geometry){
-    L.geoJSON(feature,{style:()=>({color,weight:3,opacity:1,fillColor:color,fillOpacity:.15,dashArray:"6 4"}),pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:9,color:"#fff",weight:2,fillColor:color,fillOpacity:1})}).bindPopup(popup).addTo(nwsAlertLayer);
+    L.geoJSON(feature,{interactive:false,style:()=>({color,weight:3,opacity:1,fillColor:color,fillOpacity:.15,dashArray:"6 4"}),pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{interactive:false,radius:9,color:"#fff",weight:2,fillColor:color,fillOpacity:1})}).addTo(nwsAlertLayer);
    }else{
-    L.circleMarker(nwsCountyCenter,{radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
+    L.circleMarker(nwsCountyCenter,{interactive:false,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).addTo(nwsAlertLayer);
    }
   });
   renderNwsAlertList(features);
