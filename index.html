@@ -373,6 +373,9 @@ let reports = [];
 let markers = new Map();
 let filter = "All";
 let loading = false;
+let refreshQueued = false;
+let realtimeChannel = null;
+let realtimeRefreshTimer = null;
 
 const $ = id => document.getElementById(id);
 
@@ -438,7 +441,10 @@ function setConnection(message) {
 /* LOAD REPORTS FROM SUPABASE */
 
 async function loadReports() {
- if(loading) return;
+ if(loading) {
+  refreshQueued = true;
+  return;
+ }
 
  loading = true;
 
@@ -468,6 +474,10 @@ async function loadReports() {
 
  } finally {
   loading = false;
+  if(refreshQueued) {
+   refreshQueued = false;
+   setTimeout(loadReports,250);
+  }
  }
 }
 
@@ -696,9 +706,18 @@ $("reportForm").addEventListener("submit",async e => {
 
 /* REALTIME DATABASE UPDATES */
 
-function enableRealtime() {
+function scheduleReportsRefresh() {
+ clearTimeout(realtimeRefreshTimer);
+ realtimeRefreshTimer = setTimeout(() => loadReports(),300);
+}
 
- db.channel("community-incidents-live")
+function enableRealtime() {
+ if(realtimeChannel) {
+  db.removeChannel(realtimeChannel);
+  realtimeChannel = null;
+ }
+
+ realtimeChannel = db.channel("community-incidents-live")
   .on(
    "postgres_changes",
    {
@@ -707,20 +726,19 @@ function enableRealtime() {
     table:"incidents"
    },
    () => {
-    loadReports();
+    scheduleReportsRefresh();
    }
   )
   .subscribe(status => {
-
    if(status === "SUBSCRIBED") {
     setConnection("● LIVE DATABASE CONNECTED");
+   } else if(status === "CHANNEL_ERROR" ||
+             status === "TIMED_OUT" ||
+             status === "CLOSED") {
+    setConnection("● AUTOMATIC REFRESH ACTIVE");
+   } else {
+    setConnection("● CONNECTING TO LIVE UPDATES");
    }
-
-   if(status === "CHANNEL_ERROR" ||
-      status === "TIMED_OUT") {
-    setConnection("● USING AUTOMATIC REFRESH");
-   }
-
   });
 
 }
@@ -740,11 +758,15 @@ async function initialize() {
 
  enableRealtime();
 
- /* Fallback refresh every 20 seconds */
-
+ /* Fallback refresh every 20 seconds in case Realtime is unavailable. */
  setInterval(() => {
   loadReports();
  },20000);
+
+ /* Refresh promptly when a visitor returns to this browser tab. */
+ document.addEventListener("visibilitychange",() => {
+  if(document.visibilityState === "visible") loadReports();
+ });
 
 }
 
