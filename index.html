@@ -270,7 +270,7 @@ async function checkForSiteUpdates(){
   if(!response.ok)return;
   const html=await response.text();
   const marker="MEW_SITE_BUILD";
-  const current=document.documentElement.getAttribute("data-mew-build")||"20261102-photo-rules";
+  const current=document.querySelector('meta[name="mew-build"]')?.content||"";
   const match=html.match(/<meta name=["']mew-build["'] content=["']([^"']+)["']/i);
   const latest=match?.[1];
   if(latest&&latest!==current)window.location.reload();
