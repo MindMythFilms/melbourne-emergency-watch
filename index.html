@@ -78,8 +78,10 @@ body.dark .theme-toggle{background:#f0b429;color:#172437}
 <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p></div><label><input type="checkbox" id="adultCheck"> I confirm I am at least 18 years old.</label><label><input type="checkbox" id="termsCheck"> I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</label><div class="status error hidden" id="consentError"></div><div class="actions"><button class="secondary" id="declineBtn">I do not agree — leave website</button><button id="acceptBtn" disabled>I agree — enter website</button></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxenh6bGF4dmZqdWtseXp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MjQxOTgsImV4cCI6MjEwOTIwMDE5OH0.uZrTlKL_whz-y1SF8wlsj-8G0pDCiCEtnHLhbL3abHc",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
+// Public visitor client: use the project's legacy anon JWT and do not restore a stale
+// browser login token. Public reads/submissions remain governed by the existing RLS policies.
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 const themeButton=document.getElementById("themeToggle");
 function applyTheme(theme){document.body.classList.toggle("dark",theme==="dark");themeButton.textContent=theme==="dark"?"☀️ Light mode":"🌙 Dark mode";themeButton.setAttribute("aria-pressed",String(theme==="dark"));}
 applyTheme(localStorage.getItem("mew-theme")||"light");
@@ -115,10 +117,10 @@ async function jpegBlob(file){if(file.size>5*1024*1024)throw new Error("Each pho
 $("reportForm").onsubmit=async e=>{e.preventDefault();const btn=$("submitBtn");btn.disabled=true;message("Submitting report…");try{
 const lat=Number($("latitude").value),lng=Number($("longitude").value);if(lat<27.5||lat>29||lng< -81.5||lng> -80.2)throw new Error("Location must be within the MEW service area.");
 const files=Array.from($("photos").files||[]);if(files.length>3)throw new Error("Choose no more than three photos.");
-// Match the incidents INSERT RLS policy for both anonymous and signed-in visitors.
-const {data:authData,error:authError}=await db.auth.getUser();
-if(authError && authError.name!=="AuthSessionMissingError") throw authError;
-const reporterId=authData && authData.user ? authData.user.id : null;
+// This public form intentionally submits as anon. The database RLS policy permits
+// pending submissions with reporter_id NULL; administrator authentication is isolated
+// to admin.html and is never restored into this public visitor client.
+const reporterId=null;
 const payload={category:$("category").value,title:$("category").selectedOptions[0].text,description:$("description").value.trim(),latitude:lat,longitude:lng,address:$("address").value.trim()||null,severity:$("severity").value,status:"unverified",anonymous:$("anonymous").checked,display_name:$("anonymous").checked?null:($("displayName").value.trim()||null),reporter_id:reporterId};
 if(!categories.includes(payload.category)||!payload.description)throw new Error("Complete the required fields.");
 const {data:inserted,error}=await db.from("incidents").insert(payload).select("id").single();if(error)throw error;
