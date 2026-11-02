@@ -96,6 +96,13 @@ body.dark button.secondary{background:#20394d;color:#eaf2f8;border-color:#385168
 @media(max-width:650px){header{position:relative;align-items:flex-start;flex-direction:column;padding:13px 16px;gap:12px}.brand strong{font-size:15px}nav{width:100%;gap:16px;overflow-x:auto;padding:3px 0 5px}nav a{white-space:nowrap;font-size:12px}.theme-toggle{margin-left:auto;white-space:nowrap}main{padding:0 12px;margin:14px auto}.notice{font-size:12px;padding:11px 13px}.hero{padding:25px 21px;border-radius:19px;margin:14px 0}.hero h1{font-size:31px;letter-spacing:-1.1px}.hero p{font-size:13px}.hero .tools{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.hero .tools button{padding:10px 7px;font-size:12px}.panel{border-radius:16px}.panelhead{padding:14px 15px;min-height:54px}.form{padding:16px}.formgrid{grid-template-columns:1fr;gap:12px}.full{grid-column:auto}#map{height:390px}.reportlist{padding:4px 15px 12px}.dialog{padding:19px}.dialog .actions{flex-direction:column}.dialog .actions button{width:100%}footer{padding:0 14px 25px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
+
+/* Map placement cursor: red location pin instead of the drag hand */
+#map .leaflet-container,#map.leaflet-container{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'%3E%3Cpath d='M15 1C7.3 1 1 7.2 1 14.8c0 10.1 14 26 14 26s14-15.9 14-26C29 7.2 22.7 1 15 1Z' fill='%23e52b3b' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='15' cy='14' r='5' fill='white'/%3E%3C/svg%3E") 15 40,crosshair!important}
+#map .leaflet-grab,#map .leaflet-dragging .leaflet-grab{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'%3E%3Cpath d='M15 1C7.3 1 1 7.2 1 14.8c0 10.1 14 26 14 26s14-15.9 14-26C29 7.2 22.7 1 15 1Z' fill='%23e52b3b' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='15' cy='14' r='5' fill='white'/%3E%3C/svg%3E") 15 40,crosshair!important}
+.selected-location-pin{background:transparent;border:0}
+.selected-location-pin svg{display:block;filter:drop-shadow(0 3px 4px #071a2c66)}
+
 </style></head>
 <body>
 <header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
@@ -155,7 +162,10 @@ const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 imagery.addTo(map);labels.addTo(map);
 $("satelliteBtn").onclick=()=>{map.removeLayer(streets);if(!map.hasLayer(imagery))imagery.addTo(map);if(!map.hasLayer(labels))labels.addTo(map)};
 $("streetBtn").onclick=()=>{map.removeLayer(imagery);map.removeLayer(labels);streets.addTo(map)};
-map.on("click",e=>{$("latitude").value=e.latlng.lat.toFixed(6);$("longitude").value=e.latlng.lng.toFixed(6)});
+const selectedLocationIcon=L.divIcon({className:"selected-location-pin",html:'<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 1C8.6 1 1 8.5 1 17.7 1 30 18 47 18 47s17-17 17-29.3C35 8.5 27.4 1 18 1Z" fill="#e52b3b" stroke="#fff" stroke-width="2.5"/><circle cx="18" cy="17" r="6" fill="#fff"/></svg>',iconSize:[36,48],iconAnchor:[18,47],popupAnchor:[0,-43]});
+let selectedLocationMarker=null;
+function setSelectedLocation(latlng){$("latitude").value=latlng.lat.toFixed(6);$("longitude").value=latlng.lng.toFixed(6);if(!selectedLocationMarker){selectedLocationMarker=L.marker(latlng,{icon:selectedLocationIcon,draggable:true,zIndexOffset:1000}).addTo(map).bindPopup("Selected report location — drag the pin to fine-tune it.");selectedLocationMarker.on("dragend",()=>{const p=selectedLocationMarker.getLatLng();$("latitude").value=p.lat.toFixed(6);$("longitude").value=p.lng.toFixed(6)});}else{selectedLocationMarker.setLatLng(latlng);}selectedLocationMarker.openPopup();}
+map.on("click",e=>setSelectedLocation(e.latlng));
 $("locateBtn").onclick=()=>map.locate({setView:true,maxZoom:15});
 map.on("locationfound",e=>L.circleMarker(e.latlng,{radius:8,color:"#fff",fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your approximate device location"));
 function popup(r){return `<b>${esc(r.title||r.category.replaceAll("_"," "))}</b><br>${esc(r.address||"") }<br>${esc(r.status==="confirmed"?"Community-reviewed":"Resolved")}<br>${new Date(r.created_at).toLocaleString()}<br><small>Not official verification.</small>`}
