@@ -138,6 +138,10 @@ input:focus,select:focus,textarea:focus {
  outline:2px solid #c8e2fa;border-color:#65a9e7;
 }
 .row {display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.photo-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-preview img,.approved-photos img{width:88px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.approved-photos{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.photo-note{font-size:10px;color:var(--muted);margin-top:5px}
 .notice {
  font-size:10px;line-height:1.5;color:#667589;
  background:#f4f7fa;border-radius:10px;
@@ -300,6 +304,11 @@ input:focus,select:focus,textarea:focus {
    </div>
   </div>
 
+  <label for="incidentPhotos">Photos (optional, up to 3)</label>
+  <input id="incidentPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+  <div class="notice">Photos are private until an administrator reviews and approves them. JPG, PNG, or WebP; maximum 5 MB each.</div>
+  <div id="photoPreview" class="photo-preview" aria-live="polite"></div>
+
   <button class="btn primary" id="submitButton" style="width:100%;margin-top:13px;padding:13px" type="submit">
    Submit community report
   </button>
@@ -376,6 +385,7 @@ let loading = false;
 let refreshQueued = false;
 let realtimeChannel = null;
 let realtimeRefreshTimer = null;
+let approvedPhotosByIncident = {};
 
 const $ = id => document.getElementById(id);
 
@@ -460,6 +470,27 @@ async function loadReports() {
 
   reports = data || [];
 
+  approvedPhotosByIncident = {};
+  if (reports.length) {
+   const {data:photoRows,error:photoError} = await db
+    .from("incident_photos")
+    .select("id,incident_id,storage_path")
+    .eq("status","approved")
+    .in("incident_id",reports.map(r => r.id));
+
+   if(photoError) throw photoError;
+
+   for (const photo of (photoRows || [])) {
+    const {data:signed,error:signedError} = await db.storage
+     .from("incident-photos")
+     .createSignedUrl(photo.storage_path,600);
+
+    if(!signedError && signed?.signedUrl) {
+     (approvedPhotosByIncident[photo.incident_id] ||= []).push(signed.signedUrl);
+    }
+   }
+  }
+
   render();
 
   setConnection("● DATABASE CONNECTED");
@@ -537,6 +568,7 @@ function render() {
    </div>
    <p>${escapeHTML(r.address || "Pinned map location")} — ${escapeHTML(r.description)}</p>
    <small>${dateText(r.created_at)} · ${escapeHTML(r.anonymous ? "Anonymous" : (r.display_name || "Community member"))} · ${escapeHTML(r.severity)}</small>
+   ${(approvedPhotosByIncident[r.id] || []).length ? `<div class="approved-photos">${approvedPhotosByIncident[r.id].map(url => `<a href="${escapeHTML(url)}" target="_blank" rel="noopener"><img src="${escapeHTML(url)}" alt="Administrator-approved incident photo" loading="lazy"></a>`).join("")}</div>` : ""}
   </article>
  `).join("");
 
@@ -604,6 +636,29 @@ $("focusReport").onclick = () => {
  });
 };
 
+/* PHOTO SELECTION PREVIEW */
+$("incidentPhotos").addEventListener("change", () => {
+ const files = Array.from($("incidentPhotos").files || []);
+ $("photoPreview").innerHTML = "";
+ if (files.length > 3) {
+  $("incidentPhotos").value = "";
+  showMessage("Please choose no more than 3 photos.", "error");
+  return;
+ }
+ for (const file of files) {
+  if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+   $("incidentPhotos").value = "";
+   $("photoPreview").innerHTML = "";
+   showMessage("Each photo must be JPG, PNG, or WebP and no larger than 5 MB.", "error");
+   return;
+  }
+  const img = document.createElement("img");
+  img.alt = "Selected photo preview";
+  img.src = URL.createObjectURL(file);
+  $("photoPreview").appendChild(img);
+ }
+});
+
 /* SUBMIT REPORT TO SUPABASE */
 
 $("reportForm").addEventListener("submit",async e => {
@@ -655,7 +710,16 @@ $("reportForm").addEventListener("submit",async e => {
 
  const isAnonymous = displayName.length === 0;
 
+ const incidentId = crypto.randomUUID();
+ const selectedPhotos = Array.from($("incidentPhotos").files || []);
+
+ if (selectedPhotos.length > 3) {
+  showMessage("Please choose no more than 3 photos.", "error");
+  return;
+ }
+
  const payload = {
+  id:incidentId,
   category:category,
   title:categoryName(category) + " report",
   description:description,
@@ -680,12 +744,31 @@ $("reportForm").addEventListener("submit",async e => {
 
   if(error) throw error;
 
+  for (const file of selectedPhotos) {
+   const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+   const storagePath = `${incidentId}/${crypto.randomUUID()}.${extension}`;
+   const {error:uploadError} = await db.storage
+    .from("incident-photos")
+    .upload(storagePath,file,{contentType:file.type,upsert:false});
+
+   if(uploadError) throw uploadError;
+
+   const {error:photoRowError} = await db
+    .from("incident_photos")
+    .insert({incident_id:incidentId,storage_path:storagePath,status:"pending"});
+
+   if(photoRowError) throw photoRowError;
+  }
+
   showMessage(
-   "Your report was successfully submitted to Melbourne Emergency Watch. It is now saved in the shared database.",
+   selectedPhotos.length
+    ? "Your report was submitted. Your photos are private and awaiting administrator review."
+    : "Your report was successfully submitted to Melbourne Emergency Watch.",
    "success"
   );
 
   $("reportForm").reset();
+  $("photoPreview").innerHTML = "";
 
   await loadReports();
 
