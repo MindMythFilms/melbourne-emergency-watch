@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">\n<meta name="mew-build" content="20261102-photo-rules"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Melbourne Emergency Watch</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -257,4 +257,25 @@ for(const f of files){const blob=await jpegBlob(f);const path=`${inserted.id}/${
 message(files.length?"Your report is now public as an unverified community report. Any photos remain private until an administrator reviews them.":"Your report is now public as an unverified community report.","good");e.target.reset();if(selectedLocationMarker){map.removeLayer(selectedLocationMarker);selectedLocationMarker=null;}await loadReports()
 }catch(err){message("Could not submit report: "+err.message,"error")}finally{btn.disabled=false}};
 loadReports();setInterval(loadReports,45000);
+// Check for newly deployed public-page updates every 3 minutes.
+// Do not reload while a visitor is entering a report or has unsaved form data.
+let mewPageCheckBusy=false;
+async function checkForSiteUpdates(){
+ if(mewPageCheckBusy||document.visibilityState!=="visible")return;
+ const form=$("reportForm");
+ if(form&&(form.contains(document.activeElement)||new FormData(form).entries().next().done===false))return;
+ mewPageCheckBusy=true;
+ try{
+  const response=await fetch(window.location.pathname+"?mew-version-check="+Date.now(),{method:"GET",cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+  if(!response.ok)return;
+  const html=await response.text();
+  const marker="MEW_SITE_BUILD";
+  const current=document.documentElement.getAttribute("data-mew-build")||"20261102-photo-rules";
+  const match=html.match(/<meta name=["']mew-build["'] content=["']([^"']+)["']/i);
+  const latest=match?.[1];
+  if(latest&&latest!==current)window.location.reload();
+ }catch(err){console.debug("MEW update check skipped:",err)}
+ finally{mewPageCheckBusy=false}
+}
+setInterval(checkForSiteUpdates,180000);
 </script></body></html>
