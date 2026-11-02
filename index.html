@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261102-community-safety-features"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Melbourne Emergency Watch</title>
+<meta name="mew-build" content="20261102-coastwatch-fl-rebrand"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--navy:#10243b;--blue:#1769aa;--ink:#182536;--muted:#66758a;--line:#dce4ec;--bg:#f3f6f9;--green:#167c58;--amber:#b86a0a}
@@ -19,7 +19,7 @@ footer{max-width:1180px;margin:20px auto;padding:0 18px 28px;color:var(--muted);
 .overlay{position:fixed;inset:0;background:#071321d9;z-index:99999;display:grid;place-items:center;padding:16px}.dialog{background:white;color:var(--ink);width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:16px;padding:22px}.dialog h2{margin:0 0 8px}.dialog .terms{max-height:45vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px}.dialog label{margin:14px 0;display:flex;gap:9px;align-items:start}.dialog input{width:auto;margin-top:4px}.dialog .actions{display:flex;gap:10px;justify-content:end}.dialog .actions button{width:auto;margin:0}
 @media(max-width:850px){.layout{grid-template-columns:1fr}#map{height:430px}.hero{display:block}.hero .tools{margin-top:12px}}@media(max-width:520px){header{padding:12px 15px}nav a{margin-left:8px;font-size:13px}.brand strong{font-size:15px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}#map{height:390px}}
 
-/* MEW accessible dark theme */
+/* CoastWatch FL accessible dark theme */
 body.dark{--ink:#e8eef7;--muted:#aab8ca;--line:#34465b;--bg:#0b1420;background:#0b1420;color:#e8eef7}
 body.dark .panel,body.dark .dialog{background:#142235;color:#e8eef7;border-color:#34465b}
 body.dark .panelhead{border-color:#34465b}
@@ -39,7 +39,7 @@ body.dark .theme-toggle{background:#f0b429;color:#172437}
 @media(max-width:520px){.theme-toggle{padding:8px 10px;font-size:12px}}
 
 
-/* MEW 2026 visual system — responsive public experience */
+/* CoastWatch FL 2026 visual system — responsive public experience */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
 :root{--navy:#071a2c;--blue:#19a7a1;--ink:#102235;--muted:#62758a;--line:#dce6ee;--bg:#f2f6f8;--green:#139879;--amber:#e7ad45;--surface:#fff;--shadow:0 18px 50px rgba(11,35,55,.09)}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);letter-spacing:-.01em}
@@ -173,18 +173,18 @@ body.dark .mew-flag-option{background:#0a1b2b;border-color:#385168;color:#eaf2f8
 .brand{display:flex;align-items:center;gap:12px}.brand-logo{display:flex;align-items:center;flex:0 0 auto}.brand-logo img{display:block;width:clamp(150px,20vw,230px);height:auto;max-height:76px;object-fit:contain}.brand-copy{display:none}@media(max-width:600px){.brand-logo img{width:145px;max-height:58px}}
 </style></head>
 <body>
-<header><div class="brand"><a class="brand-logo" href="/" aria-label="Melbourne Emergency Watch home"><img src="/mew-logo.svg" alt="Melbourne Emergency Watch logo"></a><div class="brand-copy"><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
+<header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/mew-logo.svg" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
 <main>
 <section class="mew-safety-announcement" role="alert" aria-labelledby="mew-safety-title">
 <div class="mew-announcement-top"><span class="mew-alert-icon" aria-hidden="true">!</span><div><div class="mew-eyebrow">IMPORTANT PUBLIC SAFETY NOTICE</div><h2 id="mew-safety-title">COMMUNITY-POSTED INFORMATION — PLEASE USE CAUTION</h2></div></div>
-<p class="mew-announcement-lead"><strong>Every report displayed on Melbourne Emergency Watch (MEW) is submitted by a member of the community.</strong> MEW does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of any report.</p>
+<p class="mew-announcement-lead"><strong>Every report displayed on CoastWatch FL is submitted by a member of the community.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of any report.</p>
 <div class="mew-announcement-grid">
 <div><strong>Reports may be inaccurate or outdated</strong><span>Conditions can change quickly. A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div>
 <div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, blocked lanes, and other hazards. Never drive through floodwater.</span></div>
 <div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a community report.</span></div>
 <div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with the appropriate official authorities before making decisions.</span></div>
 </div>
-<div class="mew-announcement-footer"><strong>MEW IS NOT AN EMERGENCY SERVICE.</strong> It is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. <strong>For emergencies or immediate danger, call 911.</strong></div>
+<div class="mew-announcement-footer"><strong>CoastWatch FL IS NOT AN EMERGENCY SERVICE.</strong> It is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. <strong>For emergencies or immediate danger, call 911.</strong></div>
 <div class="mew-announcement-disclaimer">Photo screening, when performed, is limited to content and privacy suitability. Approval of a photo does not mean the reported event has been verified.</div>
 </section>
 <section class="hero"><div><h1>Know what’s happening around you.</h1><p>View community-submitted hazard reports and share observations that may help your neighbors.</p></div><div class="tools"><button class="secondary" id="satelliteBtn">Satellite</button><button class="secondary" id="streetBtn">Street map</button><button class="secondary" id="locateBtn">My location</button></div></section>
@@ -205,14 +205,14 @@ body.dark .mew-flag-option{background:#0a1b2b;border-color:#385168;color:#eaf2f8
 <div class="full"><label style="display:flex;gap:8px;align-items:start;font-weight:500"><input id="anonymous" type="checkbox" checked style="width:auto;margin-top:4px"> Submit without displaying my name.</label></div>
 </div><button id="submitBtn" type="submit">Submit community report</button><div id="formMessage" class="status hidden" role="status"></div></form></div></section>
 </div>
-<section class="panel mew-official-resources" id="official-resources"><div class="panelhead"><h2>Official emergency information</h2><span class="pill">External official sources</span></div><div class="resource-grid"><a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard County Emergency Management <span>Preparedness, alerts and emergency information ↗</span></a><a href="https://www.weather.gov/mlb/" target="_blank" rel="noopener">National Weather Service — Melbourne <span>Official weather watches and warnings ↗</span></a><a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management <span>Statewide emergency information ↗</span></a><a href="https://www.fl511.com/" target="_blank" rel="noopener">FL511 Traffic Information <span>Road conditions and traffic alerts ↗</span></a><a href="https://www.floridahealth.gov/" target="_blank" rel="noopener">Florida Department of Health <span>Public health advisories ↗</span></a></div><div class="mapnote">These links lead to external official sources. MEW does not control their content or guarantee that every alert is shown here. For emergencies, call 911.</div></section>
-<section class="panel" id="about" style="margin-top:18px"><div class="panelhead"><h2>About MEW</h2></div><div style="padding:16px 18px;color:#536579"><p>Melbourne Emergency Watch is a volunteer-run, non-commercial community information project. It is not affiliated with any government, police, fire, emergency management, or utility agency.</p><p>Reports are user-submitted and may be inaccurate, incomplete, delayed, or removed. New reports appear automatically as “Unverified community report.” MEW does not fact-check or independently verify reports. Approved photographs have passed a content and privacy screening only; photo approval does not verify the reported event.</p><p>Do not approach hazards to take photographs. Never enter floodwater, approach fires or downed power lines, or enter damaged structures. For emergencies call 911. For official weather alerts visit <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> and <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management</a>.</p><p><a href="#terms" id="showTerms">Terms of Use</a> · <a href="#privacy" id="showPrivacy">Privacy Notice</a> · <a href="mailto:MEW_CONTACT_EMAIL">Contact MEW</a></p></div></section>
-</main><footer>© Melbourne Emergency Watch · Community information only · Not an emergency response service.</footer>
+<section class="panel mew-official-resources" id="official-resources"><div class="panelhead"><h2>Official emergency information</h2><span class="pill">External official sources</span></div><div class="resource-grid"><a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard County Emergency Management <span>Preparedness, alerts and emergency information ↗</span></a><a href="https://www.weather.gov/mlb/" target="_blank" rel="noopener">National Weather Service — Melbourne <span>Official weather watches and warnings ↗</span></a><a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management <span>Statewide emergency information ↗</span></a><a href="https://www.fl511.com/" target="_blank" rel="noopener">FL511 Traffic Information <span>Road conditions and traffic alerts ↗</span></a><a href="https://www.floridahealth.gov/" target="_blank" rel="noopener">Florida Department of Health <span>Public health advisories ↗</span></a></div><div class="mapnote">These links lead to external official sources. CoastWatch FL does not control their content or guarantee that every alert is shown here. For emergencies, call 911.</div></section>
+<section class="panel" id="about" style="margin-top:18px"><div class="panelhead"><h2>About CoastWatch FL</h2></div><div style="padding:16px 18px;color:#536579"><p>CoastWatch FL is a volunteer-run, non-commercial community information project. It is not affiliated with any government, police, fire, emergency management, or utility agency.</p><p>Reports are user-submitted and may be inaccurate, incomplete, delayed, or removed. New reports appear automatically as “Unverified community report.” CoastWatch FL does not fact-check or independently verify reports. Approved photographs have passed a content and privacy screening only; photo approval does not verify the reported event.</p><p>Do not approach hazards to take photographs. Never enter floodwater, approach fires or downed power lines, or enter damaged structures. For emergencies call 911. For official weather alerts visit <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> and <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management</a>.</p><p><a href="#terms" id="showTerms">Terms of Use</a> · <a href="#privacy" id="showPrivacy">Privacy Notice</a> · <a href="mailto:CoastWatch FL_CONTACT_EMAIL">Contact CoastWatch FL</a></p></div></section>
+</main><footer>© CoastWatch FL · Community information only · Not an emergency response service.</footer>
 
 <div class="mew-flag-overlay" id="flagOverlay" role="dialog" aria-modal="true" aria-labelledby="flagTitle">
  <div class="mew-flag-dialog">
   <h2 id="flagTitle">Report this listing</h2>
-  <p>Select all reasons that apply. Your report will be sent privately to MEW moderators.</p>
+  <p>Select all reasons that apply. Your report will be sent privately to CoastWatch FL moderators.</p>
   <form id="flagForm">
    <div class="mew-flag-options">
     <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="inaccurate"> Inaccurate or misleading</label>
@@ -229,21 +229,21 @@ body.dark .mew-flag-option{background:#0a1b2b;border-color:#385168;color:#eaf2f8
   </form>
  </div>
 </div>
-\n<div class="overlay" id="consentOverlay"><div class="dialog"><h2>Terms of Use &amp; Community Safety Agreement</h2><p>Melbourne Emergency Watch · Version 1.0 · Effective November 2, 2026. Please read this agreement carefully.</p><div class="terms"><p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
+\n<div class="overlay" id="consentOverlay"><div class="dialog"><h2>Terms of Use &amp; Community Safety Agreement</h2><p>CoastWatch FL · Version 1.0 · Effective November 2, 2026. Please read this agreement carefully.</p><div class="terms"><p><strong>Please read this agreement carefully.</strong> You may use CoastWatch FL only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
 <h3>1. Volunteer community project — not an emergency service</h3>
-<p>Melbourne Emergency Watch (“MEW”) is intended to be a volunteer-run, non-commercial community information project. It is not a government agency, public safety authority, emergency dispatcher, 911 service, professional monitoring service, or official source of emergency instructions. It does not dispatch responders, guarantee that anyone is monitoring reports, or promise that a report will be reviewed or acted upon.</p>
+<p>CoastWatch FL (“CoastWatch FL”) is intended to be a volunteer-run, non-commercial community information project. It is not a government agency, public safety authority, emergency dispatcher, 911 service, professional monitoring service, or official source of emergency instructions. It does not dispatch responders, guarantee that anyone is monitoring reports, or promise that a report will be reviewed or acted upon.</p>
 <h3>2. No guarantee; information must be independently verified</h3>
-<p>Reports, map pins, photographs, comments, status labels, and other information may be inaccurate, incomplete, outdated, misleading, duplicated, malicious, or unavailable. “Confirmed” means only that a MEW volunteer or authorized user reviewed the submission under the website’s process; it is not an official finding or a guarantee of safety, accuracy, or current conditions. You must independently verify information with appropriate official sources before acting on it.</p>
+<p>Reports, map pins, photographs, comments, status labels, and other information may be inaccurate, incomplete, outdated, misleading, duplicated, malicious, or unavailable. “Confirmed” means only that a CoastWatch FL volunteer or authorized user reviewed the submission under the website’s process; it is not an official finding or a guarantee of safety, accuracy, or current conditions. You must independently verify information with appropriate official sources before acting on it.</p>
 <h3>3. Emergencies and personal safety</h3>
-<p>Never rely on MEW to report an emergency or obtain emergency assistance. For immediate danger, call 911. Follow instructions from law enforcement, fire-rescue, emergency medical services, and official local, state, and federal authorities. Do not enter floodwater, approach fires, downed power lines, damaged structures, crime scenes, or other dangerous areas to take photographs or verify a report. Do not delay evacuation or protective action to use this website.</p>
+<p>Never rely on CoastWatch FL to report an emergency or obtain emergency assistance. For immediate danger, call 911. Follow instructions from law enforcement, fire-rescue, emergency medical services, and official local, state, and federal authorities. Do not enter floodwater, approach fires, downed power lines, damaged structures, crime scenes, or other dangerous areas to take photographs or verify a report. Do not delay evacuation or protective action to use this website.</p>
 <h3>4. Assumption of risk and limitation/release of liability</h3>
 <p>To the fullest extent permitted by applicable law, you voluntarily assume the risks associated with accessing, using, or relying on this website and its content. To the fullest extent permitted by law, you agree that the website owner/operator, project organizers, developers, volunteers, moderators, administrators, contributors, and users are not responsible for accidents, injuries, deaths, property damage, losses, costs, or other claims arising from or related to your access to or use of the website, reliance on user-submitted information, inaccurate or delayed reports, unavailable services, moderation decisions, or actions you or others take or fail to take based on website content. This provision is intended to apply to claims based on ordinary negligence to the extent such a release is legally permitted. It does not exclude or limit any liability that applicable law does not allow to be excluded or limited, including liability for intentional misconduct or other non-waivable legal duties.</p>
 <h3>5. User responsibility and submitted content</h3>
 <p>You are responsible for your actions and for any text, location, or photograph you submit. Submit only information you believe is truthful and relevant. Do not trespass, break laws, put yourself or others at risk, impersonate officials, publish threats, or upload unlawful, abusive, graphic, intimate, identifying, or otherwise inappropriate images. Do not include private personal information unless you have a lawful reason and authority to share it. You must have the rights and permissions needed to submit any photograph or other content.</p>
 <h3>6. Moderation and availability</h3>
-<p>MEW volunteers and administrators may review, edit, hide, reject, or remove submissions and may suspend or restrict access. They are not obligated to review every submission, respond to users, verify conditions, or keep the website continuously available. Photo approval and incident status are moderation decisions for this community tool only.</p>
+<p>CoastWatch FL volunteers and administrators may review, edit, hide, reject, or remove submissions and may suspend or restrict access. They are not obligated to review every submission, respond to users, verify conditions, or keep the website continuously available. Photo approval and incident status are moderation decisions for this community tool only.</p>
 <h3>7. No professional advice or relationship</h3>
-<p>Nothing on MEW is professional, legal, medical, law-enforcement, engineering, weather, or emergency-management advice. Use of the website does not create an agency, employment, partnership, fiduciary, or professional relationship with the owner, developers, volunteers, moderators, administrators, or other users.</p>
+<p>Nothing on CoastWatch FL is professional, legal, medical, law-enforcement, engineering, weather, or emergency-management advice. Use of the website does not create an agency, employment, partnership, fiduciary, or professional relationship with the owner, developers, volunteers, moderators, administrators, or other users.</p>
 <h3>8. Acceptance and refusal</h3>
 <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p></div><label><input type="checkbox" id="adultCheck"> I confirm I am at least 18 years old.</label><label><input type="checkbox" id="termsCheck"> I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</label><div class="status error hidden" id="consentError"></div><div class="actions"><button class="secondary" id="declineBtn" type="button" onclick="window.mewDeclineConsent()">I do not agree — leave website</button><button id="acceptBtn" type="button" onclick="window.mewAcceptConsent()">I agree — enter website</button></div></div></div>
 <script>
@@ -283,7 +283,7 @@ window.mewAcceptConsent=async function(){
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
+const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="coastwatch-fl-terms-2026-11-02-v1";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 const themeButton=document.getElementById("themeToggle");
@@ -315,7 +315,7 @@ map.on("locationfound",e=>L.circleMarker(e.latlng,{radius:8,color:"#fff",fillCol
 const approvedPhotos={};
 function reportStatusLabel(status){return status==="unverified"?"Unverified community report":status==="resolved"?"Marked resolved · not independently verified":"Previously admin-reviewed · not official verification"}
 function popup(r){const photo=approvedPhotos[r.id];return `<b>${esc(r.title||r.category.replaceAll("_"," "))}</b><br>${esc(r.address||"")}<br>${esc(reportStatusLabel(r.status))}<br>${new Date(r.created_at).toLocaleString()}<br><small>User-submitted information. Not official verification.</small>${photo?`<br><img src="${esc(photo)}" alt="Administrator-approved community photo" style="width:100%;max-width:220px;margin-top:8px;border-radius:8px">`:""}<br><button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:8px">Report this listing</button>`}
-async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("MEW public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
+async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
 window.mewReports=data||[];markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+" reports";
 $("latestReports").innerHTML=data.slice(0,12).map(r=>`<div class="report"><strong>${esc(r.title||r.category.replaceAll("_"," "))}</strong><small>${esc(r.address||"Location on map")} · ${new Date(r.created_at).toLocaleString()}</small><div><span class="pill">${reportStatusLabel(r.status)}</span></div>${approvedPhotos[r.id]?`<img src="${esc(approvedPhotos[r.id])}" alt="Administrator-approved community photo" style="width:100%;max-width:220px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px">`:""}<button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:9px;padding:7px 10px;font-size:11px">Report this listing</button></div>`).join("")||'<p class="hint">No community reports yet.</p>';
 data.forEach(r=>{if((mapFilter==="all"||r.category===mapFilter)&&Number.isFinite(+r.latitude)&&Number.isFinite(+r.longitude)){const color=r.status==="resolved"?"#64748b":r.status==="unverified"?"#d87917":"#167c58";const m=L.circleMarker([r.latitude,r.longitude],{radius:8,color:"#fff",weight:2,fillColor:color,fillOpacity:.95}).addTo(map).bindPopup(popup(r));markers.push(m)}})}
@@ -337,10 +337,10 @@ flagForm.addEventListener("submit",async e=>{
  const details=document.getElementById("flagDetails").value.trim()||null;
  const rows=selected.map(reason=>({incident_id:mewFlagIncidentId,reason,details,status:"pending"}));
  const {error}=await db.from("incident_flags").insert(rows);
- if(error){console.error("MEW flag submission failed:",error);errorBox.textContent="Your report could not be sent. Please try again.";errorBox.classList.remove("hidden");submit.disabled=false;submit.textContent="Submit report";return}
+ if(error){console.error("CoastWatch FL flag submission failed:",error);errorBox.textContent="Your report could not be sent. Please try again.";errorBox.classList.remove("hidden");submit.disabled=false;submit.textContent="Submit report";return}
  if(mewFlagSourceButton){mewFlagSourceButton.disabled=true;mewFlagSourceButton.textContent="Report submitted"}
  closeFlagDialog();
- alert("Thank you. Your report has been sent to MEW moderators for review.");
+ alert("Thank you. Your report has been sent to CoastWatch FL moderators for review.");
  submit.disabled=false;submit.textContent="Submit report";
 });
 
@@ -348,7 +348,7 @@ flagForm.addEventListener("submit",async e=>{
 async function jpegBlob(file){if(file.size>5*1024*1024)throw new Error("Each photo must be 5 MB or smaller.");const img=await createImageBitmap(file);const scale=Math.min(1,2000/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext("2d").drawImage(img,0,0,c.width,c.height);return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error("Image conversion failed")),"image/jpeg",.86))}
 $("photos").addEventListener("change",()=>{const hasPhotos=$("photos").files.length>0;$("photoRulesAck").disabled=!hasPhotos;if(!hasPhotos)$("photoRulesAck").checked=false;});
 $("reportForm").onsubmit=async e=>{e.preventDefault();const btn=$("submitBtn");btn.disabled=true;message("Submitting report…");try{
-const lat=Number($("latitude").value),lng=Number($("longitude").value);if(lat<27.5||lat>29||lng< -81.5||lng> -80.2)throw new Error("Location must be within the MEW service area.");
+const lat=Number($("latitude").value),lng=Number($("longitude").value);if(lat<27.5||lat>29||lng< -81.5||lng> -80.2)throw new Error("Location must be within the current CoastWatch FL service area.");
 const files=Array.from($("photos").files||[]);if(files.length>3)throw new Error("Choose no more than three photos.");const categoryNow=$("category").value;const recentDuplicate=(window.mewReports||[]).find(r=>r.category===categoryNow&&Date.now()-new Date(r.created_at).getTime()<12*60*60*1000&&Math.hypot((Number(r.latitude)-lat)*111,(Number(r.longitude)-lng)*85)<1);if(recentDuplicate&&!confirm("A similar community report was submitted nearby in the last 12 hours. Submit another anyway?"))throw new Error("Submission cancelled to avoid a duplicate report.");if(files.length&&!$("photoRulesAck").checked)throw new Error("Please confirm the photo upload rules before submitting images.");
 // This public form intentionally submits as anon. The database RLS policy permits
 // pending submissions with reporter_id NULL; administrator authentication is isolated
@@ -374,12 +374,12 @@ async function checkForSiteUpdates(){
   const response=await fetch(window.location.pathname+"?mew-version-check="+Date.now(),{method:"GET",cache:"no-store",headers:{"Cache-Control":"no-cache"}});
   if(!response.ok)return;
   const html=await response.text();
-  const marker="MEW_SITE_BUILD";
+  const marker="CoastWatch FL_SITE_BUILD";
   const current=document.querySelector('meta[name="mew-build"]')?.content||"";
   const match=html.match(/<meta name=["']mew-build["'] content=["']([^"']+)["']/i);
   const latest=match?.[1];
   if(latest&&latest!==current)window.location.reload();
- }catch(err){console.debug("MEW update check skipped:",err)}
+ }catch(err){console.debug("CoastWatch FL update check skipped:",err)}
  finally{mewPageCheckBusy=false}
 }
 setInterval(checkForSiteUpdates,180000);
