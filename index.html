@@ -90,7 +90,11 @@ async function jpegBlob(file){if(file.size>5*1024*1024)throw new Error("Each pho
 $("reportForm").onsubmit=async e=>{e.preventDefault();const btn=$("submitBtn");btn.disabled=true;message("Submitting report…");try{
 const lat=Number($("latitude").value),lng=Number($("longitude").value);if(lat<27.5||lat>29||lng< -81.5||lng> -80.2)throw new Error("Location must be within the MEW service area.");
 const files=Array.from($("photos").files||[]);if(files.length>3)throw new Error("Choose no more than three photos.");
-const payload={category:$("category").value,title:$("category").selectedOptions[0].text,description:$("description").value.trim(),latitude:lat,longitude:lng,address:$("address").value.trim()||null,severity:$("severity").value,status:"unverified",anonymous:$("anonymous").checked,display_name:$("anonymous").checked?null:($("displayName").value.trim()||null)};
+// Match the incidents INSERT RLS policy for both anonymous and signed-in visitors.
+const {data:authData,error:authError}=await db.auth.getUser();
+if(authError && authError.name!=="AuthSessionMissingError") throw authError;
+const reporterId=authData && authData.user ? authData.user.id : null;
+const payload={category:$("category").value,title:$("category").selectedOptions[0].text,description:$("description").value.trim(),latitude:lat,longitude:lng,address:$("address").value.trim()||null,severity:$("severity").value,status:"unverified",anonymous:$("anonymous").checked,display_name:$("anonymous").checked?null:($("displayName").value.trim()||null),reporter_id:reporterId};
 if(!categories.includes(payload.category)||!payload.description)throw new Error("Complete the required fields.");
 const {data:inserted,error}=await db.from("incidents").insert(payload).select("id").single();if(error)throw error;
 for(const f of files){const blob=await jpegBlob(f);const path=`${inserted.id}/${crypto.randomUUID()}.jpg`;const {error:upErr}=await db.storage.from("incident-photos").upload(path,blob,{contentType:"image/jpeg",upsert:false});if(upErr)throw upErr;const {error:metaErr}=await db.from("incident_photos").insert({incident_id:inserted.id,storage_path:path,status:"pending"});if(metaErr)throw metaErr}
