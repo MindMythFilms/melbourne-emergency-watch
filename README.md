@@ -1,6 +1,6 @@
-# Melbourne Emergency Watch — prototype
+# CoastWatch FL — prototype
 
-A responsive installable-web-app prototype for community hazard reports in Melbourne and Brevard County, Florida.
+A responsive installable-web-app prototype for community hazard reports in Melbourne, Brevard County, and nearby coastal communities in Florida.
 
 ## Run locally
 
