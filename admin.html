@@ -11,7 +11,7 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 header{background:linear-gradient(115deg,var(--navy),var(--navy2));color:white;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand{display:flex;align-items:center;gap:12px}.mark{width:40px;height:40px;border-radius:12px;background:#e8f2fb;color:var(--navy);display:grid;place-items:center;font-size:22px}.brand h1{font-size:17px;margin:0}.brand p{font-size:11px;color:#c7d7e6;margin:3px 0 0}
-.header-right{display:flex;align-items:center;gap:10px;font-size:12px}.pill{padding:6px 10px;border-radius:20px;background:#174d43;border:1px solid #327d6b;color:#d8fff1}
+.header-right{display:flex;align-items:center;gap:10px;font-size:12px}.pill{padding:6px 10px;border-radius:20px;background:#174d43;border:1px solid #327d6b;color:#d8fff1}.live-state{font-size:10px;white-space:nowrap}
 button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 12px;border-radius:9px;font-weight:650;font-size:12px}.btn.primary{background:var(--blue);border-color:var(--blue);color:white}.btn.danger{background:#fff1f1;border-color:#f1c5c7;color:#a52c34}.btn.success{background:#e8f6ef;border-color:#b7e1c9;color:#126642}.btn:disabled{opacity:.5;cursor:not-allowed}
 .wrap{max-width:1450px;margin:22px auto;padding:0 18px}.login-card{max-width:430px;margin:8vh auto;background:white;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 8px 30px #172b4210}.login-card h2{margin:0 0 7px;font-size:21px}.muted{color:var(--muted);font-size:13px;line-height:1.5}.field{margin:14px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#435165}.field input,.field select{width:100%;padding:11px;border:1px solid #d6dee7;border-radius:9px;background:white;color:var(--ink)}
 .alert{padding:11px 13px;border-radius:10px;background:#fff5e6;color:#79531d;border:1px solid #f0d8ac;font-size:12px;line-height:1.5;margin:12px 0}.alert.error{background:#fff0f0;color:#9e2931;border-color:#f0c5c7}.alert.good{background:#eaf7ef;color:#126642;border-color:#c1e5ce}
@@ -27,7 +27,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
 <body>
 <header>
   <div class="brand"><div class="mark">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Administrator control center · Brevard County, Florida</p></div></div>
-  <div class="header-right"><span id="rolePill" class="pill hidden">ADMIN</span><button id="signOutBtn" class="btn hidden">Sign out</button></div>
+  <div class="header-right"><span id="realtimeState" class="pill live-state hidden">CONNECTING…</span><span id="rolePill" class="pill hidden">ADMIN</span><button id="signOutBtn" class="btn hidden">Sign out</button></div>
 </header>
 
 <main class="wrap">
@@ -107,6 +107,11 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   let activeStatus = 'all';
   let map = null;
   let mapMarkers = [];
+  let realtimeChannel = null;
+  let pollingTimer = null;
+  let refreshTimer = null;
+  let incidentLoadInProgress = false;
+  let incidentRefreshQueued = false;
 
   function showMessage(id, message, kind='') {
     const el = $(id);
@@ -139,8 +144,70 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     if (signedIn) $('rolePill').textContent = currentRole.toUpperCase();
   }
 
+  function setRealtimeState(label) {
+    const el = $('realtimeState');
+    el.textContent = label;
+    el.classList.remove('hidden');
+  }
+
+  function stopLiveUpdates() {
+    if (realtimeChannel) {
+      db.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+      pollingTimer = null;
+    }
+    if (refreshTimer) {
+      clearTimeout(refreshTimer);
+      refreshTimer = null;
+    }
+    $('realtimeState').classList.add('hidden');
+  }
+
+  function scheduleIncidentRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => loadIncidents(), 300);
+  }
+
+  function startLiveUpdates() {
+    stopLiveUpdates();
+    setRealtimeState('CONNECTING…');
+
+    realtimeChannel = db.channel('admin-incidents-live')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'incidents'
+      }, () => {
+        scheduleIncidentRefresh();
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          setRealtimeState('● LIVE UPDATES');
+        } else if (status === 'CHANNEL_ERROR' ||
+                   status === 'TIMED_OUT' ||
+                   status === 'CLOSED') {
+          setRealtimeState('● AUTO-REFRESH ACTIVE');
+        } else {
+          setRealtimeState('CONNECTING…');
+        }
+      });
+
+    // Backup for browsers or networks where Realtime is unavailable.
+    pollingTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') loadIncidents();
+    }, 20000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadIncidents();
+    });
+  }
+
   async function checkRoleAndStart(session) {
     if (!session) {
+      stopLiveUpdates();
       currentRole = null;
       setSignedInUI(false);
       return;
@@ -157,24 +224,40 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     $('welcomeText').textContent = `Signed in as ${session.user.email} · ${pretty(role)}`;
     $('adminManagement').classList.toggle('hidden', role !== 'owner');
     await loadIncidents();
+    startLiveUpdates();
     if (role === 'owner') await loadAdmins();
     setTimeout(() => { if (map) map.invalidateSize(); }, 250);
   }
 
   async function loadIncidents() {
-    $('reportList').innerHTML = '<div class="empty">Loading reports…</div>';
-    const fields = 'id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,created_at,updated_at,expires_at';
-    const { data, error } = await db.from('incidents').select(fields).order('created_at', { ascending: false }).limit(250);
-    if (error) {
-      showMessage('pageMessage', 'Could not load incidents: ' + error.message, 'error');
-      $('reportList').innerHTML = '<div class="empty">Reports could not be loaded. Check the incidents SELECT policy.</div>';
+    if (incidentLoadInProgress) {
+      incidentRefreshQueued = true;
       return;
     }
-    incidents = data || [];
-    hideMessage('pageMessage');
-    updateStats();
-    renderReports();
-    renderMap();
+
+    incidentLoadInProgress = true;
+    $('reportList').innerHTML = '<div class="empty">Loading reports…</div>';
+    const fields = 'id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,created_at,updated_at,expires_at';
+
+    try {
+      const { data, error } = await db.from('incidents').select(fields).order('created_at', { ascending: false }).limit(250);
+      if (error) throw error;
+
+      incidents = data || [];
+      hideMessage('pageMessage');
+      updateStats();
+      renderReports();
+      renderMap();
+    } catch (error) {
+      showMessage('pageMessage', 'Could not load incidents: ' + error.message, 'error');
+      $('reportList').innerHTML = '<div class="empty">Reports could not be loaded. Check the incidents SELECT policy.</div>';
+    } finally {
+      incidentLoadInProgress = false;
+      if (incidentRefreshQueued) {
+        incidentRefreshQueued = false;
+        scheduleIncidentRefresh();
+      }
+    }
   }
 
   function updateStats() {
@@ -294,6 +377,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   });
 
   $('signOutBtn').addEventListener('click', async () => {
+    stopLiveUpdates();
     await db.auth.signOut();
     currentRole = null;
     incidents = [];
@@ -365,6 +449,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   db.auth.getSession().then(({ data }) => checkRoleAndStart(data.session));
   db.auth.onAuthStateChange((_event, session) => {
     if (!session) {
+      stopLiveUpdates();
       currentRole = null;
       setSignedInUI(false);
     }
