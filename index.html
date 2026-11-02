@@ -151,7 +151,25 @@ body.dark .mew-photo-ack{border-color:#66532f;color:#ffe0a0!important}
 
 .mew-official-resources{margin-top:18px}.resource-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px}.resource-grid a{display:block;padding:13px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);font-weight:800;background:var(--surface)}.resource-grid a span{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:3px}body.dark .resource-grid a{background:#102337;color:#eaf4fa;border-color:#263e52}#mapFilter{max-width:175px;padding:8px 10px;font-size:12px}
 @media(max-width:600px){.resource-grid{grid-template-columns:1fr}.panelhead:has(#mapFilter){align-items:flex-start;flex-wrap:wrap}#mapFilter{max-width:145px}}
-.dialog .actions #acceptBtn{cursor:pointer;min-width:190px}.dialog .actions #acceptBtn.needs-consent{opacity:.78}.dialog .actions #acceptBtn:disabled{opacity:.6;cursor:wait}.dialog .actions #acceptBtn[aria-disabled="true"]{outline:1px dashed #b7791f;outline-offset:2px}</style></head>
+.dialog .actions #acceptBtn{cursor:pointer;min-width:190px}.dialog .actions #acceptBtn.needs-consent{opacity:.78}.dialog .actions #acceptBtn:disabled{opacity:.6;cursor:wait}.dialog .actions #acceptBtn[aria-disabled="true"]{outline:1px dashed #b7791f;outline-offset:2px}
+/* Simple, mobile-friendly community flag dialog */
+.mew-flag-overlay{position:fixed;inset:0;z-index:100000;background:#071321d9;display:none;place-items:center;padding:16px}
+.mew-flag-overlay.open{display:grid}
+.mew-flag-dialog{width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;color:#182536;border-radius:18px;padding:22px;box-shadow:0 24px 80px #0006}
+.mew-flag-dialog h2{margin:0 0 6px;font:800 21px Manrope,sans-serif;color:#142d42}
+.mew-flag-dialog p{margin:0 0 15px;color:#62758a;font-size:13px}
+.mew-flag-options{display:grid;gap:9px;margin:14px 0}
+.mew-flag-option{display:flex!important;align-items:center;gap:11px;margin:0!important;padding:12px;border:1px solid #dce6ee;border-radius:11px;background:#f8fbfc;color:#24384a!important;font-size:14px!important;font-weight:650!important;cursor:pointer}
+.mew-flag-option input{width:19px;height:19px;flex:0 0 19px;margin:0;accent-color:#159c98}
+.mew-flag-dialog textarea{min-height:82px}
+.mew-flag-actions{display:flex;gap:10px;margin-top:14px}
+.mew-flag-actions button{flex:1}
+body.dark .mew-flag-dialog{background:#102337;color:#edf6fb}
+body.dark .mew-flag-dialog h2{color:#edf6fb}
+body.dark .mew-flag-dialog p{color:#a8bbca}
+body.dark .mew-flag-option{background:#0a1b2b;border-color:#385168;color:#eaf2f8!important}
+@media(max-width:520px){.mew-flag-dialog{padding:18px}.mew-flag-actions{flex-direction:column}}
+</style></head>
 <body>
 <header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
 <main>
@@ -188,7 +206,28 @@ body.dark .mew-photo-ack{border-color:#66532f;color:#ffe0a0!important}
 <section class="panel mew-official-resources" id="official-resources"><div class="panelhead"><h2>Official emergency information</h2><span class="pill">External official sources</span></div><div class="resource-grid"><a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard County Emergency Management <span>Preparedness, alerts and emergency information ↗</span></a><a href="https://www.weather.gov/mlb/" target="_blank" rel="noopener">National Weather Service — Melbourne <span>Official weather watches and warnings ↗</span></a><a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management <span>Statewide emergency information ↗</span></a><a href="https://www.fl511.com/" target="_blank" rel="noopener">FL511 Traffic Information <span>Road conditions and traffic alerts ↗</span></a><a href="https://www.floridahealth.gov/" target="_blank" rel="noopener">Florida Department of Health <span>Public health advisories ↗</span></a></div><div class="mapnote">These links lead to external official sources. MEW does not control their content or guarantee that every alert is shown here. For emergencies, call 911.</div></section>
 <section class="panel" id="about" style="margin-top:18px"><div class="panelhead"><h2>About MEW</h2></div><div style="padding:16px 18px;color:#536579"><p>Melbourne Emergency Watch is a volunteer-run, non-commercial community information project. It is not affiliated with any government, police, fire, emergency management, or utility agency.</p><p>Reports are user-submitted and may be inaccurate, incomplete, delayed, or removed. New reports appear automatically as “Unverified community report.” MEW does not fact-check or independently verify reports. Approved photographs have passed a content and privacy screening only; photo approval does not verify the reported event.</p><p>Do not approach hazards to take photographs. Never enter floodwater, approach fires or downed power lines, or enter damaged structures. For emergencies call 911. For official weather alerts visit <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> and <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management</a>.</p><p><a href="#terms" id="showTerms">Terms of Use</a> · <a href="#privacy" id="showPrivacy">Privacy Notice</a> · <a href="mailto:MEW_CONTACT_EMAIL">Contact MEW</a></p></div></section>
 </main><footer>© Melbourne Emergency Watch · Community information only · Not an emergency response service.</footer>
-<div class="overlay" id="consentOverlay"><div class="dialog"><h2>Terms of Use &amp; Community Safety Agreement</h2><p>Melbourne Emergency Watch · Version 1.0 · Effective November 2, 2026. Please read this agreement carefully.</p><div class="terms"><p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
+
+<div class="mew-flag-overlay" id="flagOverlay" role="dialog" aria-modal="true" aria-labelledby="flagTitle">
+ <div class="mew-flag-dialog">
+  <h2 id="flagTitle">Report this listing</h2>
+  <p>Select all reasons that apply. Your report will be sent privately to MEW moderators.</p>
+  <form id="flagForm">
+   <div class="mew-flag-options">
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="inaccurate"> Inaccurate or misleading</label>
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="privacy"> Privacy or personal information</label>
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="inappropriate"> Inappropriate content</label>
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="dangerous"> Dangerous or threatening content</label>
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="copyright"> Copyright concern</label>
+    <label class="mew-flag-option"><input type="checkbox" name="flagReason" value="other"> Other</label>
+   </div>
+   <label for="flagDetails">Additional details (optional)</label>
+   <textarea id="flagDetails" maxlength="1000" placeholder="Add helpful context. Do not include private personal information."></textarea>
+   <div class="status error hidden" id="flagError" role="alert"></div>
+   <div class="mew-flag-actions"><button type="button" class="secondary" id="cancelFlag">Cancel</button><button type="submit" id="submitFlag">Submit report</button></div>
+  </form>
+ </div>
+</div>
+\n<div class="overlay" id="consentOverlay"><div class="dialog"><h2>Terms of Use &amp; Community Safety Agreement</h2><p>Melbourne Emergency Watch · Version 1.0 · Effective November 2, 2026. Please read this agreement carefully.</p><div class="terms"><p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
 <h3>1. Volunteer community project — not an emergency service</h3>
 <p>Melbourne Emergency Watch (“MEW”) is intended to be a volunteer-run, non-commercial community information project. It is not a government agency, public safety authority, emergency dispatcher, 911 service, professional monitoring service, or official source of emergency instructions. It does not dispatch responders, guarantee that anyone is monitoring reports, or promise that a report will be reviewed or acted upon.</p>
 <h3>2. No guarantee; information must be independently verified</h3>
@@ -278,7 +317,31 @@ async function loadReports(){const {data,error}=await db.from("incidents").selec
 window.mewReports=data||[];markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+" reports";
 $("latestReports").innerHTML=data.slice(0,12).map(r=>`<div class="report"><strong>${esc(r.title||r.category.replaceAll("_"," "))}</strong><small>${esc(r.address||"Location on map")} · ${new Date(r.created_at).toLocaleString()}</small><div><span class="pill">${reportStatusLabel(r.status)}</span></div>${approvedPhotos[r.id]?`<img src="${esc(approvedPhotos[r.id])}" alt="Administrator-approved community photo" style="width:100%;max-width:220px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px">`:""}<button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:9px;padding:7px 10px;font-size:11px">Report this listing</button></div>`).join("")||'<p class="hint">No community reports yet.</p>';
 data.forEach(r=>{if((mapFilter==="all"||r.category===mapFilter)&&Number.isFinite(+r.latitude)&&Number.isFinite(+r.longitude)){const color=r.status==="resolved"?"#64748b":r.status==="unverified"?"#d87917":"#167c58";const m=L.circleMarker([r.latitude,r.longitude],{radius:8,color:"#fff",weight:2,fillColor:color,fillOpacity:.95}).addTo(map).bindPopup(popup(r));markers.push(m)}})}
-document.addEventListener("click",async e=>{const b=e.target.closest("[data-flag]");if(!b)return;const id=b.dataset.flag;const choices=["Inaccurate or misleading","Privacy or personal information","Inappropriate content","Dangerous or threatening content","Copyright concern","Other"];const choice=prompt("Why are you reporting this listing?\\n"+choices.map((x,i)=>(i+1)+". "+x).join("\\n")+"\\nEnter a number (1-6):");if(choice===null)return;const n=Number(choice);if(!Number.isInteger(n)||n<1||n>6){alert("Please choose a number from 1 to 6.");return}const details=prompt("Optional details (do not include personal information):")||null;const reasons=["inaccurate","privacy","inappropriate","dangerous","copyright","other"];const {error}=await db.from("incident_flags").insert({incident_id:id,reason:reasons[n-1],details,status:"pending"});if(error){alert("Your report could not be sent. Please try again later.");console.error(error);return}b.disabled=true;b.textContent="Flag submitted";alert("Thank you. Your flag has been sent to MEW moderators for review.");});
+
+let mewFlagIncidentId=null,mewFlagSourceButton=null;
+const flagOverlay=document.getElementById("flagOverlay"),flagForm=document.getElementById("flagForm");
+function closeFlagDialog(){flagOverlay.classList.remove("open");flagForm.reset();document.getElementById("flagError").classList.add("hidden");mewFlagIncidentId=null;mewFlagSourceButton=null}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-flag]");if(!b)return;mewFlagIncidentId=b.dataset.flag;mewFlagSourceButton=b;flagOverlay.classList.add("open");});
+document.getElementById("cancelFlag").addEventListener("click",closeFlagDialog);
+flagOverlay.addEventListener("click",e=>{if(e.target===flagOverlay)closeFlagDialog()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&flagOverlay.classList.contains("open"))closeFlagDialog()});
+flagForm.addEventListener("submit",async e=>{
+ e.preventDefault();
+ const selected=[...flagForm.querySelectorAll('input[name="flagReason"]:checked')].map(x=>x.value);
+ const errorBox=document.getElementById("flagError"),submit=document.getElementById("submitFlag");
+ errorBox.classList.add("hidden");
+ if(!selected.length){errorBox.textContent="Please select at least one reason.";errorBox.classList.remove("hidden");return}
+ submit.disabled=true;submit.textContent="Sending…";
+ const details=document.getElementById("flagDetails").value.trim()||null;
+ const rows=selected.map(reason=>({incident_id:mewFlagIncidentId,reason,details,status:"pending"}));
+ const {error}=await db.from("incident_flags").insert(rows);
+ if(error){console.error("MEW flag submission failed:",error);errorBox.textContent="Your report could not be sent. Please try again.";errorBox.classList.remove("hidden");submit.disabled=false;submit.textContent="Submit report";return}
+ if(mewFlagSourceButton){mewFlagSourceButton.disabled=true;mewFlagSourceButton.textContent="Report submitted"}
+ closeFlagDialog();
+ alert("Thank you. Your report has been sent to MEW moderators for review.");
+ submit.disabled=false;submit.textContent="Submit report";
+});
+
 
 async function jpegBlob(file){if(file.size>5*1024*1024)throw new Error("Each photo must be 5 MB or smaller.");const img=await createImageBitmap(file);const scale=Math.min(1,2000/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext("2d").drawImage(img,0,0,c.width,c.height);return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error("Image conversion failed")),"image/jpeg",.86))}
 $("photos").addEventListener("change",()=>{const hasPhotos=$("photos").files.length>0;$("photoRulesAck").disabled=!hasPhotos;if(!hasPhotos)$("photoRulesAck").checked=false;});
