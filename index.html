@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">\n<meta name="mew-build" content="20261102-community-safety-features"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Melbourne Emergency Watch</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--navy:#10243b;--blue:#1769aa;--ink:#182536;--muted:#66758a;--line:#dce4ec;--bg:#f3f6f9;--green:#167c58;--amber:#b86a0a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -239,7 +239,7 @@ window.mewAcceptConsent=async function(){
  if(sessionStorage.getItem("mew_accepted_version")==="mew-natural-hazards-2026-11-02-v3")overlay.remove();
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
@@ -257,7 +257,10 @@ let map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
 const imagery=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community",maxZoom:19});
 const labels=L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{attribution:"",maxZoom:19});
 const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19});
-imagery.addTo(map);labels.addTo(map);
+streets.addTo(map);
+streets.on("tileerror",()=>{const note=document.querySelector("#map-panel .mapnote");if(note)note.textContent="Map tiles are temporarily unavailable. Please refresh or use the official emergency links below.";});
+imagery.on("tileerror",()=>{if(map.hasLayer(imagery)){map.removeLayer(imagery);streets.addTo(map);const note=document.querySelector("#map-panel .mapnote");if(note)note.textContent="Satellite imagery is unavailable; showing the street map instead.";}});
+
 $("satelliteBtn").onclick=()=>{map.removeLayer(streets);if(!map.hasLayer(imagery))imagery.addTo(map);if(!map.hasLayer(labels))labels.addTo(map)};
 $("streetBtn").onclick=()=>{map.removeLayer(imagery);map.removeLayer(labels);streets.addTo(map)};
 const selectedLocationIcon=L.divIcon({className:"selected-location-pin",html:'<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 1C8.6 1 1 8.5 1 17.7 1 30 18 47 18 47s17-17 17-29.3C35 8.5 27.4 1 18 1Z" fill="#e52b3b" stroke="#fff" stroke-width="2.5"/><circle cx="18" cy="17" r="6" fill="#fff"/></svg>',iconSize:[36,48],iconAnchor:[18,47],popupAnchor:[0,-43]});
