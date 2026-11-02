@@ -78,8 +78,7 @@ body.dark .theme-toggle{background:#f0b429;color:#172437}
 <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p></div><label><input type="checkbox" id="adultCheck"> I confirm I am at least 18 years old.</label><label><input type="checkbox" id="termsCheck"> I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</label><div class="status error hidden" id="consentError"></div><div class="actions"><button class="secondary" id="declineBtn">I do not agree — leave website</button><button id="acceptBtn" disabled>I agree — enter website</button></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxxenh6bGF4dmZqdWtseXp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MjQxOTgsImV4cCI6MjEwOTIwMDE5OH0.uZrTlKL_whz-y1SF8wlsj-8G0pDCiCEtnHLhbL3abHc",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
-// Public visitor client: use the project's legacy anon JWT and do not restore a stale
+const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 const themeButton=document.getElementById("themeToggle");
