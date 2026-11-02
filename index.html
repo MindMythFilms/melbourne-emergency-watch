@@ -37,6 +37,65 @@ body.dark .dialog label{color:#e8eef7}
 body.dark .theme-toggle{background:#f0b429;color:#172437}
 @media(max-width:520px){.theme-toggle{padding:8px 10px;font-size:12px}}
 
+
+/* MEW 2026 visual system — responsive public experience */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
+:root{--navy:#071a2c;--blue:#19a7a1;--ink:#102235;--muted:#62758a;--line:#dce6ee;--bg:#f2f6f8;--green:#139879;--amber:#e7ad45;--surface:#fff;--shadow:0 18px 50px rgba(11,35,55,.09)}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);letter-spacing:-.01em}
+header{position:sticky;top:0;z-index:1000;padding:13px max(22px,calc((100% - 1320px)/2));background:rgba(6,24,41,.94);backdrop-filter:blur(18px);border-bottom:1px solid #ffffff18;box-shadow:0 8px 30px #071a2c22}
+.brand{gap:13px}.mark{width:46px;height:46px;border:1px solid #70d6ce;border-radius:15px;background:linear-gradient(145deg,#1ba79f,#126b80);box-shadow:0 7px 22px #14a79b40;font-family:Manrope,sans-serif}
+.brand strong{font:800 17px Manrope,sans-serif;letter-spacing:-.5px}.brand small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a9c5d2}
+nav{display:flex;align-items:center;gap:22px}nav a{margin:0!important;font-size:13px;color:#d7e8ee;transition:color .2s}nav a:hover{color:#70ded2}
+main{max-width:1320px;margin:30px auto;padding:0 24px}
+.notice{border:1px solid #f0d49a;background:linear-gradient(110deg,#fff8e8,#fffdf7);border-radius:14px;padding:13px 17px;box-shadow:0 5px 18px #6d4c1510;font-size:13px}
+.hero{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:25px;margin:22px 0 20px;padding:34px 36px;border-radius:24px;background:radial-gradient(ellipse at 85% 15%,#1e8f8c66,transparent 35%),linear-gradient(115deg,#09243a 0%,#0b3549 58%,#0c5960 100%);box-shadow:0 18px 45px #08263b26}
+.hero:after{content:"";position:absolute;z-index:-1;width:300px;height:300px;right:15%;top:-210px;border:1px solid #b5f7ed2c;border-radius:50%;box-shadow:0 0 0 35px #b5f7ed0a,0 0 0 75px #b5f7ed08}
+.hero h1{font:800 clamp(29px,4vw,46px)/1.1 Manrope,sans-serif;letter-spacing:-1.8px;color:#fff;max-width:650px}
+.hero p{color:#c2dce4;font-size:15px;max-width:600px;margin:11px 0 0}
+.hero .tools{position:relative;z-index:1;gap:9px}.hero .tools button{background:#ffffff14;border:1px solid #ffffff3d;color:#efffff;padding:10px 14px;border-radius:11px;backdrop-filter:blur(8px)}.hero .tools button:hover{background:#ffffff26}
+.layout{grid-template-columns:minmax(0,1.55fr) minmax(320px,.85fr);gap:20px}
+.panel{background:var(--surface);border:1px solid #dfe8ee;border-radius:19px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s,border-color .2s}
+.panel:hover{box-shadow:0 20px 55px rgba(11,35,55,.12)}
+.panelhead{padding:17px 20px;border-bottom:1px solid #e8eef2;min-height:60px}
+.panelhead h2{font:800 15px Manrope,sans-serif;letter-spacing:-.25px;color:#142d42}
+.pill{background:#e2f5f2;color:#087c70;padding:5px 10px;font-size:11px;letter-spacing:.02em}
+#map{height:610px;background:#dbe6e8}
+.mapnote{font-size:11px;background:#fbfcfd;padding:11px 16px}
+.form{padding:20px}.formgrid{gap:15px}
+label{font-size:12px;letter-spacing:.01em;color:#334d61}
+input,select,textarea{border:1px solid #d4e0e8;border-radius:11px;padding:12px 13px;background:#fbfdfe;transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#19a7a1;box-shadow:0 0 0 3px #19a7a11c;background:#fff}
+textarea{min-height:115px}
+button,.btn{border-radius:11px;background:linear-gradient(135deg,#159c98,#117b86);padding:11px 16px;box-shadow:0 5px 13px #128f8b26;transition:transform .18s,filter .18s,box-shadow .18s}
+button:hover,.btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 8px 18px #128f8b30}
+button.secondary{background:#eaf1f5;color:#16354a;box-shadow:none;border:1px solid #dbe6ed}
+.form button{padding:14px;font-size:14px}
+.status{border-radius:11px}
+.reportlist{padding:4px 20px 16px;max-height:420px}
+.report{padding:15px 0;border-color:#e9eff3}.report strong{font:700 14px Manrope,sans-serif;color:#18344a}
+.report small{font-size:11px}
+#about>div:last-child{padding:20px 22px!important;color:#536b7e!important;font-size:13px}
+footer{max-width:1320px;padding:0 24px 35px;font-size:11px;letter-spacing:.02em}
+.overlay{backdrop-filter:blur(8px)}.dialog{border:1px solid #e2eaf0;box-shadow:0 25px 90px #0005;border-radius:22px;padding:28px}.dialog h2{font:800 22px Manrope,sans-serif}
+.theme-toggle{background:#f3c65e;color:#1d2b38;border:1px solid #ffe7a4;box-shadow:0 5px 16px #0003}
+body.dark{--ink:#eaf2f8;--muted:#a8bbca;--line:#2a4054;--bg:#071421;background:#071421;color:#eaf2f8}
+body.dark header{background:rgba(4,17,29,.96)}
+body.dark .notice{background:#302713;border-color:#745b29;color:#ffe5ae}
+body.dark .hero{box-shadow:0 18px 45px #0005}
+body.dark .panel{background:#102337;border-color:#263e52;box-shadow:0 18px 48px #0003}
+body.dark .panelhead{border-color:#263e52}body.dark .panelhead h2{color:#edf6fb}
+body.dark input,body.dark select,body.dark textarea{background:#0a1b2b;border-color:#385168;color:#f2f7fa}
+body.dark input:focus,body.dark select:focus,body.dark textarea:focus{border-color:#39c7bb;box-shadow:0 0 0 3px #39c7bb22}
+body.dark .report{border-color:#263e52}body.dark .report strong{color:#eaf4fa}
+body.dark .mapnote{background:#0c1d2d}body.dark #about>div:last-child{color:#b5c6d2!important}
+body.dark .dialog{background:#102337;color:#edf6fb;border-color:#30485e}
+body.dark .dialog .terms{border-color:#385168}body.dark .dialog label{color:#eaf2f8}
+body.dark .pill{background:#153e42;color:#8ee6d8}
+body.dark button.secondary{background:#20394d;color:#eaf2f8;border-color:#385168}
+@media(max-width:900px){main{margin:20px auto;padding:0 18px}.layout{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column;padding:29px}.hero .tools{margin-top:2px}#map{height:470px}}
+@media(max-width:650px){header{position:relative;align-items:flex-start;flex-direction:column;padding:13px 16px;gap:12px}.brand strong{font-size:15px}nav{width:100%;gap:16px;overflow-x:auto;padding:3px 0 5px}nav a{white-space:nowrap;font-size:12px}.theme-toggle{margin-left:auto;white-space:nowrap}main{padding:0 12px;margin:14px auto}.notice{font-size:12px;padding:11px 13px}.hero{padding:25px 21px;border-radius:19px;margin:14px 0}.hero h1{font-size:31px;letter-spacing:-1.1px}.hero p{font-size:13px}.hero .tools{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.hero .tools button{padding:10px 7px;font-size:12px}.panel{border-radius:16px}.panelhead{padding:14px 15px;min-height:54px}.form{padding:16px}.formgrid{grid-template-columns:1fr;gap:12px}.full{grid-column:auto}#map{height:390px}.reportlist{padding:4px 15px 12px}.dialog{padding:19px}.dialog .actions{flex-direction:column}.dialog .actions button{width:100%}footer{padding:0 14px 25px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
 </style></head>
 <body>
 <header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
