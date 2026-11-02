@@ -237,7 +237,7 @@ input:focus,select:focus,textarea:focus {
  <div class="panel-head">
   <div>
    <h2>Recent community reports</h2>
-   <div class="sub">Community observations only · Not official alerts</div>
+   <div class="sub">Administrator-approved community observations · Not official alerts</div>
   </div>
   <span class="count" id="reportCount">0 reports</span>
  </div>
@@ -341,7 +341,7 @@ input:focus,select:focus,textarea:focus {
 </main>
 
 <div class="footer">
- Community information only · Reports may be inaccurate or outdated · Always verify conditions before traveling.
+ Community information only · Only approved reports appear publicly · Reports may be inaccurate or outdated · Always verify conditions before traveling.
 </div>
 
 <div id="photoLightbox" class="photo-lightbox" role="dialog" aria-modal="true" aria-label="Incident photo viewer">
@@ -366,6 +366,7 @@ const db = window.supabase.createClient(
  SUPABASE_URL,
  SUPABASE_KEY
 );
+window.mewSupabaseClient = db;
 
 /* INCIDENT SETTINGS */
 
@@ -442,8 +443,8 @@ function categoryName(value) {
 
 function statusName(value) {
  const names = {
-  unverified:"Unverified",
-  confirmed:"Confirmed",
+  unverified:"Pending review",
+  confirmed:"Community-reviewed",
   resolved:"Resolved",
   rejected:"Rejected"
  };
@@ -474,7 +475,7 @@ async function loadReports() {
   const {data,error} = await db
    .from("incidents")
    .select("id,category,title,description,latitude,longitude,address,severity,status,anonymous,display_name,created_at").in("category",ALLOWED_CATEGORIES)
-   .in("status",["unverified","confirmed","resolved"])
+   .in("status",["confirmed","resolved"])
    .order("created_at",{ascending:false})
    .limit(500);
 
@@ -655,6 +656,25 @@ $("focusReport").onclick = () => {
  });
 };
 
+/* Remove image metadata (including EXIF/GPS) and normalize uploads before storage. */
+async function makePrivacySafeImage(file) {
+ const bitmap = await createImageBitmap(file);
+ const maxSide = 2400;
+ const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+ const canvas = document.createElement("canvas");
+ canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+ canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+ const context = canvas.getContext("2d", { alpha:false });
+ context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+ bitmap.close?.();
+ const blob = await new Promise((resolve, reject) => canvas.toBlob(
+  value => value ? resolve(value) : reject(new Error("Could not process photo safely.")),
+  "image/jpeg", 0.88
+ ));
+ if (blob.size > 5 * 1024 * 1024) throw new Error("A processed photo is still larger than 5 MB. Please choose a smaller image.");
+ return blob;
+}
+
 /* PHOTO SELECTION PREVIEW */
 $("incidentPhotos").addEventListener("change", () => {
  const files = Array.from($("incidentPhotos").files || []);
@@ -763,12 +783,11 @@ $("reportForm").addEventListener("submit",async e => {
 
   if(error) throw error;
 
-  for (const file of selectedPhotos) {
-   const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-   const storagePath = `${incidentId}/${crypto.randomUUID()}.${extension}`;
+  for (const privacySafeBlob of privacySafePhotos) {
+   const storagePath = `${incidentId}/${crypto.randomUUID()}.jpg`;
    const {error:uploadError} = await db.storage
     .from("incident-photos")
-    .upload(storagePath,file,{contentType:file.type,upsert:false});
+    .upload(storagePath,privacySafeBlob,{contentType:"image/jpeg",upsert:false});
 
    if(uploadError) throw uploadError;
 
@@ -782,7 +801,7 @@ $("reportForm").addEventListener("submit",async e => {
   showMessage(
    selectedPhotos.length
     ? "Your report was submitted. Your photos are private and awaiting administrator review."
-    : "Your report was successfully submitted to Melbourne Emergency Watch.",
+    : "Your report was received and is awaiting administrator review. It will not appear publicly unless approved.",
    "success"
   );
 
@@ -790,17 +809,6 @@ $("reportForm").addEventListener("submit",async e => {
   $("photoPreview").innerHTML = "";
 
   await loadReports();
-
-  const newest = reports[0];
-
-  if(newest) {
-   map.setView([
-    Number(newest.latitude),
-    Number(newest.longitude)
-   ],15);
-
-   markers.get(newest.id)?.openPopup();
-  }
 
  } catch(error) {
 
@@ -915,7 +923,7 @@ document.addEventListener("click",e => {
 });
 document.addEventListener("keydown",e => { if(e.key === "Escape") closePhotoViewer(); });
 
-initialize();
+window.mewStartPublicApp = initialize;
 
 })();
 </script>
@@ -942,53 +950,65 @@ body.terms-blocked{overflow:hidden}
 </style>
 
 
-<footer class="notice" style="margin:24px auto;max-width:1100px">MEW is a volunteer community information project, not an official alerting or emergency-response service. Reports are not monitored continuously. For emergencies call 911. Consult official weather and emergency-management sources. Do not submit personal or sensitive information. <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> · <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Disaster</a> · <a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard Emergency Management</a></footer>
+<footer class="notice" style="margin:24px auto;max-width:1100px">MEW is a volunteer community information project, not an official alerting or emergency-response service. Reports are not monitored continuously. For emergencies call 911. Consult official weather and emergency-management sources. Do not submit personal or sensitive information. <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> · <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Disaster</a> · <a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard Emergency Management</a> · <a href="#mewPrivacy" onclick="document.getElementById('termsGate').style.display='flex';document.getElementById('mewPrivacy').scrollIntoView();return false;">Privacy Notice</a></footer>
 <div id="termsGate" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
  <section class="terms-card">
   <h2 id="termsTitle">Terms of Use &amp; Community Safety Agreement</h2>
-  <p class="terms-sub">Melbourne Emergency Watch · Version 2.0 · Effective November 2, 2026</p>
+  <p class="terms-sub">Melbourne Emergency Watch · Version 3.0 · Effective November 2, 2026</p>
   <div class="terms-body">
    <p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
    <h3>1. Purpose and scope — natural hazards only</h3>
    <p>MEW is a volunteer-run, non-commercial community information project for resident observations of natural disasters, severe weather, and environmental hazards in the Melbourne/Brevard County area. Permitted topics include flooding, storm damage, fallen trees, tornado damage, visible smoke or wildfire observations, debris, road washouts, coastal flooding, erosion, and utility disruptions. Crime reports, suspicious-person reports, missing-person reports, medical emergencies, personal disputes, and accusations about individuals are not permitted and may be removed.</p>
-   <h3>2. Volunteer project — not an emergency service</h3>
+   <h3>2. Adults-only access</h3>
+   <p>MEW is intended for adults age 18 or older. You must be at least 18 to use the website or submit reports. The age check is a self-attestation only; MEW does not collect your date of birth or perform identity verification. Anyone under 18 must leave and must not submit information.</p>
+   <h3>3. Volunteer project — not an emergency service</h3>
    <p>Melbourne Emergency Watch (“MEW”) is intended to be a volunteer-run, non-commercial community information project. It is not a government agency, public safety authority, emergency dispatcher, 911 service, professional monitoring service, or official source of emergency instructions. It does not dispatch responders, guarantee that anyone is monitoring reports, or promise that a report will be reviewed or acted upon.</p>
-   <h3>3. No guarantee; information must be independently verified</h3>
-   <p>Reports, map pins, photographs, comments, status labels, and other information may be inaccurate, incomplete, outdated, misleading, duplicated, malicious, or unavailable. “Confirmed” means only that a MEW volunteer or authorized user reviewed the submission under the website’s process; it is not an official finding or a guarantee of safety, accuracy, or current conditions. You must independently verify information with appropriate official sources before acting on it.</p>
-   <h3>4. Emergencies and personal safety</h3>
+   <h3>4. No guarantee; information must be independently verified</h3>
+   <p>Reports, map pins, photographs, comments, status labels, and other information may be inaccurate, incomplete, outdated, misleading, duplicated, malicious, or unavailable. “Community-reviewed” means only that a MEW volunteer or authorized user reviewed the submission under the website’s process; it is not an official finding or a guarantee of safety, accuracy, or current conditions. You must independently verify information with appropriate official sources before acting on it.</p>
+   <h3>5. Emergencies and personal safety</h3>
    <p>Never rely on MEW to report an emergency or obtain emergency assistance. For immediate danger, call 911. Follow instructions from law enforcement, fire-rescue, emergency medical services, and official local, state, and federal authorities. Do not enter floodwater, approach fires, downed power lines, damaged structures, hazard areas, or other dangerous locations to take photographs or verify a report. Do not delay evacuation or protective action to use this website.</p>
-   <h3>5. Assumption of risk and limitation/release of liability</h3>
+   <h3>6. Assumption of risk and limitation/release of liability</h3>
    <p>To the fullest extent permitted by applicable law, you voluntarily assume the risks associated with accessing, using, or relying on this website and its content. To the fullest extent permitted by law, you agree that the website owner/operator, project organizers, developers, volunteers, moderators, administrators, contributors, and users are not responsible for accidents, injuries, deaths, property damage, losses, costs, or other claims arising from or related to your access to or use of the website, reliance on user-submitted information, inaccurate or delayed reports, unavailable services, moderation decisions, or actions you or others take or fail to take based on website content. This provision is intended to apply to claims based on ordinary negligence to the extent such a release is legally permitted. It does not exclude or limit any liability that applicable law does not allow to be excluded or limited, including liability for intentional misconduct or other non-waivable legal duties.</p>
-   <h3>6. User responsibility and submitted content</h3>
+   <h3>7. User responsibility and submitted content</h3>
    <p>You are responsible for your actions and for any text, location, or photograph you submit. Submit only information you believe is truthful and relevant. Do not trespass, break laws, put yourself or others at risk, impersonate officials, publish threats, or upload unlawful, abusive, graphic, intimate, identifying, or otherwise inappropriate images. Do not include private personal information unless you have a lawful reason and authority to share it. You must have the rights and permissions needed to submit any photograph or other content.</p>
-   <h3>7. Moderation and availability</h3>
+   <h3>8. Moderation and availability</h3>
    <p>MEW volunteers and administrators may review, edit, hide, reject, or remove submissions and may suspend or restrict access. They are not obligated to review every submission, respond to users, verify conditions, or keep the website continuously available. Photo approval and incident status are moderation decisions for this community tool only.</p>
-   <h3>8. No professional advice or relationship</h3>
+   <h3>9. No professional advice or relationship</h3>
    <p>Nothing on MEW is professional, legal, medical, engineering, weather, or emergency-management advice. Use of the website does not create an agency, employment, partnership, fiduciary, or professional relationship with the owner, developers, volunteers, moderators, administrators, or other users.</p>
-   <h3>9. Acceptance and refusal</h3>
+
+   <h3 id="mewPrivacy">Privacy Notice</h3>
+   <p><strong>Information collected.</strong> When you submit a report, MEW may collect the hazard category, description, map coordinates, nearby landmark/address, optional display name, photographs, submission time, and technical information needed to operate and protect the website. When you accept these terms, MEW records the terms version, acceptance timestamp, a random browser-session identifier, limited browser user-agent information, and your Supabase account ID if you are signed in.</p>
+   <p><strong>Public display.</strong> Reports remain pending and are not shown on the public map until an administrator approves them. Approved report descriptions, the submitted map coordinates and nearby landmark/address, optional display names, and separately approved photographs may be displayed publicly. Do not submit home addresses, contact details, faces, license plates, children's information, or other sensitive personal information.</p>
+   <p><strong>Service providers.</strong> MEW uses Supabase for database, authentication, and private photo storage; Cloudflare Pages for website hosting; and third-party libraries/map tile providers to display the map. These providers may process technical data such as IP addresses as part of delivering their services, subject to their own terms and privacy practices.</p>
+   <p><strong>Use and sharing.</strong> MEW uses submitted information to operate the community hazard map, review submissions, prevent abuse, maintain security, and document agreement acceptance. MEW does not intend to sell personal information. Information may be disclosed when required by law, to protect users or the service, or to service providers supporting MEW.</p>
+   <p><strong>Retention and requests.</strong> Reports, moderation records, and consent records may be retained for operational, safety, and recordkeeping purposes. MEW does not promise a particular deletion period at this time. To request access, correction, or removal, contact the MEW operator using the dedicated project contact address published on the website. A dedicated contact address must be added before public launch.</p>
+   <p><strong>Security and limits.</strong> MEW uses reasonable safeguards but cannot guarantee that any website or transmission is completely secure. Do not submit information you would not want disclosed publicly once a report or image is approved.</p>
+   <h3>11. Acceptance and refusal</h3>
    <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p>
   </div>
-  <label class="terms-check"><input id="termsAgreeCheck" type="checkbox"><span>I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</span></label>
+  <label class="terms-check"><input id="termsAgeCheck" type="checkbox"><span>I confirm that I am 18 years of age or older.</span></label>
+  <label class="terms-check"><input id="termsAgreeCheck" type="checkbox"><span>I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement and Privacy Notice, including the assumption of risk and limitation/release of liability to the extent permitted by law.</span></label>
   <div id="termsError" class="terms-error">You must check the agreement box to continue.</div>
   <div class="terms-actions">
    <button type="button" id="termsDecline">I do not agree — leave website</button>
    <button type="button" id="termsAccept" disabled>I agree — enter website</button>
   </div>
-  <p class="terms-note">Your acceptance is saved in this browser. Clearing browser data or using another device/browser may cause this agreement to appear again. This browser-only record is not a complete server-side consent record. Read the Privacy Notice before submitting information.</p>
+  <p class="terms-note">Your acceptance and age self-attestation are recorded in MEW’s database. A local browser marker helps avoid repeating the prompt on every page visit; clearing browser data or using another browser/device may cause this agreement to appear again. The age check is self-attested and does not verify identity. Read the Privacy Notice above before submitting information.</p>
  </section>
 </div>
 <script id="mew-terms-script">
 (() => {
  "use strict";
- const VERSION = "mew-natural-hazards-2026-11-02-v2";
+ const VERSION = "mew-natural-hazards-2026-11-02-v3";
  const KEY = "mew_terms_acceptance";
  const SESSION_KEY = "mew_terms_browser_session";
  const gate = document.getElementById("termsGate");
  const check = document.getElementById("termsAgreeCheck");
+ const ageCheck = document.getElementById("termsAgeCheck");
  const accept = document.getElementById("termsAccept");
  const decline = document.getElementById("termsDecline");
  const error = document.getElementById("termsError");
- if (!gate || !check || !accept || !decline) return;
+ if (!gate || !check || !ageCheck || !accept || !decline) return;
 
  let browserSessionId = null;
  try {
@@ -1005,15 +1025,17 @@ body.terms-blocked{overflow:hidden}
 
  let accepted = false;
  try { accepted = localStorage.getItem(KEY) === VERSION; } catch (_) {}
- if (accepted) { gate.remove(); return; }
+ if (accepted) { gate.style.display = "none"; window.mewStartPublicApp?.(); return; }
  document.body.classList.add("terms-blocked");
- check.addEventListener("change", () => {
-   accept.disabled = !check.checked;
+ const updateAcceptState = () => {
+   accept.disabled = !(check.checked && ageCheck.checked);
    error.style.display = "none";
- });
+ };
+ check.addEventListener("change", updateAcceptState);
+ ageCheck.addEventListener("change", updateAcceptState);
 
  accept.addEventListener("click", async () => {
-   if (!check.checked) { error.textContent = "You must check the agreement box to continue."; error.style.display = "block"; return; }
+   if (!ageCheck.checked || !check.checked) { error.textContent = "You must confirm that you are 18 or older and accept the agreement to continue."; error.style.display = "block"; return; }
    accept.disabled = true;
    decline.disabled = true;
    accept.textContent = "Saving agreement…";
@@ -1021,28 +1043,22 @@ body.terms-blocked{overflow:hidden}
    try {
      const db = window.mewSupabaseClient;
      if (!db) throw new Error("The secure database connection is unavailable. Please refresh and try again.");
-     let userId = null;
-     try {
-       const { data: userData, error: userError } = await db.auth.getUser();
-       if (!userError && userData && userData.user) userId = userData.user.id;
-     } catch (_) { /* anonymous visitor */ }
-     const record = {
-       terms_version: VERSION,
-       browser_session_id: browserSessionId,
-       user_agent: (navigator.userAgent || "").slice(0, 500),
-       user_id: userId
-     };
-     const { error: insertError } = await db.from("terms_acceptances").insert(record);
+     const { error: insertError } = await db.rpc("record_mew_terms_acceptance", {
+       p_terms_version: VERSION,
+       p_browser_session_id: browserSessionId,
+       p_age_attested: true
+     });
      if (insertError) throw insertError;
      try { localStorage.setItem(KEY, VERSION); } catch (_) {}
-     gate.remove();
+     gate.style.display = "none";
      document.body.classList.remove("terms-blocked");
+     window.mewStartPublicApp?.();
    } catch (err) {
      console.error("MEW agreement acceptance could not be recorded:", err);
      error.textContent = "We could not save your acceptance. Please check your connection and try again. You cannot continue until the agreement is recorded.";
      error.style.display = "block";
      accept.textContent = "Try again";
-     accept.disabled = !check.checked;
+     accept.disabled = !(check.checked && ageCheck.checked);
      decline.disabled = false;
    }
  });
