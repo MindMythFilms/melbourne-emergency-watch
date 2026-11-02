@@ -122,6 +122,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   const SUPABASE_URL = "https://lqzxzlaxvfjuklyzxbex.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO";
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  window.mewSupabaseClient = db;
 
   const $ = (id) => document.getElementById(id);
   let currentRole = null;
@@ -610,19 +611,35 @@ body.terms-blocked{overflow:hidden}
    <button type="button" id="termsDecline">I do not agree — leave website</button>
    <button type="button" id="termsAccept" disabled>I agree — enter website</button>
   </div>
-  <p class="terms-note">Your acceptance is saved in this browser. Clearing browser data or using another device/browser may cause this agreement to appear again. This on-screen acceptance is not a substitute for legal review or a complete server-side consent record.</p>
+  <p class="terms-note">When you agree, MEW records the agreement version, timestamp, browser-session identifier, and limited technical information in its database. Clearing browser data or using another device/browser may cause this agreement to appear again. This record is not a substitute for legal review.</p>
  </section>
 </div>
 <script id="mew-terms-script">
 (() => {
+ "use strict";
  const VERSION = "mew-natural-hazards-2026-11-02-v2";
  const KEY = "mew_terms_acceptance";
+ const SESSION_KEY = "mew_terms_browser_session";
  const gate = document.getElementById("termsGate");
  const check = document.getElementById("termsAgreeCheck");
  const accept = document.getElementById("termsAccept");
  const decline = document.getElementById("termsDecline");
  const error = document.getElementById("termsError");
  if (!gate || !check || !accept || !decline) return;
+
+ let browserSessionId = null;
+ try {
+   browserSessionId = localStorage.getItem(SESSION_KEY);
+   if (!browserSessionId) {
+     browserSessionId = (window.crypto && crypto.randomUUID)
+       ? crypto.randomUUID()
+       : 'mew-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+     localStorage.setItem(SESSION_KEY, browserSessionId);
+   }
+ } catch (_) {
+   browserSessionId = 'mew-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+ }
+
  let accepted = false;
  try { accepted = localStorage.getItem(KEY) === VERSION; } catch (_) {}
  if (accepted) { gate.remove(); return; }
@@ -631,12 +648,42 @@ body.terms-blocked{overflow:hidden}
    accept.disabled = !check.checked;
    error.style.display = "none";
  });
- accept.addEventListener("click", () => {
-   if (!check.checked) { error.style.display = "block"; return; }
-   try { localStorage.setItem(KEY, VERSION); } catch (_) {}
-   gate.remove();
-   document.body.classList.remove("terms-blocked");
+
+ accept.addEventListener("click", async () => {
+   if (!check.checked) { error.textContent = "You must check the agreement box to continue."; error.style.display = "block"; return; }
+   accept.disabled = true;
+   decline.disabled = true;
+   accept.textContent = "Saving agreement…";
+   error.style.display = "none";
+   try {
+     const db = window.mewSupabaseClient;
+     if (!db) throw new Error("The secure database connection is unavailable. Please refresh and try again.");
+     let userId = null;
+     try {
+       const { data: userData, error: userError } = await db.auth.getUser();
+       if (!userError && userData && userData.user) userId = userData.user.id;
+     } catch (_) { /* anonymous visitor */ }
+     const record = {
+       terms_version: VERSION,
+       browser_session_id: browserSessionId,
+       user_agent: (navigator.userAgent || "").slice(0, 500),
+       user_id: userId
+     };
+     const { error: insertError } = await db.from("terms_acceptances").insert(record);
+     if (insertError) throw insertError;
+     try { localStorage.setItem(KEY, VERSION); } catch (_) {}
+     gate.remove();
+     document.body.classList.remove("terms-blocked");
+   } catch (err) {
+     console.error("MEW agreement acceptance could not be recorded:", err);
+     error.textContent = "We could not save your acceptance. Please check your connection and try again. You cannot continue until the agreement is recorded.";
+     error.style.display = "block";
+     accept.textContent = "Try again";
+     accept.disabled = !check.checked;
+     decline.disabled = false;
+   }
  });
+
  decline.addEventListener("click", () => {
    document.body.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;background:#f2f5f8;color:#172536;font-family:system-ui;padding:24px;text-align:center"><section><h1>Access not accepted</h1><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use Melbourne Emergency Watch.</p><p>You may close this browser tab.</p></section></main>';
  });
