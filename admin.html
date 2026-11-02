@@ -39,7 +39,13 @@ const cats=["flooding","coastal_flooding","storm_damage","tornado_damage","fire"
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let role=null,rows=[],map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
 const img=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri and contributors",maxZoom:19}),labels=L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19});img.addTo(map);labels.addTo(map);
+function refreshAdminMapSize(){requestAnimationFrame(()=>map.invalidateSize({pan:false}));}
+window.addEventListener("load",()=>{refreshAdminMapSize();setTimeout(refreshAdminMapSize,250);setTimeout(refreshAdminMapSize,900);});
+window.addEventListener("resize",refreshAdminMapSize);
+if("ResizeObserver" in window){const mapBox=document.getElementById("map");new ResizeObserver(refreshAdminMapSize).observe(mapBox);}
+
 function msg(text,kind=""){const e=$("pageMsg");e.textContent=text;e.className="msg "+kind}
+map.whenReady(()=>{setTimeout(refreshAdminMapSize,100);});
 function sessionId(){let v=sessionStorage.getItem("mew_admin_session");if(!v){v=crypto.randomUUID();sessionStorage.setItem("mew_admin_session",v)}return v}
 $("adult").onchange=$("agree").onchange=()=>{$("accept").disabled=!($("adult").checked&&$("agree").checked)};
 $("decline").onclick=()=>{$("consent").innerHTML='<div class="consentbox"><h2>Access not accepted</h2><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use Melbourne Emergency Watch.</p></div>'};
