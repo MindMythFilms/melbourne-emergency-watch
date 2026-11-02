@@ -1,711 +1,757 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#10243a"><meta name="description" content="Community-powered hazard and disaster reports for Melbourne and Brevard County, Florida."><title>Melbourne Emergency Watch</title>
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10243a">
+<meta name="description" content="Community emergency and hazard reporting for Melbourne and Brevard County, Florida.">
+<title>Melbourne Emergency Watch</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <style>
-:root{--navy:#10243a;--navy2:#193650;--ink:#182536;--muted:#637286;--bg:#f2f5f8;--line:#dce3ea;--blue:#1677d2;--red:#d83d42;--orange:#e58b23;--green:#16845b}*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}header{background:linear-gradient(115deg,var(--navy),var(--navy2));color:white;padding:18px max(18px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:13px;background:#e8f2fb;color:#12334f;display:grid;place-items:center;font-size:23px}.brand h1{font-size:17px;margin:0;letter-spacing:.1px}.brand p{margin:3px 0 0;color:#c7d7e6;font-size:12px}.live{font-size:11px;background:#174d43;border:1px solid #327d6b;color:#d8fff1;border-radius:20px;padding:7px 10px;white-space:nowrap}.layout{max-width:1300px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}.map-card,.panel{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 4px 18px #172b420b}.map-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}.map-head h2,.panel h2{font-size:15px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:4px}.map-actions{display:flex;gap:7px}.btn{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 12px;border-radius:10px;font-weight:650;font-size:12px;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:white}.btn:hover{filter:brightness(.97)}#map{height:min(70vh,680px);min-height:440px;background:#e4edf2}.legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.side{display:flex;flex-direction:column;gap:14px}.panel{padding:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.count{font-size:11px;color:var(--muted)}.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.chip{border:1px solid var(--line);background:white;border-radius:30px;padding:7px 10px;font-size:11px;color:#536174;cursor:pointer}.chip.active{background:#eaf3fc;color:#075da8;border-color:#a9d0f3}.incident-list{display:flex;flex-direction:column;gap:9px;max-height:330px;overflow:auto}.incident{border:1px solid var(--line);border-radius:12px;padding:11px;cursor:pointer}.incident:hover{border-color:#9db9d2}.incident-top{display:flex;justify-content:space-between;gap:8px;align-items:center}.incident strong{font-size:12px}.tag{font-size:10px;border-radius:20px;padding:4px 7px;background:#fff1e4;color:#9b5812;white-space:nowrap}.tag.confirmed{background:#e5f5ed;color:#126642}.incident p{font-size:11px;color:var(--muted);margin:6px 0}.incident small{font-size:10px;color:#8793a2}.empty{font-size:12px;color:var(--muted);padding:18px;text-align:center;border:1px dashed var(--line);border-radius:12px}.report-panel{border-top:4px solid var(--blue)}label{display:block;font-size:11px;font-weight:700;margin:11px 0 5px;color:#435165}input,select,textarea{width:100%;border:1px solid #d6dee7;border-radius:10px;padding:10px 11px;font:inherit;font-size:12px;background:white;color:var(--ink)}textarea{resize:vertical;min-height:70px}input:focus,select:focus,textarea:focus{outline:2px solid #c8e2fa;border-color:#65a9e7}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.notice{font-size:10px;line-height:1.5;color:#667589;background:#f4f7fa;border-radius:10px;padding:10px;margin-top:11px}.safety{background:#fff7e8;border:1px solid #f1d8a9;color:#78521c;border-radius:12px;padding:11px;font-size:11px;line-height:1.5}.safety b{display:block;margin-bottom:3px}.footer{text-align:center;color:#7a8796;font-size:10px;padding:0 16px 22px}.file-label{display:block;border:1px dashed #b9c8d7;padding:10px;border-radius:10px;text-align:center;color:#65758a;font-size:11px;cursor:pointer}.file-label input{display:none}.leaflet-popup-content{font-size:12px}.leaflet-container{font:inherit}
-@media(max-width:850px){.layout{grid-template-columns:1fr;padding:10px}.side{display:grid;grid-template-columns:1fr}.map-head{align-items:flex-start}.map-actions{flex-wrap:wrap;justify-content:flex-end}#map{height:52vh;min-height:360px}.incident-list{max-height:260px}}@media(max-width:420px){header{padding:14px}.brand h1{font-size:15px}.live{font-size:10px}.map-head{flex-direction:column}.map-actions{width:100%}.map-actions .btn{flex:1}}
-</style></head>
+:root {
+ --navy:#10243a;
+ --navy2:#193650;
+ --blue:#1677d2;
+ --bg:#f2f5f8;
+ --ink:#182536;
+ --muted:#637286;
+ --line:#dce3ea;
+ --green:#16845b;
+ --red:#d83d42;
+}
+* {box-sizing:border-box}
+body {
+ margin:0;
+ font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+ background:var(--bg);
+ color:var(--ink);
+}
+header {
+ background:linear-gradient(115deg,var(--navy),var(--navy2));
+ color:white;
+ padding:17px 20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+}
+.brand {display:flex;align-items:center;gap:12px}
+.logo {
+ width:43px;height:43px;border-radius:12px;
+ background:#e8f2fb;color:var(--navy);
+ display:grid;place-items:center;font-size:25px;
+}
+.brand h1 {font-size:17px;margin:0}
+.brand p {font-size:12px;margin:4px 0 0;color:#c7d7e6}
+.live {
+ background:#174d43;color:#d8fff1;
+ border:1px solid #327d6b;
+ padding:7px 11px;border-radius:20px;font-size:11px;
+ white-space:nowrap;
+}
+.layout {
+ max-width:1350px;margin:auto;padding:16px;
+ display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;
+}
+.map-card,.panel {
+ background:white;border:1px solid var(--line);
+ border-radius:17px;overflow:hidden;
+ box-shadow:0 4px 18px #172b420b;
+}
+.map-head {
+ padding:15px;display:flex;justify-content:space-between;
+ align-items:center;gap:10px;
+}
+h2 {font-size:15px;margin:0}
+.sub {font-size:12px;color:var(--muted);margin-top:4px}
+.map-actions {display:flex;gap:7px}
+.btn {
+ border:1px solid var(--line);background:white;
+ padding:10px 13px;border-radius:10px;
+ font-weight:650;font-size:12px;cursor:pointer;
+ color:var(--ink);
+}
+.btn.primary {background:var(--blue);color:white;border-color:var(--blue)}
+.btn:disabled {opacity:.6;cursor:wait}
+#map {height:min(72vh,720px);min-height:440px}
+.legend {
+ display:flex;flex-wrap:wrap;gap:13px;
+ padding:12px 15px;border-top:1px solid var(--line);
+ font-size:11px;color:var(--muted);
+}
+.dot {display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.side {display:flex;flex-direction:column;gap:14px}
+.panel {padding:16px}
+.panel-head {
+ display:flex;justify-content:space-between;
+ align-items:center;gap:8px;margin-bottom:12px;
+}
+.count {font-size:11px;color:var(--muted)}
+.filters {display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip {
+ border:1px solid var(--line);background:white;
+ border-radius:30px;padding:7px 10px;
+ font-size:11px;color:#536174;cursor:pointer;
+}
+.chip.active {background:#eaf3fc;color:#075da8;border-color:#a9d0f3}
+.incident-list {
+ display:flex;flex-direction:column;gap:9px;
+ max-height:350px;overflow:auto;
+}
+.incident {
+ border:1px solid var(--line);
+ border-radius:11px;padding:11px;cursor:pointer;
+}
+.incident:hover {border-color:#9db9d2}
+.incident-top {display:flex;justify-content:space-between;gap:8px}
+.incident strong {font-size:12px}
+.incident p {font-size:11px;color:var(--muted);margin:6px 0}
+.incident small {font-size:10px;color:#8793a2}
+.tag {
+ font-size:10px;border-radius:20px;padding:4px 7px;
+ background:#fff1e4;color:#9b5812;
+ white-space:nowrap;
+}
+.tag.confirmed {background:#e5f5ed;color:#126642}
+.tag.resolved {background:#e9edf4;color:#46566b}
+.empty {
+ font-size:12px;color:var(--muted);
+ padding:18px;text-align:center;
+ border:1px dashed var(--line);border-radius:12px;
+}
+.report-panel {border-top:4px solid var(--blue)}
+label {
+ display:block;font-size:11px;font-weight:700;
+ margin:11px 0 5px;color:#435165;
+}
+input,select,textarea {
+ width:100%;border:1px solid #d6dee7;
+ border-radius:10px;padding:10px 11px;
+ font:inherit;font-size:12px;
+ background:white;color:var(--ink);
+}
+textarea {resize:vertical;min-height:85px}
+input:focus,select:focus,textarea:focus {
+ outline:2px solid #c8e2fa;border-color:#65a9e7;
+}
+.row {display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.notice {
+ font-size:10px;line-height:1.5;color:#667589;
+ background:#f4f7fa;border-radius:10px;
+ padding:10px;margin-top:11px;
+}
+.safety {
+ background:#fff7e8;border:1px solid #f1d8a9;
+ color:#78521c;border-radius:12px;padding:12px;
+ font-size:11px;line-height:1.5;
+}
+.safety b {display:block;margin-bottom:4px}
+.footer {
+ text-align:center;color:#7a8796;
+ font-size:10px;padding:0 16px 22px;
+}
+#message {
+ display:none;padding:11px;margin-top:10px;
+ border-radius:9px;font-size:11px;line-height:1.5;
+}
+#message.success {display:block;background:#e5f5ed;color:#126642}
+#message.error {display:block;background:#fff0f0;color:#a32222}
+.connection {font-size:10px;color:#d4e6f5}
+@media(max-width:850px) {
+ .layout {grid-template-columns:1fr;padding:10px}
+ #map {height:52vh;min-height:360px}
+ .incident-list {max-height:270px}
+}
+@media(max-width:420px) {
+ header {padding:13px}
+ .brand h1 {font-size:14px}
+ .live {font-size:9px}
+ .map-head {align-items:flex-start;flex-direction:column}
+ .map-actions {width:100%}
+ .map-actions .btn {flex:1}
+}
+</style>
+</head>
+
 <body>
-<header><div class="brand"><div class="logo">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Community hazard reports · Brevard County, Florida</p></div></div><div class="live">● COMMUNITY MAP</div></header>
-<main class="layout"><section class="map-card"><div class="map-head"><div><h2>Incident map</h2><div class="sub">Melbourne and surrounding Brevard County</div></div><div class="map-actions"><button class="btn" id="locate">◎ My location</button><button class="btn primary" id="focusReport">＋ Report hazard</button></div></div><div id="map" role="application" aria-label="Map of community incident reports"></div><div class="legend"><span><i class="dot" style="background:#247bd1"></i>Flooding</span><span><i class="dot" style="background:#d83d42"></i>Fire / smoke</span><span><i class="dot" style="background:#e58b23"></i>Storm damage</span><span><i class="dot" style="background:#7456b8"></i>Road hazard</span><span><i class="dot" style="background:#16845b"></i>Other</span></div></section>
-<aside class="side"><section class="panel"><div class="panel-head"><div><h2>Recent community reports</h2><div class="sub">Select a report to view its map location</div></div><span class="count" id="reportCount">0 reports</span></div><div class="filters" id="filters"><button class="chip active" data-filter="All">All</button><button class="chip" data-filter="Flooding">Flooding</button><button class="chip" data-filter="Fire / smoke">Fire / smoke</button><button class="chip" data-filter="Storm damage">Storm damage</button><button class="chip" data-filter="Road hazard">Road hazard</button><button class="chip" data-filter="Power outage">Power outage</button><button class="chip" data-filter="Road closure">Road closure</button><button class="chip" data-filter="Medical emergency">Medical emergency</button><button class="chip" data-filter="Missing person">Missing person</button><button class="chip" data-filter="Other">Other</button></div><div class="incident-list" id="incidentList"></div></section>
-<section class="panel report-panel" id="reportPanel"><div class="panel-head"><div><h2>＋ Submit a report</h2><div class="sub">Report a hazard you personally observed</div></div></div><form id="reportForm"><label for="type">Incident type *</label><select id="type" required><option value="Flooding">Flooding</option><option value="Fire / smoke">Fire / smoke</option><option value="Storm damage">Storm damage / fallen tree</option><option value="Road hazard">Road hazard / closure</option><option value="Power outage">Power outage</option><option value="Other">Other hazard</option></select><div class="row"><div><label for="lat">Latitude *</label><input id="lat" type="number" step="any" placeholder="Tap map to set" required></div><div><label for="lng">Longitude *</label><input id="lng" type="number" step="any" placeholder="Tap map to set" required></div></div><div class="sub" style="margin-top:5px">Tap the map to place the report pin, or enter coordinates.</div><label for="location">Street / nearby landmark</label><input id="location" maxlength="100" placeholder="e.g. US-1 near Eau Gallie Blvd"><label for="details">What did you observe? *</label><textarea id="details" maxlength="500" required placeholder="Describe what you saw, direction of travel, water depth if known, etc."></textarea><div class="row"><div><label for="severity">Severity</label><select id="severity"><option>Unclear</option><option>Minor</option><option>Moderate</option><option>Severe</option></select></div><div><label for="reporter">Display name</label><input id="reporter" maxlength="35" placeholder="Anonymous"></div></div><div class="notice">Photo uploads are not enabled yet. Please submit text details and a map location only.</div><button class="btn primary" style="width:100%;margin-top:12px;padding:12px" type="submit">Submit community report</button><div class="notice">Reports are submitted to the shared Melbourne Emergency Watch database and may be visible to other visitors. You can submit anonymously or sign in. Reports are not sent to 911 or emergency services. Do not include sensitive personal information.</div></form></section>
-<section class="safety"><b>🚨 Immediate danger?</b> Call 911. Do not drive through floodwater. This community map is not an official emergency alert system; follow Brevard County and emergency-management instructions.</section></aside></main><div class="footer">Community information only · Reports may be inaccurate or outdated · Always verify conditions before traveling.</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<header>
+ <div class="brand">
+  <div class="logo">⌖</div>
+  <div>
+   <h1>Melbourne Emergency Watch</h1>
+   <p>Community hazard reports · Brevard County, Florida</p>
+  </div>
+ </div>
+ <div>
+  <div class="live">● COMMUNITY MAP</div>
+  <div class="connection" id="connection">Connecting...</div>
+ </div>
+</header>
+
+<main class="layout">
+
+<section class="map-card">
+ <div class="map-head">
+  <div>
+   <h2>Incident map</h2>
+   <div class="sub">Melbourne and surrounding Brevard County</div>
+  </div>
+  <div class="map-actions">
+   <button class="btn" id="locate">◎ My location</button>
+   <button class="btn primary" id="focusReport">＋ Report hazard</button>
+  </div>
+ </div>
+
+ <div id="map"></div>
+
+ <div class="legend">
+  <span><i class="dot" style="background:#247bd1"></i>Flooding</span>
+  <span><i class="dot" style="background:#d83d42"></i>Fire</span>
+  <span><i class="dot" style="background:#e58b23"></i>Storm damage</span>
+  <span><i class="dot" style="background:#7456b8"></i>Road hazard</span>
+  <span><i class="dot" style="background:#16845b"></i>Other</span>
+ </div>
+</section>
+
+<aside class="side">
+
+<section class="panel">
+ <div class="panel-head">
+  <div>
+   <h2>Recent community reports</h2>
+   <div class="sub">Select a report to view its map location</div>
+  </div>
+  <span class="count" id="reportCount">0 reports</span>
+ </div>
+
+ <div class="filters" id="filters">
+  <button class="chip active" data-filter="All">All</button>
+  <button class="chip" data-filter="flooding">Flooding</button>
+  <button class="chip" data-filter="fire">Fire</button>
+  <button class="chip" data-filter="storm_damage">Storm</button>
+  <button class="chip" data-filter="road_hazard">Road</button>
+  <button class="chip" data-filter="other">Other</button>
+ </div>
+
+ <div class="incident-list" id="incidentList">
+  <div class="empty">Loading community reports...</div>
+ </div>
+</section>
+
+<section class="panel report-panel" id="reportPanel">
+ <div class="panel-head">
+  <div>
+   <h2>＋ Submit a report</h2>
+   <div class="sub">Report a hazard you personally observed</div>
+  </div>
+ </div>
+
+ <form id="reportForm">
+
+  <label for="type">Incident type *</label>
+  <select id="type" required>
+   <option value="flooding">Flooding</option>
+   <option value="fire">Fire / smoke</option>
+   <option value="storm_damage">Storm damage / fallen tree</option>
+   <option value="road_hazard">Road hazard</option>
+   <option value="road_closure">Road closure</option>
+   <option value="power_outage">Power outage</option>
+   <option value="medical_emergency">Medical emergency</option>
+   <option value="missing_person">Missing person</option>
+   <option value="other">Other hazard</option>
+  </select>
+
+  <div class="row">
+   <div>
+    <label for="lat">Latitude *</label>
+    <input id="lat" type="number" step="any" placeholder="Tap map to set" required>
+   </div>
+   <div>
+    <label for="lng">Longitude *</label>
+    <input id="lng" type="number" step="any" placeholder="Tap map to set" required>
+   </div>
+  </div>
+
+  <div class="sub">Tap the map to place a report pin, or enter coordinates.</div>
+
+  <label for="location">Street / nearby landmark</label>
+  <input id="location" maxlength="150" placeholder="e.g. US-1 near Eau Gallie Blvd">
+
+  <label for="details">What did you observe? *</label>
+  <textarea id="details" maxlength="1000" required placeholder="Describe what you saw, direction of travel, water depth if known, etc."></textarea>
+
+  <div class="row">
+   <div>
+    <label for="severity">Severity *</label>
+    <select id="severity" required>
+     <option value="low">Low</option>
+     <option value="moderate" selected>Moderate</option>
+     <option value="high">High</option>
+     <option value="critical">Critical</option>
+    </select>
+   </div>
+   <div>
+    <label for="reporter">Display name</label>
+    <input id="reporter" maxlength="35" placeholder="Anonymous">
+   </div>
+  </div>
+
+  <button class="btn primary" id="submitButton" style="width:100%;margin-top:13px;padding:13px" type="submit">
+   Submit community report
+  </button>
+
+  <div id="message" role="status" aria-live="polite"></div>
+
+  <div class="notice">
+   Anonymous reporting is available. Reports are submitted as unverified community reports until reviewed or confirmed. This platform is not monitored by emergency services. Do not use it to request emergency assistance.
+  </div>
+
+ </form>
+</section>
+
+<section class="safety">
+ <b>🚨 Immediate danger?</b>
+ Call 911. Do not drive through floodwater. Follow official Brevard County emergency-management instructions.
+</section>
+
+</aside>
+</main>
+
+<div class="footer">
+ Community information only · Reports may be inaccurate or outdated · Always verify conditions before traveling.
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-(async () => {
-'use strict';
+(() => {
+"use strict";
 
-/* =========================================
-   MELBOURNE EMERGENCY WATCH
-   SUPABASE CONFIGURATION
-========================================= */
+/* SUPABASE CONNECTION */
 
-const SUPABASE_URL = 'https://lqzxzlaxvfjuklyzxbex.supabase.co';
+const SUPABASE_URL = "https://lqzxzlaxvfjuklyzxbex.supabase.co";
 
-const SUPABASE_KEY = 'sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO';
+const SUPABASE_KEY = "sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO";
 
-const TABLE = 'incidents';
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
 
-const CATEGORIES = {
-  flooding: 'Flooding',
-  fire: 'Fire / smoke',
-  storm_damage: 'Storm damage',
-  road_hazard: 'Road hazard',
-  road_closure: 'Road closure',
-  power_outage: 'Power outage',
-  medical_emergency: 'Medical emergency',
-  missing_person: 'Missing person',
-  other: 'Other'
+/* INCIDENT SETTINGS */
+
+const categories = {
+ flooding:"Flooding",
+ fire:"Fire / smoke",
+ storm_damage:"Storm damage",
+ road_hazard:"Road hazard",
+ road_closure:"Road closure",
+ power_outage:"Power outage",
+ medical_emergency:"Medical emergency",
+ missing_person:"Missing person",
+ other:"Other"
 };
 
-const COLORS = {
-  flooding: '#247bd1',
-  fire: '#d83d42',
-  storm_damage: '#e58b23',
-  road_hazard: '#7456b8',
-  road_closure: '#7456b8',
-  power_outage: '#b58b20',
-  medical_emergency: '#d83d42',
-  missing_person: '#16845b',
-  other: '#16845b'
+const colors = {
+ flooding:"#247bd1",
+ fire:"#d83d42",
+ storm_damage:"#e58b23",
+ road_hazard:"#7456b8",
+ road_closure:"#7456b8",
+ power_outage:"#b58b20",
+ medical_emergency:"#d83d42",
+ missing_person:"#16845b",
+ other:"#16845b"
 };
 
-const TYPE_MAP = {
-  'Flooding': 'flooding',
-  'Fire / smoke': 'fire',
-  'Storm damage': 'storm_damage',
-  'Road hazard': 'road_hazard',
-  'Road closure': 'road_closure',
-  'Power outage': 'power_outage',
-  'Medical emergency': 'medical_emergency',
-  'Missing person': 'missing_person',
-  'Other': 'other'
-};
-
-const SEVERITY_MAP = {
-  'Unclear': 'low',
-  'Minor': 'low',
-  'Moderate': 'moderate',
-  'Severe': 'high',
-  'Critical': 'critical'
-};
-
-let db;
-let currentUser = null;
 let reports = [];
-let filter = 'All';
 let markers = new Map();
-let realtimeChannel = null;
-
-/* =========================================
-   LOAD SUPABASE
-========================================= */
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-try {
-  await loadScript(
-    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
-  );
-
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-} catch (error) {
-  alert('Unable to connect to Supabase. Please refresh the website.');
-  console.error(error);
-  return;
-}
-
-/* =========================================
-   HELPERS
-========================================= */
+let filter = "All";
+let loading = false;
 
 const $ = id => document.getElementById(id);
 
-function esc(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  })[char]);
+/* MAP */
+
+const map = L.map("map").setView([28.0836,-80.6081],11);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+ maxZoom:19,
+ attribution:"&copy; OpenStreetMap contributors"
+}).addTo(map);
+
+map.on("click",e => {
+ $("lat").value = e.latlng.lat.toFixed(6);
+ $("lng").value = e.latlng.lng.toFixed(6);
+});
+
+/* HELPERS */
+
+function escapeHTML(value) {
+ return String(value ?? "").replace(/[&<>"']/g,c => ({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ })[c]);
 }
 
-function categoryName(category) {
-  return CATEGORIES[category] || 'Other';
+function dateText(value) {
+ return new Date(value).toLocaleString([],{
+  month:"short",
+  day:"numeric",
+  hour:"numeric",
+  minute:"2-digit"
+ });
 }
 
-function formatDate(date) {
-  return new Date(date).toLocaleString([], {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  });
+function categoryName(value) {
+ return categories[value] || "Other";
 }
 
-function statusName(status) {
-  const names = {
-    unverified: 'Unverified',
-    confirmed: 'Confirmed',
-    resolved: 'Resolved',
-    rejected: 'Rejected'
-  };
-
-  return names[status] || 'Unverified';
+function statusName(value) {
+ const names = {
+  unverified:"Unverified",
+  confirmed:"Confirmed",
+  resolved:"Resolved",
+  rejected:"Rejected"
+ };
+ return names[value] || "Unverified";
 }
 
-function severityName(severity) {
-  const names = {
-    low: 'Minor',
-    moderate: 'Moderate',
-    high: 'Severe',
-    critical: 'Critical'
-  };
-
-  return names[severity] || 'Unclear';
+function showMessage(message,type) {
+ const el = $("message");
+ el.textContent = message;
+ el.className = type;
 }
 
-/* =========================================
-   MAP
-========================================= */
-
-if (typeof L === 'undefined') {
-  alert('The map library could not load. Please refresh.');
-  return;
+function setConnection(message) {
+ $("connection").textContent = message;
 }
 
-const map = L.map('map').setView(
-  [28.0836, -80.6081],
-  11
-);
-
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }
-).addTo(map);
-
-function createPopup(report) {
-  return `
-    <div style="min-width:180px">
-      <strong>${esc(categoryName(report.category))}</strong>
-      <p>${esc(report.title || '')}</p>
-      <p>${esc(report.description)}</p>
-      <p><b>Severity:</b> ${esc(severityName(report.severity))}</p>
-      <p><b>Status:</b> ${esc(statusName(report.status))}</p>
-      <small>${formatDate(report.created_at)}</small>
-    </div>
-  `;
-}
-
-/* =========================================
-   REPORT DISPLAY
-========================================= */
-
-function renderReports() {
-  markers.forEach(marker => map.removeLayer(marker));
-  markers.clear();
-
-  const visible = reports.filter(report =>
-    filter === 'All' ||
-    categoryName(report.category) === filter
-  );
-
-  visible.forEach(report => {
-    const marker = L.circleMarker(
-      [report.latitude, report.longitude],
-      {
-        radius: 9,
-        color: '#ffffff',
-        weight: 2,
-        fillColor: COLORS[report.category] || COLORS.other,
-        fillOpacity: 0.95
-      }
-    ).addTo(map);
-
-    marker.bindPopup(createPopup(report));
-    markers.set(report.id, marker);
-  });
-
-  $('reportCount').textContent =
-    `${reports.length} reports`;
-
-  const list = $('incidentList');
-
-  if (!visible.length) {
-    list.innerHTML = `
-      <div class="empty">
-        No community reports available in this category.
-      </div>
-    `;
-    return;
-  }
-
-  list.innerHTML = visible.map(report => `
-    <article class="incident" data-id="${esc(report.id)}">
-
-      <div class="incident-top">
-        <strong>${esc(categoryName(report.category))}</strong>
-
-        <span class="tag ${
-          report.status === 'confirmed' ? 'confirmed' : ''
-        }">
-          ${esc(statusName(report.status))}
-        </span>
-      </div>
-
-      <p>
-        ${esc(report.address || 'Pinned map location')}
-        — ${esc(report.description)}
-      </p>
-
-      <small>
-        ${formatDate(report.created_at)}
-        · ${esc(severityName(report.severity))}
-        · ${report.anonymous ? 'Anonymous' : 'Registered user'}
-      </small>
-
-    </article>
-  `).join('');
-
-  list.querySelectorAll('.incident').forEach(element => {
-    element.addEventListener('click', () => {
-      const report = visible.find(
-        item => item.id === element.dataset.id
-      );
-
-      if (!report) return;
-
-      map.setView(
-        [report.latitude, report.longitude],
-        15
-      );
-
-      markers.get(report.id)?.openPopup();
-    });
-  });
-}
-
-/* =========================================
-   FETCH SHARED REPORTS
-========================================= */
+/* LOAD REPORTS FROM SUPABASE */
 
 async function loadReports() {
-  const { data, error } = await db
-    .from(TABLE)
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(500);
+ if(loading) return;
 
-  if (error) {
-    console.error('Report loading error:', error);
-    $('incidentList').innerHTML = `
-      <div class="empty">
-        Unable to load reports. Please refresh the page.
-      </div>
-    `;
-    return;
-  }
+ loading = true;
+
+ try {
+  const {data,error} = await db
+   .from("incidents")
+   .select("id,category,title,description,latitude,longitude,address,severity,status,anonymous,created_at")
+   .in("status",["unverified","confirmed","resolved"])
+   .order("created_at",{ascending:false})
+   .limit(500);
+
+  if(error) throw error;
 
   reports = data || [];
-  renderReports();
+
+  render();
+
+  setConnection("● DATABASE CONNECTED");
+
+ } catch(error) {
+  console.error("Supabase loading error:",error);
+
+  setConnection("● DATABASE ERROR");
+
+  $("incidentList").innerHTML =
+   '<div class="empty">Unable to load reports. Please check your connection.</div>';
+
+ } finally {
+  loading = false;
+ }
 }
 
-/* =========================================
-   LIVE UPDATES
-========================================= */
+/* RENDER MAP AND REPORT LIST */
+
+function render() {
+
+ markers.forEach(marker => map.removeLayer(marker));
+ markers.clear();
+
+ const visible = reports.filter(r =>
+  filter === "All" || r.category === filter
+ );
+
+ visible.forEach(r => {
+
+  const marker = L.circleMarker(
+   [Number(r.latitude),Number(r.longitude)],
+   {
+    radius:9,
+    color:"#fff",
+    weight:2,
+    fillColor:colors[r.category] || colors.other,
+    fillOpacity:.95
+   }
+  ).addTo(map);
+
+  marker.bindPopup(`
+   <b>${escapeHTML(r.title)}</b><br>
+   ${escapeHTML(r.address || "Pinned location")}<br>
+   ${escapeHTML(r.description)}<br>
+   <b>Status:</b> ${escapeHTML(statusName(r.status))}<br>
+   <small>${dateText(r.created_at)}</small>
+  `);
+
+  markers.set(r.id,marker);
+ });
+
+ $("reportCount").textContent =
+  reports.length + (reports.length === 1 ? " report" : " reports");
+
+ const list = $("incidentList");
+
+ if(!visible.length) {
+  list.innerHTML =
+   '<div class="empty">No community reports available in this category.</div>';
+  return;
+ }
+
+ list.innerHTML = visible.map(r => `
+  <article class="incident" data-id="${escapeHTML(r.id)}">
+   <div class="incident-top">
+    <strong>${escapeHTML(categoryName(r.category))}</strong>
+    <span class="tag ${r.status === "confirmed" ? "confirmed" : r.status === "resolved" ? "resolved" : ""}">
+     ${escapeHTML(statusName(r.status))}
+    </span>
+   </div>
+   <p>${escapeHTML(r.address || "Pinned map location")} — ${escapeHTML(r.description)}</p>
+   <small>${dateText(r.created_at)} · ${escapeHTML(r.anonymous ? "Anonymous" : "Community member")} · ${escapeHTML(r.severity)}</small>
+  </article>
+ `).join("");
+
+ list.querySelectorAll(".incident").forEach(el => {
+  el.addEventListener("click",() => {
+   const report = reports.find(r => r.id === el.dataset.id);
+
+   if(report) {
+    map.setView([
+     Number(report.latitude),
+     Number(report.longitude)
+    ],15);
+
+    markers.get(report.id)?.openPopup();
+   }
+  });
+ });
+}
+
+/* FILTERS */
+
+$("filters").addEventListener("click",e => {
+ const button = e.target.closest("[data-filter]");
+ if(!button) return;
+
+ filter = button.dataset.filter;
+
+ document.querySelectorAll(".chip").forEach(chip => {
+  chip.classList.toggle("active",chip === button);
+ });
+
+ render();
+});
+
+/* LOCATE USER */
+
+$("locate").onclick = () => {
+
+ if(!navigator.geolocation) {
+  alert("Location is unavailable in this browser.");
+  return;
+ }
+
+ navigator.geolocation.getCurrentPosition(
+  position => {
+   const lat = position.coords.latitude;
+   const lng = position.coords.longitude;
+
+   map.setView([lat,lng],15);
+
+   $("lat").value = lat.toFixed(6);
+   $("lng").value = lng.toFixed(6);
+  },
+  () => alert("Location permission was denied or unavailable."),
+  {enableHighAccuracy:true,timeout:10000}
+ );
+};
+
+/* SCROLL TO REPORT FORM */
+
+$("focusReport").onclick = () => {
+ $("reportPanel").scrollIntoView({
+  behavior:"smooth",
+  block:"start"
+ });
+};
+
+/* SUBMIT REPORT TO SUPABASE */
+
+$("reportForm").addEventListener("submit",async e => {
+
+ e.preventDefault();
+
+ const button = $("submitButton");
+
+ if(button.disabled) return;
+
+ const category = $("type").value;
+ const latitude = Number($("lat").value);
+ const longitude = Number($("lng").value);
+ const description = $("details").value.trim();
+ const address = $("location").value.trim();
+ const severity = $("severity").value;
+ const displayName = $("reporter").value.trim();
+
+ if(!Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < 27.5 ||
+    latitude > 29.0 ||
+    longitude < -81.5 ||
+    longitude > -80.2) {
+
+  showMessage(
+   "Please select a location within the supported Brevard County area.",
+   "error"
+  );
+
+  return;
+ }
+
+ if(!description) {
+  showMessage("Please describe the incident.","error");
+  return;
+ }
+
+ const payload = {
+  category:category,
+  title:categoryName(category) + " report",
+  description:description,
+  latitude:latitude,
+  longitude:longitude,
+  address:address || null,
+  severity:severity,
+  status:"unverified",
+  reporter_id:null,
+  anonymous:true
+ };
+
+ button.disabled = true;
+ button.textContent = "Submitting...";
+
+ try {
+
+  const {error} = await db
+   .from("incidents")
+   .insert(payload);
+
+  if(error) throw error;
+
+  showMessage(
+   "Your report was successfully submitted to Melbourne Emergency Watch. It is now saved in the shared database.",
+   "success"
+  );
+
+  $("reportForm").reset();
+
+  await loadReports();
+
+  const newest = reports[0];
+
+  if(newest) {
+   map.setView([
+    Number(newest.latitude),
+    Number(newest.longitude)
+   ],15);
+
+   markers.get(newest.id)?.openPopup();
+  }
+
+ } catch(error) {
+
+  console.error("Submission error:",error);
+
+  showMessage(
+   "Unable to submit your report: " + error.message,
+   "error"
+  );
+
+ } finally {
+
+  button.disabled = false;
+  button.textContent = "Submit community report";
+
+ }
+
+});
+
+/* REALTIME DATABASE UPDATES */
 
 function enableRealtime() {
-  if (realtimeChannel) {
-    db.removeChannel(realtimeChannel);
-  }
 
-  realtimeChannel = db
-    .channel('mew-live-reports')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: TABLE
-      },
-      () => {
-        loadReports();
-      }
-    )
-    .subscribe(status => {
-      console.log('Live updates:', status);
-    });
-}
+ db.channel("community-incidents-live")
+  .on(
+   "postgres_changes",
+   {
+    event:"*",
+    schema:"public",
+    table:"incidents"
+   },
+   () => {
+    loadReports();
+   }
+  )
+  .subscribe(status => {
 
-/* =========================================
-   ACCOUNT INTERFACE
-========================================= */
+   if(status === "SUBSCRIBED") {
+    setConnection("● LIVE DATABASE CONNECTED");
+   }
 
-const accountBar = document.createElement('div');
+   if(status === "CHANNEL_ERROR" ||
+      status === "TIMED_OUT") {
+    setConnection("● USING AUTOMATIC REFRESH");
+   }
 
-accountBar.style.cssText = `
-  background:#e8eef5;
-  padding:10px 16px;
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-`;
-
-document.querySelector('header').after(accountBar);
-
-function accountButton(label, callback) {
-  const button = document.createElement('button');
-  button.textContent = label;
-
-  button.style.cssText = `
-    border:1px solid #b9c9d8;
-    background:white;
-    color:#10243a;
-    padding:9px 13px;
-    border-radius:9px;
-    font-weight:650;
-    cursor:pointer;
-  `;
-
-  button.onclick = callback;
-  accountBar.appendChild(button);
-}
-
-function renderAccount() {
-  accountBar.innerHTML = '';
-
-  if (currentUser) {
-    const welcome = document.createElement('span');
-
-    welcome.textContent =
-      'Signed in: ' + currentUser.email;
-
-    welcome.style.cssText =
-      'font-size:12px;color:#10243a;margin-right:auto;';
-
-    accountBar.appendChild(welcome);
-
-    accountButton('Sign out', signOut);
-
-  } else {
-    const label = document.createElement('span');
-
-    label.textContent = 'Browsing anonymously';
-
-    label.style.cssText =
-      'font-size:12px;color:#526477;margin-right:auto;';
-
-    accountBar.appendChild(label);
-
-    accountButton('Sign in', signIn);
-    accountButton('Create account', signUp);
-  }
-}
-
-/* =========================================
-   CREATE ACCOUNT
-========================================= */
-
-async function signUp() {
-  const email = prompt('Enter your email address:');
-  if (!email) return;
-
-  const password = prompt(
-    'Create a password (at least 8 characters):'
-  );
-
-  if (!password) return;
-
-  if (password.length < 8) {
-    alert('Your password must be at least 8 characters.');
-    return;
-  }
-
-  const { data, error } = await db.auth.signUp({
-    email: email.trim(),
-    password
   });
 
-  if (error) {
-    alert('Registration failed: ' + error.message);
-    return;
-  }
-
-  if (data.session) {
-    alert('Your account has been created successfully!');
-  } else {
-    alert(
-      'Registration received. Check your email to confirm your account before signing in.'
-    );
-  }
 }
 
-/* =========================================
-   SIGN IN
-========================================= */
+/* INITIALIZATION */
 
-async function signIn() {
-  const email = prompt('Enter your email address:');
-  if (!email) return;
+async function initialize() {
 
-  const password = prompt('Enter your password:');
-  if (!password) return;
+ if(!window.supabase || !window.L) {
+  setConnection("● LIBRARY LOADING ERROR");
+  $("incidentList").innerHTML =
+   '<div class="empty">A required library could not be loaded. Check your internet connection.</div>';
+  return;
+ }
 
-  const { error } = await db.auth.signInWithPassword({
-    email: email.trim(),
-    password
-  });
+ await loadReports();
 
-  if (error) {
-    alert('Sign-in failed: ' + error.message);
-    return;
-  }
+ enableRealtime();
 
-  alert('You are now signed in!');
+ /* Fallback refresh every 20 seconds */
+
+ setInterval(() => {
+  loadReports();
+ },20000);
+
 }
 
-/* =========================================
-   SIGN OUT
-========================================= */
-
-async function signOut() {
-  const { error } = await db.auth.signOut();
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  alert('You have signed out.');
-}
-
-/* =========================================
-   AUTHENTICATION STATE
-========================================= */
-
-const { data: sessionData } = await db.auth.getSession();
-
-currentUser = sessionData.session?.user || null;
-
-renderAccount();
-
-db.auth.onAuthStateChange((event, session) => {
-  currentUser = session?.user || null;
-  renderAccount();
-});
-
-/* =========================================
-   ADD MISSING CATEGORIES
-========================================= */
-
-const typeSelect = $('type');
-
-const extraTypes = [
-  ['Road closure', 'Road closure'],
-  ['Medical emergency', 'Medical emergency'],
-  ['Missing person', 'Missing person'],
-  ['Other', 'Other hazard']
-];
-
-extraTypes.forEach(([value, label]) => {
-  if (![...typeSelect.options].some(o => o.value === value)) {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = label;
-    typeSelect.appendChild(option);
-  }
-});
-
-const severitySelect = $('severity');
-
-if (![...severitySelect.options].some(o => o.value === 'Critical')) {
-  const option = document.createElement('option');
-  option.value = 'Critical';
-  option.textContent = 'Critical';
-  severitySelect.appendChild(option);
-}
-
-/* =========================================
-   MAP PIN SELECTION
-========================================= */
-
-map.on('click', event => {
-  $('lat').value = event.latlng.lat.toFixed(6);
-  $('lng').value = event.latlng.lng.toFixed(6);
-});
-
-$('focusReport').onclick = () => {
-  $('reportPanel').scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
-};
-
-$('locate').onclick = () => {
-  if (!navigator.geolocation) {
-    alert('Location is unavailable.');
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      map.setView([lat, lng], 15);
-
-      $('lat').value = lat.toFixed(6);
-      $('lng').value = lng.toFixed(6);
-    },
-    () => alert(
-      'Location permission denied or unavailable.'
-    ),
-    {
-      enableHighAccuracy: true,
-      timeout: 12000
-    }
-  );
-};
-
-/* =========================================
-   FILTERS
-========================================= */
-
-$('filters').addEventListener('click', event => {
-  const button = event.target.closest('[data-filter]');
-
-  if (!button) return;
-
-  filter = button.dataset.filter;
-
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.classList.toggle('active', chip === button);
-  });
-
-  renderReports();
-});
-
-/* =========================================
-   SUBMIT COMMUNITY REPORT
-========================================= */
-
-$('reportForm').addEventListener('submit', async event => {
-  event.preventDefault();
-
-  const lat = Number($('lat').value);
-  const lng = Number($('lng').value);
-
-  if (
-    !Number.isFinite(lat) ||
-    !Number.isFinite(lng) ||
-    lat < 27.5 ||
-    lat > 29.0 ||
-    lng < -81.5 ||
-    lng > -80.2
-  ) {
-    alert(
-      'Please select a valid location within the Brevard County reporting area.'
-    );
-    return;
-  }
-
-  if (!$('details').value.trim()) {
-    alert('Please describe what you observed.');
-    return;
-  }
-
-  const category = TYPE_MAP[$('type').value] || 'other';
-
-  const displayName = $('reporter').value.trim();
-
-  let description = $('details').value.trim();
-
-  if (displayName) {
-    description += '\n\nDisplay name: ' + displayName;
-  }
-
-  const report = {
-    category: category,
-    title: categoryName(category) + ' report',
-    description: description,
-    latitude: lat,
-    longitude: lng,
-    address: $('location').value.trim() || null,
-    severity: SEVERITY_MAP[$('severity').value] || 'low',
-    status: 'unverified',
-    reporter_id: currentUser ? currentUser.id : null,
-    anonymous: !currentUser
-  };
-
-  const submitButton =
-    $('reportForm').querySelector('button[type="submit"]');
-
-  submitButton.disabled = true;
-  submitButton.textContent = 'Submitting report...';
-
-  try {
-    const { data, error } = await db
-      .from(TABLE)
-      .insert(report)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Submission error:', error);
-      alert('Report could not be submitted: ' + error.message);
-      return;
-    }
-
-    alert(
-      'Thank you! Your community report has been submitted successfully.'
-    );
-
-    $('reportForm').reset();
-
-    filter = 'All';
-
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.classList.toggle(
-        'active',
-        chip.dataset.filter === 'All'
-      );
-    });
-
-    await loadReports();
-
-    if (data) {
-      map.setView(
-        [data.latitude, data.longitude],
-        15
-      );
-
-      markers.get(data.id)?.openPopup();
-    }
-
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = 'Submit community report';
-  }
-});
-
-/* =========================================
-   INITIALIZE
-========================================= */
-
-await loadReports();
-
-enableRealtime();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .catch(error => console.warn('Service worker:', error));
-}
-
-console.log('Melbourne Emergency Watch initialized.');
+initialize();
 
 })();
 </script>
-</body></html>
+
+</body>
+</html>
