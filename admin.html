@@ -19,6 +19,13 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.stat span{font-size:11px;color:var(--muted)}.stat strong{display:block;font-size:25px;margin-top:6px}
 .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.85fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.card-head h3{font-size:15px;margin:0}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.tab{border:1px solid var(--line);background:white;color:#536174;border-radius:20px;padding:7px 10px;font-size:11px}.tab.active{background:#eaf3fc;border-color:#a9d0f3;color:#075da8}
 #incidentMap{height:300px;border-radius:11px;overflow:hidden;background:#e4edf2;margin-bottom:13px}.report-list{display:flex;flex-direction:column;gap:9px;max-height:520px;overflow:auto}.report{border:1px solid var(--line);border-radius:11px;padding:12px}.report.selected{border-color:#5ca4e6;box-shadow:0 0 0 2px #d9edff}.report-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.report-title strong{font-size:13px}.report p{font-size:12px;color:#536174;line-height:1.45;margin:7px 0}.meta{font-size:10px;color:#8290a0}.status{font-size:10px;border-radius:20px;padding:4px 7px;background:#fff2df;color:#92570e;white-space:nowrap}.status.confirmed{background:#e6f5ed;color:#126642}.status.resolved{background:#eaf0f7;color:#42566e}.status.rejected{background:#fff0f0;color:#a52c34}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.actions .btn{padding:7px 9px;font-size:11px}
+.photo-review{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}
+.photo-review h4{font-size:11px;margin:0 0 8px}
+.photo-grid{display:flex;flex-wrap:wrap;gap:9px}
+.photo-item{width:116px}
+.photo-item img{width:116px;height:86px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
+.photo-item small{display:block;font-size:9px;color:var(--muted);margin:4px 0}
+.photo-item .btn{padding:5px 7px;font-size:10px;margin:2px 2px 0 0}
 .admin-list{display:flex;flex-direction:column;gap:9px}.admin-row{border:1px solid var(--line);border-radius:10px;padding:11px;display:flex;justify-content:space-between;align-items:center;gap:10px}.admin-row strong{font-size:12px;display:block}.admin-row small{font-size:10px;color:var(--muted)}.role{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#536174}
 .empty{border:1px dashed var(--line);border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:12px}.section-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}.footer{text-align:center;color:#8290a0;font-size:10px;padding:22px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){header{padding:13px}.brand h1{font-size:14px}.header-right .pill{display:none}.wrap{padding:0 10px;margin:13px auto}.stats{gap:8px}.stat{padding:11px}.stat strong{font-size:21px}.topline{align-items:center}.card{padding:12px}}
@@ -107,6 +114,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   let activeStatus = 'all';
   let map = null;
   let mapMarkers = [];
+  let photosByIncident = {};
   let realtimeChannel = null;
   let pollingTimer = null;
   let refreshTimer = null;
@@ -244,6 +252,24 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
       if (error) throw error;
 
       incidents = data || [];
+      photosByIncident = {};
+      const {data:photoRows,error:photoError} = await db
+        .from('incident_photos')
+        .select('id,incident_id,storage_path,status,created_at')
+        .order('created_at', {ascending:false})
+        .limit(750);
+      if (photoError) throw photoError;
+
+      for (const photo of (photoRows || [])) {
+        const {data:signed,error:signedError} = await db.storage
+          .from('incident-photos')
+          .createSignedUrl(photo.storage_path, 1800);
+        (photosByIncident[photo.incident_id] ||= []).push({
+          ...photo,
+          signedUrl: signedError ? null : signed?.signedUrl || null
+        });
+      }
+
       hideMessage('pageMessage');
       updateStats();
       renderReports();
@@ -294,6 +320,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
         <div class="report-title"><strong>${esc(r.title || pretty(r.category))}</strong><span class="status ${statusClass(r.status)}">${esc(pretty(r.status))}</span></div>
         <p><b>${esc(pretty(r.category))}</b>${r.address ? ' · ' + esc(r.address) : ''}<br>${esc(r.description || 'No description supplied')}</p>
         <div class="meta">${esc(dateText(r.created_at))} · ${esc(pretty(r.severity))} · ${esc(reporter)} · ${esc(coords)}</div>
+        ${(photosByIncident[r.id] || []).length ? `<div class="photo-review"><h4>Submitted photos — review required</h4><div class="photo-grid">${photosByIncident[r.id].map(p => `<div class="photo-item">${p.signedUrl ? `<a href="${esc(p.signedUrl)}" target="_blank" rel="noopener"><img src="${esc(p.signedUrl)}" alt="Submitted incident photo"></a>` : '<div class="empty">Image unavailable</div>'}<small>${esc(pretty(p.status))}</small>${p.status === 'pending' ? `<button class="btn success" data-photo-action="approved" data-photo-id="${esc(p.id)}">Approve</button><button class="btn danger" data-photo-action="rejected" data-photo-id="${esc(p.id)}">Reject</button>` : ''}</div>`).join('')}</div></div>` : ''}
         <div class="actions">${buttons.join('')}</div>
       </article>`;
     }).join('');
@@ -405,6 +432,27 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     const { action, id } = button.dataset;
     if (action === 'delete') await deleteIncident(id);
     else await changeStatus(id, action);
+  });
+
+  $('reportList').addEventListener('click', async e => {
+    const button = e.target.closest('[data-photo-action]');
+    if (!button) return;
+    const photoId = button.dataset.photoId;
+    const status = button.dataset.photoAction;
+    if (!['approved','rejected'].includes(status)) return;
+
+    button.disabled = true;
+    const {error} = await db.from('incident_photos')
+      .update({status, reviewed_at:new Date().toISOString(), reviewed_by:(await db.auth.getUser()).data.user?.id || null})
+      .eq('id', photoId);
+
+    if (error) {
+      showMessage('pageMessage', 'Photo review failed: ' + error.message, 'error');
+      button.disabled = false;
+      return;
+    }
+    showMessage('pageMessage', `Photo ${status}.`, 'good');
+    await loadIncidents();
   });
 
   $('addAdminForm').addEventListener('submit', async e => {
