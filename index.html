@@ -247,6 +247,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Prevent browser-default small text from shrinking important instructions. */
 small{font-size:14px;line-height:1.55}
 .hint{font-size:15px}
+
+/* Mobile map legend: stack heading above the legend cards instead of beside them. */
+@media(max-width:650px){
+ .nws-legend{display:block!important;padding:16px!important}
+ .legend-heading{display:block;margin:0 0 13px}
+ .legend-heading strong{display:block;font-size:19px;margin-bottom:4px}
+ .legend-heading>span{display:block;font-size:15px;line-height:1.5}
+ .legend-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .legend-items>span{min-width:0;padding:12px 10px;grid-template-columns:20px minmax(0,1fr);column-gap:9px}
+ .legend-items b,.legend-items small{min-width:0;overflow-wrap:anywhere;word-break:normal}
+ .legend-items b{font-size:15px;line-height:1.35}
+ .legend-items small{font-size:14px;line-height:1.4}
+ .legend-note{font-size:15px;line-height:1.6;margin-top:14px}
+}
+@media(max-width:360px){
+ .legend-items{grid-template-columns:1fr}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
