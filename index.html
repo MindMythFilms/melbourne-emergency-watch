@@ -196,7 +196,7 @@ body.dark .mew-flag-option{background:#0a1b2b;border-color:#385168;color:#eaf2f8
 </section>
 <section class="hero"><div><h1>Know what’s happening around you.</h1><p>View community-submitted hazard reports and share observations that may help your neighbors.</p></div><div class="tools"><button class="secondary" id="satelliteBtn">Satellite</button><button class="secondary" id="streetBtn">Street map</button><button class="secondary" id="locateBtn">My location</button></div></section>
 <div class="layout">
-<section class="panel" id="map-panel"><div class="panelhead"><h2>Community hazard map</h2><div class="tools"><select id="mapFilter" aria-label="Filter map reports"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Utility disruptions</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select><span class="pill" id="countLabel">Loading…</span></div></div><div id="map"></div><div class="mapnote">Satellite imagery is not live and may be outdated. <strong>Blue outlined areas / red alert markers:</strong> active National Weather Service alerts for Brevard County. <strong>Community pins:</strong> unverified resident submissions. NWS alerts are official weather products; CoastWatch FL is not an emergency service. Imagery © Esri and its contributors. <span id="nwsStatus" role="status">Loading NWS alerts…</span></div><div class="panelhead"><h2>Latest community reports</h2></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
+<section class="panel" id="map-panel"><div class="panelhead"><h2>Community hazard map</h2><div class="tools"><select id="mapFilter" aria-label="Filter map reports"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Utility disruptions</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select><span class="pill" id="countLabel">Loading…</span></div></div><div id="map"></div><div class="mapnote">Satellite imagery is not live and may be outdated. Map markers show unverified community submissions, not official verification. Imagery © Esri and its contributors.</div><div class="panelhead"><h2>Latest community reports</h2></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
 <section class="panel" id="report-panel"><div class="panelhead"><h2>Submit a hazard observation</h2></div><div class="form"><form id="reportForm"><div class="formgrid">
 <div class="full"><label for="category">Hazard type *</label><select id="category" required><option value="">Choose a category</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding / storm surge</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Visible fire or smoke</option><option value="road_hazard">Road hazard / debris</option><option value="road_closure">Road closure / washout</option><option value="power_outage">Utility disruption</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other natural or environmental hazard</option></select></div>
 <div><label for="latitude">Latitude *</label><input id="latitude" type="number" step="any" min="27.5" max="29" required></div><div><label for="longitude">Longitude *</label><input id="longitude" type="number" step="any" min="-81.5" max="-80.2" required></div>
@@ -321,45 +321,6 @@ function setSelectedLocation(latlng){$("latitude").value=latlng.lat.toFixed(6);$
 map.on("click",e=>setSelectedLocation(e.latlng));
 $("locateBtn").onclick=()=>map.locate({setView:true,maxZoom:15});
 map.on("locationfound",e=>L.circleMarker(e.latlng,{radius:8,color:"#fff",fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your approximate device location"));
-// COASTWATCH_NWS_ALERTS_V1 — official NWS active alerts for Brevard County (FLC009).
-// NWS data is free/open for redistribution. Keep this layer visually separate from community reports.
-const nwsAlertLayer=L.featureGroup().addTo(map);
-let nwsAlertCount=0,nwsLastUpdated=null,nwsFetchBusy=false;
-function nwsAlertColor(severity){
- const v=String(severity||"").toLowerCase();
- return v==="extreme"?"#b91c1c":v==="severe"?"#ea580c":v==="moderate"?"#d97706":"#2563eb";
-}
-function nwsAlertPopup(p){
- const headline=p.headline||p.event||"National Weather Service alert";
- const parts=[p.event?'<strong>'+esc(p.event)+'</strong>':"",p.headline&&p.headline!==p.event?esc(p.headline):"",p.areaDesc?'<div style="margin-top:6px"><strong>Area:</strong> '+esc(p.areaDesc)+'</div>':"",p.severity?'<div><strong>Severity:</strong> '+esc(p.severity)+'</div>':"",p.urgency?'<div><strong>Urgency:</strong> '+esc(p.urgency)+'</div>':"",p.effective?'<div><strong>Effective:</strong> '+esc(new Date(p.effective).toLocaleString())+'</div>':"",p.expires?'<div><strong>Expires:</strong> '+esc(new Date(p.expires).toLocaleString())+'</div>':"",p.description?'<p style="white-space:pre-wrap;max-height:180px;overflow:auto">'+esc(p.description.slice(0,3500))+'</p>':"",p.instruction?'<p><strong>Instructions:</strong><br>'+esc(p.instruction.slice(0,1800))+'</p>':"",p.web?'<a href="'+esc(p.web)+'" target="_blank" rel="noopener noreferrer">View official NWS alert</a>':"",'<small style="display:block;margin-top:8px">Source: National Weather Service · Official weather alert. CoastWatch FL is not an emergency service.</small>'];
- return '<div style="min-width:220px;max-width:320px">'+parts.filter(Boolean).join("")+'</div>';
-}
-async function loadNwsAlerts(){
- if(nwsFetchBusy||document.visibilityState==="hidden")return;
- nwsFetchBusy=true;
- try{
-  const response=await fetch("https://api.weather.gov/alerts/active?zone=FLC009",{headers:{Accept:"application/geo+json"},cache:"no-store"});
-  if(!response.ok)throw new Error("NWS returned HTTP "+response.status);
-  const payload=await response.json();
-  const features=(payload.features||[]).filter(f=>f&&f.properties&&f.properties.status!=="Test"&&f.properties.messageType!=="Cancel");
-  nwsAlertLayer.clearLayers();
-  features.forEach(feature=>{
-   const p=feature.properties||{},color=nwsAlertColor(p.severity);
-   const popup=nwsAlertPopup(p);
-   if(feature.geometry){
-    L.geoJSON(feature,{style:()=>({color,weight:3,opacity:.95,fillColor:color,fillOpacity:.12,dashArray:"7 5"}),pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{radius:9,color:"#fff",weight:2,fillColor:color,fillOpacity:1})}).bindPopup(popup).addTo(nwsAlertLayer);
-   }
-  });
-  nwsAlertCount=features.length;
-  nwsLastUpdated=new Date();
-  const status=$("nwsStatus");
-  if(status)status.textContent=" NWS: "+nwsAlertCount+" active Brevard alert"+(nwsAlertCount===1?"":"s")+" · updated "+nwsLastUpdated.toLocaleTimeString()+".";
- }catch(error){
-  console.warn("CoastWatch NWS alert refresh failed:",error);
-  const status=$("nwsStatus");
-  if(status)status.textContent=" NWS alerts temporarily unavailable; check weather.gov for current conditions.";
- }finally{nwsFetchBusy=false}
-}
 const approvedPhotos={};
 function reportStatusLabel(status){return status==="unverified"?"Unverified community report":status==="resolved"?"Marked resolved · not independently verified":"Previously admin-reviewed · not official verification"}
 function popup(r){const photo=approvedPhotos[r.id];const observed=String(r.description||"").trim();return `<b>${esc(r.title||r.category.replaceAll("_"," "))}</b><br>${esc(r.address||"")}<br>${esc(reportStatusLabel(r.status))}<br>${new Date(r.created_at).toLocaleString()}<br><small>User-submitted information. Not official verification.</small>${observed?`<div style="margin-top:9px;padding:9px 10px;background:#f1f5f9;color:#172b3d;border:1px solid #dbe5ee;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere"><strong>What was observed</strong><br>${esc(observed)}</div>`:""}${photo?`<br><img src="${esc(photo)}" alt="Administrator-approved community photo" class="mew-photo-zoom" role="button" tabindex="0" aria-label="Enlarge community report photo" style="width:100%;max-width:220px;margin-top:8px;border-radius:8px">`:""}<br><button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:8px">Report this listing</button>`}
@@ -415,7 +376,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();setInterval(loadReports,45000);\nloadNwsAlerts();setInterval(loadNwsAlerts,60000);
+loadReports();setInterval(loadReports,45000);
 // Check for newly deployed public-page updates every 3 minutes.
 // Do not reload while a visitor is entering a report or has unsaved form data.
 let mewPageCheckBusy=false;
