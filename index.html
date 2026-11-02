@@ -642,6 +642,17 @@ $("reportForm").addEventListener("submit",async e => {
   return;
  }
 
+ // Match reporter_id to the signed-in Supabase user when one exists.
+ // Anonymous visitors have no session, so reporter_id remains NULL.
+ const {data:sessionData,error:sessionError} = await db.auth.getSession();
+
+ if(sessionError) {
+  showMessage("Unable to check your sign-in status: " + sessionError.message,"error");
+  return;
+ }
+
+ const reporterId = sessionData?.session?.user?.id ?? null;
+
  const payload = {
   category:category,
   title:categoryName(category) + " report",
@@ -651,7 +662,7 @@ $("reportForm").addEventListener("submit",async e => {
   address:address || null,
   severity:severity,
   status:"unverified",
-  reporter_id:null,
+  reporter_id:reporterId,
   anonymous:true
  };
 
