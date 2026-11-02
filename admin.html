@@ -43,7 +43,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
 </head>
 <body>
 <header>
-  <div class="brand"><div class="mark">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Administrator control center · Brevard County, Florida</p></div></div>
+  <div class="brand"><div class="mark">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Natural hazard moderation · Brevard County, Florida</p></div></div>
   <div class="header-right"><span id="realtimeState" class="pill live-state hidden">CONNECTING…</span><span id="rolePill" class="pill hidden">ADMIN</span><button id="signOutBtn" class="btn hidden">Sign out</button></div>
 </header>
 
@@ -61,7 +61,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   </section>
 
   <section id="dashboardView" class="hidden">
-    <div class="topline"><div><h2>Operations dashboard</h2><p id="welcomeText">Manage community incident reports and administrator access.</p></div><button class="btn" id="refreshBtn">↻ Refresh</button></div>
+    <div class="topline"><div><h2>Operations dashboard</h2><p id="welcomeText">Review natural-hazard observations and manage administrator access.</p></div><button class="btn" id="refreshBtn">↻ Refresh</button></div>
     <div id="pageMessage" class="alert hidden"></div>
     <div class="stats">
       <div class="stat"><span>Total reports loaded</span><strong id="totalCount">0</strong></div>
@@ -99,7 +99,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
         <section class="card">
           <div class="card-head"><h3>Operational guidance</h3></div>
           <div class="alert">This dashboard manages community-submitted information. It is not an official emergency dispatch system.</div>
-          <p class="muted">For immediate danger, call 911. Verify reports before sharing them as confirmed incidents. Do not expose personal information unnecessarily.</p>
+          <p class="muted">Only natural-disaster, severe-weather, and environmental-hazard observations are in scope. Reject crime, medical, missing-person, personal-accusation, or identifying submissions. “Confirmed” means community-reviewed only, never official verification. For immediate danger, call 911. Never encourage users to approach hazards.</p>
         </section>
       </aside>
     </div>
@@ -263,7 +263,8 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     const fields = 'id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,display_name,created_at,updated_at,expires_at';
 
     try {
-      const { data, error } = await db.from('incidents').select(fields).order('created_at', { ascending: false }).limit(250);
+      const allowedCategories = ['flooding','coastal_flooding','storm_damage','tornado_damage','fire','road_hazard','road_closure','power_outage','erosion_washout','other_hazard'];
+      const { data, error } = await db.from('incidents').select(fields).in('category', allowedCategories).order('created_at', { ascending: false }).limit(250);
       if (error) throw error;
 
       incidents = data || [];
@@ -556,5 +557,91 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   });
 })();
 </script>
+
+<style id="mew-terms-style">
+#termsGate{position:fixed;inset:0;z-index:1000000;background:rgba(5,12,20,.88);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+#termsGate .terms-card{width:min(760px,100%);max-height:min(90vh,900px);overflow:auto;background:#fff;color:#172536;border-radius:16px;box-shadow:0 24px 90px #0008;padding:24px}
+#termsGate h2{font-size:23px;margin:0 0 6px}
+#termsGate .terms-sub{color:#667589;font-size:12px;margin:0 0 16px}
+#termsGate .terms-body{font-size:13px;line-height:1.6}
+#termsGate .terms-body h3{font-size:14px;margin:15px 0 4px}
+#termsGate .terms-body p{margin:5px 0}
+#termsGate .terms-check{display:flex;align-items:flex-start;gap:10px;padding:14px 0 8px;border-top:1px solid #dce3ea;margin-top:15px;font-size:13px;font-weight:650}
+#termsGate .terms-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto}
+#termsGate .terms-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+#termsGate button{border:1px solid #dce3ea;border-radius:9px;padding:10px 15px;font-weight:700;cursor:pointer;background:#fff;color:#172536}
+#termsGate #termsAccept{background:#1677d2;color:white;border-color:#1677d2}
+#termsGate #termsAccept:disabled{opacity:.45;cursor:not-allowed}
+#termsGate .terms-note{font-size:11px;color:#667589;margin-top:12px}
+#termsGate .terms-error{color:#a52c34;font-size:12px;margin-top:8px;display:none}
+body.terms-blocked{overflow:hidden}
+@media(max-width:520px){#termsGate .terms-card{padding:18px}#termsGate h2{font-size:20px}}
+</style>
+
+
+<div id="termsGate" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+ <section class="terms-card">
+  <h2 id="termsTitle">Terms of Use &amp; Community Safety Agreement</h2>
+  <p class="terms-sub">Melbourne Emergency Watch · Version 2.0 · Effective November 2, 2026</p>
+  <div class="terms-body">
+   <p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
+   <h3>1. Purpose and scope — natural hazards only</h3>
+   <p>MEW is a volunteer-run, non-commercial community information project for resident observations of natural disasters, severe weather, and environmental hazards in the Melbourne/Brevard County area. Permitted topics include flooding, storm damage, fallen trees, tornado damage, visible smoke or wildfire observations, debris, road washouts, coastal flooding, erosion, and utility disruptions. Crime reports, suspicious-person reports, missing-person reports, medical emergencies, personal disputes, and accusations about individuals are not permitted and may be removed.</p>
+   <h3>2. Volunteer project — not an emergency service</h3>
+   <p>Melbourne Emergency Watch (“MEW”) is intended to be a volunteer-run, non-commercial community information project. It is not a government agency, public safety authority, emergency dispatcher, 911 service, professional monitoring service, or official source of emergency instructions. It does not dispatch responders, guarantee that anyone is monitoring reports, or promise that a report will be reviewed or acted upon.</p>
+   <h3>3. No guarantee; information must be independently verified</h3>
+   <p>Reports, map pins, photographs, comments, status labels, and other information may be inaccurate, incomplete, outdated, misleading, duplicated, malicious, or unavailable. “Confirmed” means only that a MEW volunteer or authorized user reviewed the submission under the website’s process; it is not an official finding or a guarantee of safety, accuracy, or current conditions. You must independently verify information with appropriate official sources before acting on it.</p>
+   <h3>4. Emergencies and personal safety</h3>
+   <p>Never rely on MEW to report an emergency or obtain emergency assistance. For immediate danger, call 911. Follow instructions from law enforcement, fire-rescue, emergency medical services, and official local, state, and federal authorities. Do not enter floodwater, approach fires, downed power lines, damaged structures, crime scenes, or other dangerous areas to take photographs or verify a report. Do not delay evacuation or protective action to use this website.</p>
+   <h3>5. Assumption of risk and limitation/release of liability</h3>
+   <p>To the fullest extent permitted by applicable law, you voluntarily assume the risks associated with accessing, using, or relying on this website and its content. To the fullest extent permitted by law, you agree that the website owner/operator, project organizers, developers, volunteers, moderators, administrators, contributors, and users are not responsible for accidents, injuries, deaths, property damage, losses, costs, or other claims arising from or related to your access to or use of the website, reliance on user-submitted information, inaccurate or delayed reports, unavailable services, moderation decisions, or actions you or others take or fail to take based on website content. This provision is intended to apply to claims based on ordinary negligence to the extent such a release is legally permitted. It does not exclude or limit any liability that applicable law does not allow to be excluded or limited, including liability for intentional misconduct or other non-waivable legal duties.</p>
+   <h3>6. User responsibility and submitted content</h3>
+   <p>You are responsible for your actions and for any text, location, or photograph you submit. Submit only information you believe is truthful and relevant. Do not trespass, break laws, put yourself or others at risk, impersonate officials, publish threats, or upload unlawful, abusive, graphic, intimate, identifying, or otherwise inappropriate images. Do not include private personal information unless you have a lawful reason and authority to share it. You must have the rights and permissions needed to submit any photograph or other content.</p>
+   <h3>7. Moderation and availability</h3>
+   <p>MEW volunteers and administrators may review, edit, hide, reject, or remove submissions and may suspend or restrict access. They are not obligated to review every submission, respond to users, verify conditions, or keep the website continuously available. Photo approval and incident status are moderation decisions for this community tool only.</p>
+   <h3>8. No professional advice or relationship</h3>
+   <p>Nothing on MEW is professional, legal, medical, law-enforcement, engineering, weather, or emergency-management advice. Use of the website does not create an agency, employment, partnership, fiduciary, or professional relationship with the owner, developers, volunteers, moderators, administrators, or other users.</p>
+   <h3>9. Acceptance and refusal</h3>
+   <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p>
+  </div>
+  <label class="terms-check"><input id="termsAgreeCheck" type="checkbox"><span>I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</span></label>
+  <div id="termsError" class="terms-error">You must check the agreement box to continue.</div>
+  <div class="terms-actions">
+   <button type="button" id="termsDecline">I do not agree — leave website</button>
+   <button type="button" id="termsAccept" disabled>I agree — enter website</button>
+  </div>
+  <p class="terms-note">Your acceptance is saved in this browser. Clearing browser data or using another device/browser may cause this agreement to appear again. This on-screen acceptance is not a substitute for legal review or a complete server-side consent record.</p>
+ </section>
+</div>
+<script id="mew-terms-script">
+(() => {
+ const VERSION = "mew-natural-hazards-2026-11-02-v2";
+ const KEY = "mew_terms_acceptance";
+ const gate = document.getElementById("termsGate");
+ const check = document.getElementById("termsAgreeCheck");
+ const accept = document.getElementById("termsAccept");
+ const decline = document.getElementById("termsDecline");
+ const error = document.getElementById("termsError");
+ if (!gate || !check || !accept || !decline) return;
+ let accepted = false;
+ try { accepted = localStorage.getItem(KEY) === VERSION; } catch (_) {}
+ if (accepted) { gate.remove(); return; }
+ document.body.classList.add("terms-blocked");
+ check.addEventListener("change", () => {
+   accept.disabled = !check.checked;
+   error.style.display = "none";
+ });
+ accept.addEventListener("click", () => {
+   if (!check.checked) { error.style.display = "block"; return; }
+   try { localStorage.setItem(KEY, VERSION); } catch (_) {}
+   gate.remove();
+   document.body.classList.remove("terms-blocked");
+ });
+ decline.addEventListener("click", () => {
+   document.body.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;background:#f2f5f8;color:#172536;font-family:system-ui;padding:24px;text-align:center"><section><h1>Access not accepted</h1><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use Melbourne Emergency Watch.</p><p>You may close this browser tab.</p></section></main>';
+ });
+})();
+</script>
+
 </body>
 </html>
