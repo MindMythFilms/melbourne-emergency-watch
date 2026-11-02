@@ -103,6 +103,14 @@ body.dark button.secondary{background:#20394d;color:#eaf2f8;border-color:#385168
 .selected-location-pin{background:transparent;border:0}
 .selected-location-pin svg{display:block;filter:drop-shadow(0 3px 4px #071a2c66)}
 
+
+/* High-contrast links in the About panel, especially in dark mode */
+#about a{color:#087f83;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;font-weight:700}
+#about a:hover{color:#075e63;text-decoration-thickness:2px}
+body.dark #about a{color:#63ded2;text-decoration-thickness:1.5px}
+body.dark #about a:hover{color:#a0fff2}
+body.dark #about a:focus-visible{outline:2px solid #63ded2;outline-offset:3px;border-radius:3px}
+
 </style></head>
 <body>
 <header><div class="brand"><div class="mark">M</div><div><strong>Melbourne Emergency Watch</strong><small>Community hazard observations</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
