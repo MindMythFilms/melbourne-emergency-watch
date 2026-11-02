@@ -316,7 +316,7 @@ input:focus,select:focus,textarea:focus {
 
   <label for="incidentPhotos">Photos (optional, up to 3)</label>
   <input id="incidentPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
-  <div class="notice">Photos are private until an administrator reviews and approves them. JPG, PNG, or WebP; maximum 5 MB each.</div>
+  <div class="notice">Photos remain private until administrator approval. JPG, PNG, or WebP accepted; images are converted to JPEG and stripped of location metadata. Maximum 5 MB each.</div>
   <div id="photoPreview" class="photo-preview" aria-live="polite"></div>
 
   <button class="btn primary" id="submitButton" style="width:100%;margin-top:13px;padding:13px" type="submit">
@@ -754,6 +754,16 @@ $("reportForm").addEventListener("submit",async e => {
 
  if (selectedPhotos.length > 3) {
   showMessage("Please choose no more than 3 photos.", "error");
+  return;
+ }
+
+ // Convert every selected image to a metadata-stripped JPEG before creating
+ // the incident row. This also guarantees the Storage bucket receives JPEG.
+ let privacySafePhotos = [];
+ try {
+  privacySafePhotos = await Promise.all(selectedPhotos.map(makePrivacySafeImage));
+ } catch (photoProcessingError) {
+  showMessage("The selected photo could not be prepared safely: " + photoProcessingError.message, "error");
   return;
  }
 
