@@ -29,6 +29,16 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
 .admin-list{display:flex;flex-direction:column;gap:9px}.admin-row{border:1px solid var(--line);border-radius:10px;padding:11px;display:flex;justify-content:space-between;align-items:center;gap:10px}.admin-row strong{font-size:12px;display:block}.admin-row small{font-size:10px;color:var(--muted)}.role{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#536174}
 .empty{border:1px dashed var(--line);border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:12px}.section-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}.footer{text-align:center;color:#8290a0;font-size:10px;padding:22px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){header{padding:13px}.brand h1{font-size:14px}.header-right .pill{display:none}.wrap{padding:0 10px;margin:13px auto}.stats{gap:8px}.stat{padding:11px}.stat strong{font-size:21px}.topline{align-items:center}.card{padding:12px}}
+
+/* Same-page photo viewer */
+.photo-lightbox{position:fixed;inset:0;z-index:99999;background:rgba(5,12,20,.92);display:none;align-items:center;justify-content:center;padding:22px}
+.photo-lightbox.open{display:flex}
+.photo-lightbox img{display:block;max-width:min(94vw,1100px);max-height:86vh;object-fit:contain;border-radius:10px;box-shadow:0 18px 60px #0008}
+.photo-lightbox button{position:absolute;top:18px;right:20px;border:1px solid #ffffff66;background:#172536;color:#fff;border-radius:999px;width:42px;height:42px;font-size:25px;line-height:1;cursor:pointer}
+.popup-photos{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;max-width:260px}
+.popup-photos img{width:76px;height:64px;object-fit:cover;border-radius:7px;border:1px solid #dce3ea;cursor:zoom-in}
+.photo-item img{cursor:zoom-in}
+
 </style>
 </head>
 <body>
@@ -96,6 +106,11 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   </section>
 </main>
 <div class="footer">Melbourne Emergency Watch · Administrative access is logged by Supabase authentication.</div>
+
+<div id="photoLightbox" class="photo-lightbox" role="dialog" aria-modal="true" aria-label="Incident photo viewer">
+ <button type="button" id="closePhotoLightbox" aria-label="Close photo">×</button>
+ <img id="photoLightboxImage" alt="Expanded incident photo">
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -320,7 +335,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
         <div class="report-title"><strong>${esc(r.title || pretty(r.category))}</strong><span class="status ${statusClass(r.status)}">${esc(pretty(r.status))}</span></div>
         <p><b>${esc(pretty(r.category))}</b>${r.address ? ' · ' + esc(r.address) : ''}<br>${esc(r.description || 'No description supplied')}</p>
         <div class="meta">${esc(dateText(r.created_at))} · ${esc(pretty(r.severity))} · ${esc(reporter)} · ${esc(coords)}</div>
-        ${(photosByIncident[r.id] || []).length ? `<div class="photo-review"><h4>Submitted photos — review required</h4><div class="photo-grid">${photosByIncident[r.id].map(p => `<div class="photo-item">${p.signedUrl ? `<a href="${esc(p.signedUrl)}" target="_blank" rel="noopener"><img src="${esc(p.signedUrl)}" alt="Submitted incident photo"></a>` : '<div class="empty">Image unavailable</div>'}<small>${esc(pretty(p.status))}</small>${p.status === 'pending' ? `<button class="btn success" data-photo-action="approved" data-photo-id="${esc(p.id)}">Approve</button><button class="btn danger" data-photo-action="rejected" data-photo-id="${esc(p.id)}">Reject</button>` : ''}</div>`).join('')}</div></div>` : ''}
+        ${(photosByIncident[r.id] || []).length ? `<div class="photo-review"><h4>Submitted photos — review required</h4><div class="photo-grid">${photosByIncident[r.id].map(p => `<div class="photo-item">${p.signedUrl ? `<img src="${esc(p.signedUrl)}" data-photo-viewer="${esc(p.signedUrl)}" alt="Submitted incident photo">` : '<div class="empty">Image unavailable</div>'}<small>${esc(pretty(p.status))}</small>${p.status === 'pending' ? `<button class="btn success" data-photo-action="approved" data-photo-id="${esc(p.id)}">Approve</button><button class="btn danger" data-photo-action="rejected" data-photo-id="${esc(p.id)}">Reject</button>` : ''}</div>`).join('')}</div></div>` : ''}
         <div class="actions">${buttons.join('')}</div>
       </article>`;
     }).join('');
@@ -344,9 +359,13 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
       if (lat < 27.5 || lat > 29.0 || lng < -81.5 || lng > -80.2) return;
       const color = r.status === 'confirmed' ? '#16845b' : r.status === 'resolved' ? '#64748b' : r.status === 'rejected' ? '#c83e45' : '#e58b23';
+      const reportPhotos = photosByIncident[r.id] || [];
+      const popupPhotos = reportPhotos.length
+        ? `<div><b>Submitted photos</b><div class="popup-photos">${reportPhotos.filter(p => p.signedUrl).map(p => `<img src="${esc(p.signedUrl)}" data-photo-viewer="${esc(p.signedUrl)}" alt="Incident photo" loading="lazy">`).join('')}</div></div>`
+        : '';
       const marker = L.circleMarker([lat,lng], {radius:8,color:'#fff',weight:2,fillColor:color,fillOpacity:.95})
         .addTo(map)
-        .bindPopup(`<b>${esc(r.title || pretty(r.category))}</b><br>${esc(r.address || '')}<br>${esc(pretty(r.status))}<br>${esc(dateText(r.created_at))}`);
+        .bindPopup(`<b>${esc(r.title || pretty(r.category))}</b><br>${esc(r.address || '')}<br>${esc(pretty(r.status))}<br>${esc(dateText(r.created_at))}${popupPhotos}`);
       mapMarkers.push(marker);
     });
   }
@@ -497,6 +516,35 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     showMessage('pageMessage', 'Administrator access removed. The user account was not deleted.', 'good');
     await loadAdmins();
   });
+
+  // Open photos in an overlay without leaving the admin dashboard.
+  function openPhotoViewer(url) {
+    const viewer = $('photoLightbox');
+    const image = $('photoLightboxImage');
+    if (!viewer || !image || !url) return;
+    image.src = url;
+    viewer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePhotoViewer() {
+    const viewer = $('photoLightbox');
+    const image = $('photoLightboxImage');
+    if (!viewer || !image) return;
+    viewer.classList.remove('open');
+    image.src = '';
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('click', e => {
+    const photo = e.target.closest('[data-photo-viewer]');
+    if (photo) {
+      e.preventDefault();
+      e.stopPropagation();
+      openPhotoViewer(photo.getAttribute('data-photo-viewer'));
+      return;
+    }
+    if (e.target.id === 'photoLightbox' || e.target.id === 'closePhotoLightbox') closePhotoViewer();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoViewer(); });
 
   db.auth.getSession().then(({ data }) => checkRoleAndStart(data.session));
   db.auth.onAuthStateChange((_event, session) => {
