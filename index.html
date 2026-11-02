@@ -204,6 +204,48 @@ body.dark .mew-photo-ack{border-color:#66532f;color:#ffe0a0!important}
 <p>Nothing on MEW is professional, legal, medical, law-enforcement, engineering, weather, or emergency-management advice. Use of the website does not create an agency, employment, partnership, fiduciary, or professional relationship with the owner, developers, volunteers, moderators, administrators, or other users.</p>
 <h3>8. Acceptance and refusal</h3>
 <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p></div><label><input type="checkbox" id="adultCheck"> I confirm I am at least 18 years old.</label><label><input type="checkbox" id="termsCheck"> I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</label><div class="status error hidden" id="consentError"></div><div class="actions"><button class="secondary" id="declineBtn">I do not agree — leave website</button><button id="acceptBtn" type="button">I agree — enter website</button></div></div></div>
+<script>
+(()=> {
+ const overlay=document.getElementById("consentOverlay");
+ const accept=document.getElementById("acceptBtn");
+ const error=document.getElementById("consentError");
+ const version="mew-natural-hazards-2026-11-02-v3";
+ const key="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO";
+ const url="https://lqzxzlaxvfjuklyzxbex.supabase.co";
+ if(sessionStorage.getItem("mew_accepted_version")===version){overlay.remove();return}
+ accept.disabled=false;
+ accept.addEventListener("click",async()=>{
+  error.classList.add("hidden");
+  if(!document.getElementById("adultCheck").checked||!document.getElementById("termsCheck").checked){
+   error.textContent="Please check both boxes above before continuing.";
+   error.classList.remove("hidden");return;
+  }
+  accept.disabled=true;accept.textContent="Recording agreement…";
+  let sid=sessionStorage.getItem("mew_browser_session");
+  if(!sid){sid=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random());sessionStorage.setItem("mew_browser_session",sid)}
+  try{
+   const response=await fetch(url+"/rest/v1/rpc/record_mew_terms_acceptance",{
+    method:"POST",headers:{"apikey":key,"Authorization":"Bearer "+key,"Content-Type":"application/json"},
+    body:JSON.stringify({p_terms_version:version,p_browser_session_id:sid,p_age_attested:true})
+   });
+   const body=await response.text();
+   if(!response.ok)throw new Error(body||("HTTP "+response.status));
+   sessionStorage.setItem("mew_accepted_version",version);
+   overlay.remove();
+  }catch(e){
+   error.textContent="We couldn't save your agreement. Please try again. "+(e.message||"");
+   error.classList.remove("hidden");accept.disabled=false;accept.textContent="I agree — enter website";
+  }
+ });
+ document.getElementById("adultCheck").addEventListener("change",()=>{accept.disabled=false});
+ document.getElementById("termsCheck").addEventListener("change",()=>{accept.disabled=false});
+ document.getElementById("declineBtn").addEventListener("click",()=>{
+  overlay.innerHTML='<div class="dialog"><h2>Access not granted</h2><p>You must agree to the Terms of Use and confirm that you are 18 or older to use MEW.</p></div>';
+ });
+ document.getElementById("showTerms").addEventListener("click",e=>{e.preventDefault();overlay.style.display="grid"});
+ document.getElementById("showPrivacy").addEventListener("click",e=>{e.preventDefault();overlay.style.display="grid"});
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="mew-natural-hazards-2026-11-02-v3";
@@ -216,15 +258,7 @@ themeButton.addEventListener("click",()=>{const next=document.body.classList.con
 
 const categories=["flooding","coastal_flooding","storm_damage","tornado_damage","fire","road_hazard","road_closure","power_outage","erosion_washout","other_hazard"];
 const $=id=>document.getElementById(id);
-function sessionId(){let v=sessionStorage.getItem("mew_browser_session");if(!v){v=crypto.randomUUID();sessionStorage.setItem("mew_browser_session",v)}return v}
-async function recordConsent(){const {data,error}=await db.rpc("record_mew_terms_acceptance",{p_terms_version:TERMS_VERSION,p_browser_session_id:sessionId(),p_age_attested:true});if(error)throw error;if(!data)throw new Error("No consent record ID returned");sessionStorage.setItem("mew_accepted_version",TERMS_VERSION)}
-function syncConsent(){const ready=$("adultCheck").checked&&$("termsCheck").checked;$("acceptBtn").disabled=false;$("acceptBtn").setAttribute("aria-disabled",String(!ready));$("acceptBtn").classList.toggle("needs-consent",!ready)}
-$("adultCheck").addEventListener("change",syncConsent);$("termsCheck").addEventListener("change",syncConsent);
-$("acceptBtn").addEventListener("click",async()=>{const errorBox=$("consentError");errorBox.classList.add("hidden");if(!$("adultCheck").checked||!$("termsCheck").checked){errorBox.textContent="Please check both boxes above before continuing.";errorBox.classList.remove("hidden");return}const button=$("acceptBtn");button.disabled=true;button.textContent="Recording agreement…";try{await recordConsent();$("consentOverlay").remove()}catch(e){errorBox.textContent="Could not record your agreement. Please try again. "+(e?.message||"");errorBox.classList.remove("hidden");button.disabled=false;button.textContent="I agree — enter website"}});
-$("declineBtn").onclick=()=>{$("consentOverlay").innerHTML='<div class="dialog"><h2>Access not granted</h2><p>You must agree to the Terms of Use and Privacy Notice and confirm that you are 18 or older to use MEW.</p></div>'};
-$("showTerms").onclick=$("showPrivacy").onclick=e=>{e.preventDefault();$("consentOverlay").style.display="grid"};
-if(sessionStorage.getItem("mew_accepted_version")===TERMS_VERSION)$("consentOverlay").remove();
-syncConsent();const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
 const imagery=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community",maxZoom:19});
