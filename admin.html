@@ -583,7 +583,7 @@ body.terms-blocked{overflow:hidden}
 <div id="termsGate" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
  <section class="terms-card">
   <h2 id="termsTitle">Terms of Use &amp; Community Safety Agreement</h2>
-  <p class="terms-sub">Melbourne Emergency Watch · Version 2.0 · Effective November 2, 2026</p>
+  <p class="terms-sub">Melbourne Emergency Watch · Version 3.0 · Effective November 2, 2026</p>
   <div class="terms-body">
    <p><strong>Please read this agreement carefully.</strong> You may use Melbourne Emergency Watch only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
    <h3>1. Purpose and scope — natural hazards only</h3>
@@ -605,7 +605,7 @@ body.terms-blocked{overflow:hidden}
    <h3>9. Acceptance and refusal</h3>
    <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p>
   </div>
-  <label class="terms-check"><input id="termsAgreeCheck" type="checkbox"><span>I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</span></label>
+  <label class="terms-check"><input id="termsAgreeCheck" type="checkbox"><span>I confirm that I am 18 or older, and I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</span></label>
   <div id="termsError" class="terms-error">You must check the agreement box to continue.</div>
   <div class="terms-actions">
    <button type="button" id="termsDecline">I do not agree — leave website</button>
@@ -617,7 +617,7 @@ body.terms-blocked{overflow:hidden}
 <script id="mew-terms-script">
 (() => {
  "use strict";
- const VERSION = "mew-natural-hazards-2026-11-02-v2";
+ const VERSION = "mew-natural-hazards-2026-11-02-v3";
  const KEY = "mew_terms_acceptance";
  const SESSION_KEY = "mew_terms_browser_session";
  const gate = document.getElementById("termsGate");
@@ -658,25 +658,23 @@ body.terms-blocked{overflow:hidden}
    try {
      const db = window.mewSupabaseClient;
      if (!db) throw new Error("The secure database connection is unavailable. Please refresh and try again.");
-     let userId = null;
-     try {
-       const { data: userData, error: userError } = await db.auth.getUser();
-       if (!userError && userData && userData.user) userId = userData.user.id;
-     } catch (_) { /* anonymous visitor */ }
-     const record = {
-       terms_version: VERSION,
-       browser_session_id: browserSessionId,
-       user_agent: (navigator.userAgent || "").slice(0, 500),
-       user_id: userId
-     };
-     const { error: insertError } = await db.from("terms_acceptances").insert(record);
+     // Use the same validated server-side RPC as the public website.
+     // The agreement checkbox is the visitor's affirmative acceptance and
+     // the admin dashboard is covered by the same 18+ access requirement.
+     const { data: acceptanceId, error: insertError } = await db.rpc("record_mew_terms_acceptance", {
+       p_terms_version: VERSION,
+       p_browser_session_id: browserSessionId,
+       p_age_attested: true
+     });
      if (insertError) throw insertError;
+     if (!acceptanceId) throw new Error("The database did not return an acceptance record ID.");
      try { localStorage.setItem(KEY, VERSION); } catch (_) {}
      gate.remove();
      document.body.classList.remove("terms-blocked");
    } catch (err) {
      console.error("MEW agreement acceptance could not be recorded:", err);
-     error.textContent = "We could not save your acceptance. Please check your connection and try again. You cannot continue until the agreement is recorded.";
+     const detail = err && err.message ? err.message : String(err || "Unknown error");
+     error.textContent = "We could not save your acceptance: " + detail + ". You cannot continue until the agreement is recorded.";
      error.style.display = "block";
      accept.textContent = "Try again";
      accept.disabled = !check.checked;
