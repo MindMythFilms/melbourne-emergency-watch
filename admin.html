@@ -29,6 +29,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   <div class="brand"><div class="mark">⌖</div><div><h1>Melbourne Emergency Watch</h1><p>Administrator control center · Brevard County, Florida</p></div></div>
   <div class="header-right"><span id="realtimeState" class="pill live-state hidden">CONNECTING…</span><span id="rolePill" class="pill hidden">ADMIN</span><button id="signOutBtn" class="btn hidden">Sign out</button></div>
 </header>
+
 <main class="wrap">
   <section id="loginView" class="login-card">
     <h2>Administrator sign in</h2>
@@ -41,6 +42,7 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
     </form>
     <p class="section-note">Administrator accounts are created by the platform owner. This page does not provide public registration.</p>
   </section>
+
   <section id="dashboardView" class="hidden">
     <div class="topline"><div><h2>Operations dashboard</h2><p id="welcomeText">Manage community incident reports and administrator access.</p></div><button class="btn" id="refreshBtn">↻ Refresh</button></div>
     <div id="pageMessage" class="alert hidden"></div>
@@ -50,15 +52,21 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
       <div class="stat"><span>Confirmed</span><strong id="confirmedCount">0</strong></div>
       <div class="stat"><span>Resolved</span><strong id="resolvedCount">0</strong></div>
     </div>
+
     <div class="grid">
       <section class="card">
         <div class="card-head"><h3>Incident management</h3><span class="muted" id="loadedLabel">Latest reports</span></div>
         <div id="incidentMap"></div>
         <div class="tabs" id="statusTabs">
-          <button class="tab active" data-status="all">All</button><button class="tab" data-status="unverified">Unverified</button><button class="tab" data-status="confirmed">Confirmed</button><button class="tab" data-status="resolved">Resolved</button><button class="tab" data-status="rejected">Rejected</button>
+          <button class="tab active" data-status="all">All</button>
+          <button class="tab" data-status="unverified">Unverified</button>
+          <button class="tab" data-status="confirmed">Confirmed</button>
+          <button class="tab" data-status="resolved">Resolved</button>
+          <button class="tab" data-status="rejected">Rejected</button>
         </div>
         <div id="reportList" class="report-list"><div class="empty">Sign in to load reports.</div></div>
       </section>
+
       <aside style="display:flex;flex-direction:column;gap:14px">
         <section id="adminManagement" class="card hidden">
           <div class="card-head"><h3>Administrator management</h3><span class="role">Owner only</span></div>
@@ -81,163 +89,375 @@ button,input,select{font:inherit}button{cursor:pointer}.btn{border:1px solid var
   </section>
 </main>
 <div class="footer">Melbourne Emergency Watch · Administrative access is logged by Supabase authentication.</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 (() => {
   'use strict';
+
   // The publishable key is designed for browser use. Never put a service_role/secret key here.
   const SUPABASE_URL = "https://lqzxzlaxvfjuklyzxbex.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO";
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-  const $ = (id) => document.getElementById(id);
-  let currentRole = null, incidents = [], activeStatus = 'all', map = null, mapMarkers = [];
-  let realtimeChannel = null, pollingTimer = null, refreshTimer = null;
-  let incidentLoadInProgress = false, incidentRefreshQueued = false;
 
-  function showMessage(id, message, kind='') { const el=$(id); el.textContent=message; el.className='alert'+(kind?' '+kind:''); el.classList.remove('hidden'); }
-  function hideMessage(id) { $(id).classList.add('hidden'); }
-  function esc(value) { return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function pretty(value) { return String(value||'other').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase()); }
-  function dateText(value) { if(!value)return 'Time unavailable';const d=new Date(value);return Number.isNaN(d.getTime())?'Time unavailable':d.toLocaleString(); }
-  function statusClass(status) { return ['confirmed','resolved','rejected'].includes(status)?status:''; }
-  function setSignedInUI(signedIn) {
-    $('loginView').classList.toggle('hidden',signedIn);$('dashboardView').classList.toggle('hidden',!signedIn);
-    $('signOutBtn').classList.toggle('hidden',!signedIn);$('rolePill').classList.toggle('hidden',!signedIn);
-    if(signedIn)$('rolePill').textContent=currentRole.toUpperCase();
+  const $ = (id) => document.getElementById(id);
+  let currentRole = null;
+  let incidents = [];
+  let activeStatus = 'all';
+  let map = null;
+  let mapMarkers = [];
+  let realtimeChannel = null;
+  let pollingTimer = null;
+  let refreshTimer = null;
+  let incidentLoadInProgress = false;
+  let incidentRefreshQueued = false;
+
+  function showMessage(id, message, kind='') {
+    const el = $(id);
+    el.textContent = message;
+    el.className = 'alert' + (kind ? ' ' + kind : '');
+    el.classList.remove('hidden');
   }
-  function setRealtimeState(label) { const el=$('realtimeState');el.textContent=label;el.classList.remove('hidden'); }
+  function hideMessage(id) { $(id).classList.add('hidden'); }
+  function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+  function pretty(value) {
+    return String(value || 'other').replaceAll('_',' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  function dateText(value) {
+    if (!value) return 'Time unavailable';
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? 'Time unavailable' : d.toLocaleString();
+  }
+  function statusClass(status) {
+    return ['confirmed','resolved','rejected'].includes(status) ? status : '';
+  }
+  function setSignedInUI(signedIn) {
+    $('loginView').classList.toggle('hidden', signedIn);
+    $('dashboardView').classList.toggle('hidden', !signedIn);
+    $('signOutBtn').classList.toggle('hidden', !signedIn);
+    $('rolePill').classList.toggle('hidden', !signedIn);
+    if (signedIn) $('rolePill').textContent = currentRole.toUpperCase();
+  }
+
+  function setRealtimeState(label) {
+    const el = $('realtimeState');
+    el.textContent = label;
+    el.classList.remove('hidden');
+  }
+
   function stopLiveUpdates() {
-    if(realtimeChannel){db.removeChannel(realtimeChannel);realtimeChannel=null;}
-    if(pollingTimer){clearInterval(pollingTimer);pollingTimer=null;}
-    if(refreshTimer){clearTimeout(refreshTimer);refreshTimer=null;}
+    if (realtimeChannel) {
+      db.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+      pollingTimer = null;
+    }
+    if (refreshTimer) {
+      clearTimeout(refreshTimer);
+      refreshTimer = null;
+    }
     $('realtimeState').classList.add('hidden');
   }
-  function scheduleIncidentRefresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>loadIncidents(),300);}
-  function startLiveUpdates(){
-    stopLiveUpdates();setRealtimeState('CONNECTING…');
-    realtimeChannel=db.channel('admin-incidents-live').on('postgres_changes',{event:'*',schema:'public',table:'incidents'},()=>scheduleIncidentRefresh()).subscribe(status=>{
-      if(status==='SUBSCRIBED')setRealtimeState('● LIVE UPDATES');
-      else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED')setRealtimeState('● AUTO-REFRESH ACTIVE');
-      else setRealtimeState('CONNECTING…');
+
+  function scheduleIncidentRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => loadIncidents(), 300);
+  }
+
+  function startLiveUpdates() {
+    stopLiveUpdates();
+    setRealtimeState('CONNECTING…');
+
+    realtimeChannel = db.channel('admin-incidents-live')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'incidents'
+      }, () => {
+        scheduleIncidentRefresh();
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          setRealtimeState('● LIVE UPDATES');
+        } else if (status === 'CHANNEL_ERROR' ||
+                   status === 'TIMED_OUT' ||
+                   status === 'CLOSED') {
+          setRealtimeState('● AUTO-REFRESH ACTIVE');
+        } else {
+          setRealtimeState('CONNECTING…');
+        }
+      });
+
+    // Backup for browsers or networks where Realtime is unavailable.
+    pollingTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') loadIncidents();
+    }, 20000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadIncidents();
     });
-    pollingTimer=setInterval(()=>{if(document.visibilityState==='visible')loadIncidents();},20000);
-    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadIncidents();});
   }
-  async function checkRoleAndStart(session){
-    if(!session){stopLiveUpdates();currentRole=null;setSignedInUI(false);return;}
-    const {data:role,error}=await db.rpc('get_my_admin_role');
-    if(error||!role){await db.auth.signOut();setSignedInUI(false);showMessage('loginMessage','This account does not have administrator access. Ask the platform owner to grant access.','error');return;}
-    currentRole=role;setSignedInUI(true);$('welcomeText').textContent=`Signed in as ${session.user.email} · ${pretty(role)}`;
-    $('adminManagement').classList.toggle('hidden',role!=='owner');
-    await loadIncidents();startLiveUpdates();if(role==='owner')await loadAdmins();setTimeout(()=>{if(map)map.invalidateSize();},250);
+
+  async function checkRoleAndStart(session) {
+    if (!session) {
+      stopLiveUpdates();
+      currentRole = null;
+      setSignedInUI(false);
+      return;
+    }
+    const { data: role, error } = await db.rpc('get_my_admin_role');
+    if (error || !role) {
+      await db.auth.signOut();
+      setSignedInUI(false);
+      showMessage('loginMessage', 'This account does not have administrator access. Ask the platform owner to grant access.', 'error');
+      return;
+    }
+    currentRole = role;
+    setSignedInUI(true);
+    $('welcomeText').textContent = `Signed in as ${session.user.email} · ${pretty(role)}`;
+    $('adminManagement').classList.toggle('hidden', role !== 'owner');
+    await loadIncidents();
+    startLiveUpdates();
+    if (role === 'owner') await loadAdmins();
+    setTimeout(() => { if (map) map.invalidateSize(); }, 250);
   }
-  async function loadIncidents(){
-    if(incidentLoadInProgress){incidentRefreshQueued=true;return;}
-    incidentLoadInProgress=true;$('reportList').innerHTML='<div class="empty">Loading reports…</div>';
-    const fields='id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,created_at,updated_at,expires_at';
-    try{
-      const {data,error}=await db.from('incidents').select(fields).order('created_at',{ascending:false}).limit(250);
-      if(error)throw error;incidents=data||[];hideMessage('pageMessage');updateStats();renderReports();renderMap();
-    }catch(error){showMessage('pageMessage','Could not load incidents: '+error.message,'error');$('reportList').innerHTML='<div class="empty">Reports could not be loaded. Check the incidents SELECT policy.</div>';}
-    finally{incidentLoadInProgress=false;if(incidentRefreshQueued){incidentRefreshQueued=false;scheduleIncidentRefresh();}}
+
+  async function loadIncidents() {
+    if (incidentLoadInProgress) {
+      incidentRefreshQueued = true;
+      return;
+    }
+
+    incidentLoadInProgress = true;
+    $('reportList').innerHTML = '<div class="empty">Loading reports…</div>';
+    const fields = 'id,category,title,description,latitude,longitude,address,severity,status,reporter_id,anonymous,display_name,created_at,updated_at,expires_at';
+
+    try {
+      const { data, error } = await db.from('incidents').select(fields).order('created_at', { ascending: false }).limit(250);
+      if (error) throw error;
+
+      incidents = data || [];
+      hideMessage('pageMessage');
+      updateStats();
+      renderReports();
+      renderMap();
+    } catch (error) {
+      showMessage('pageMessage', 'Could not load incidents: ' + error.message, 'error');
+      $('reportList').innerHTML = '<div class="empty">Reports could not be loaded. Check the incidents SELECT policy.</div>';
+    } finally {
+      incidentLoadInProgress = false;
+      if (incidentRefreshQueued) {
+        incidentRefreshQueued = false;
+        scheduleIncidentRefresh();
+      }
+    }
   }
-  function updateStats(){
-    $('totalCount').textContent=incidents.length;$('pendingCount').textContent=incidents.filter(x=>x.status==='unverified').length;
-    $('confirmedCount').textContent=incidents.filter(x=>x.status==='confirmed').length;$('resolvedCount').textContent=incidents.filter(x=>x.status==='resolved').length;
-    $('loadedLabel').textContent=`${incidents.length} latest reports`;
+
+  function updateStats() {
+    $('totalCount').textContent = incidents.length;
+    $('pendingCount').textContent = incidents.filter(x => x.status === 'unverified').length;
+    $('confirmedCount').textContent = incidents.filter(x => x.status === 'confirmed').length;
+    $('resolvedCount').textContent = incidents.filter(x => x.status === 'resolved').length;
+    $('loadedLabel').textContent = `${incidents.length} latest reports`;
   }
-  function renderReports(){
-    const list=incidents.filter(x=>activeStatus==='all'||x.status===activeStatus);
-    if(!list.length){$('reportList').innerHTML='<div class="empty">No reports in this category.</div>';return;}
-    $('reportList').innerHTML=list.map(r=>{
-      const coords=Number.isFinite(Number(r.latitude))&&Number.isFinite(Number(r.longitude))?`${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}`:'No coordinates';
-      const reporter=r.anonymous?'Anonymous':(r.reporter_id?'Registered user':'Unspecified');const buttons=[];
-      if(r.status!=='confirmed')buttons.push(`<button class="btn success" data-action="confirmed" data-id="${esc(r.id)}">Confirm</button>`);
-      if(r.status!=='resolved')buttons.push(`<button class="btn" data-action="resolved" data-id="${esc(r.id)}">Resolve</button>`);
-      if(r.status!=='rejected')buttons.push(`<button class="btn" data-action="rejected" data-id="${esc(r.id)}">Reject</button>`);
-      if(r.status==='rejected')buttons.push(`<button class="btn" data-action="unverified" data-id="${esc(r.id)}">Restore</button>`);
-      if(currentRole==='owner'||currentRole==='admin')buttons.push(`<button class="btn danger" data-action="delete" data-id="${esc(r.id)}">Delete</button>`);
-      return `<article class="report"><div class="report-title"><strong>${esc(r.title||pretty(r.category))}</strong><span class="status ${statusClass(r.status)}">${esc(pretty(r.status))}</span></div>
-        <p><b>${esc(pretty(r.category))}</b>${r.address?' · '+esc(r.address):''}<br>${esc(r.description||'No description supplied')}</p>
-        <div class="meta">${esc(dateText(r.created_at))} · ${esc(pretty(r.severity))} · ${esc(reporter)} · ${esc(coords)}</div><div class="actions">${buttons.join('')}</div></article>`;
+
+  function renderReports() {
+    const list = incidents.filter(x => activeStatus === 'all' || x.status === activeStatus);
+    if (!list.length) {
+      $('reportList').innerHTML = '<div class="empty">No reports in this category.</div>';
+      return;
+    }
+    $('reportList').innerHTML = list.map(r => {
+      const coords = Number.isFinite(Number(r.latitude)) && Number.isFinite(Number(r.longitude))
+        ? `${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}` : 'No coordinates';
+      const reporter = r.anonymous
+        ? 'Anonymous'
+        : (r.display_name && r.display_name.trim()
+            ? r.display_name.trim()
+            : (r.reporter_id ? 'Registered user' : 'Unspecified'));
+      const buttons = [];
+      if (r.status !== 'confirmed') buttons.push(`<button class="btn success" data-action="confirmed" data-id="${esc(r.id)}">Confirm</button>`);
+      if (r.status !== 'resolved') buttons.push(`<button class="btn" data-action="resolved" data-id="${esc(r.id)}">Resolve</button>`);
+      if (r.status !== 'rejected') buttons.push(`<button class="btn" data-action="rejected" data-id="${esc(r.id)}">Reject</button>`);
+      if (r.status === 'rejected') buttons.push(`<button class="btn" data-action="unverified" data-id="${esc(r.id)}">Restore</button>`);
+      if (currentRole === 'owner' || currentRole === 'admin') {
+        buttons.push(`<button class="btn danger" data-action="delete" data-id="${esc(r.id)}">Delete</button>`);
+      }
+      return `<article class="report">
+        <div class="report-title"><strong>${esc(r.title || pretty(r.category))}</strong><span class="status ${statusClass(r.status)}">${esc(pretty(r.status))}</span></div>
+        <p><b>${esc(pretty(r.category))}</b>${r.address ? ' · ' + esc(r.address) : ''}<br>${esc(r.description || 'No description supplied')}</p>
+        <div class="meta">${esc(dateText(r.created_at))} · ${esc(pretty(r.severity))} · ${esc(reporter)} · ${esc(coords)}</div>
+        <div class="actions">${buttons.join('')}</div>
+      </article>`;
     }).join('');
   }
-  function initMap(){
-    if(map||!window.L)return;map=L.map('incidentMap').setView([28.0836,-80.6081],10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+
+  function initMap() {
+    if (map || !window.L) return;
+    map = L.map('incidentMap').setView([28.0836, -80.6081], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
   }
-  function renderMap(){
-    initMap();if(!map)return;mapMarkers.forEach(marker=>map.removeLayer(marker));mapMarkers=[];
-    incidents.forEach(r=>{
-      const lat=Number(r.latitude),lng=Number(r.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<27.5||lat>29.0||lng< -81.5||lng> -80.2)return;
-      const color=r.status==='confirmed'?'#16845b':r.status==='resolved'?'#64748b':r.status==='rejected'?'#c83e45':'#e58b23';
-      const marker=L.circleMarker([lat,lng],{radius:8,color:'#fff',weight:2,fillColor:color,fillOpacity:.95}).addTo(map)
-        .bindPopup(`<b>${esc(r.title||pretty(r.category))}</b><br>${esc(r.address||'')}<br>${esc(pretty(r.status))}<br>${esc(dateText(r.created_at))}`);
+
+  function renderMap() {
+    initMap();
+    if (!map) return;
+    mapMarkers.forEach(marker => map.removeLayer(marker));
+    mapMarkers = [];
+    incidents.forEach(r => {
+      const lat = Number(r.latitude), lng = Number(r.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      if (lat < 27.5 || lat > 29.0 || lng < -81.5 || lng > -80.2) return;
+      const color = r.status === 'confirmed' ? '#16845b' : r.status === 'resolved' ? '#64748b' : r.status === 'rejected' ? '#c83e45' : '#e58b23';
+      const marker = L.circleMarker([lat,lng], {radius:8,color:'#fff',weight:2,fillColor:color,fillOpacity:.95})
+        .addTo(map)
+        .bindPopup(`<b>${esc(r.title || pretty(r.category))}</b><br>${esc(r.address || '')}<br>${esc(pretty(r.status))}<br>${esc(dateText(r.created_at))}`);
       mapMarkers.push(marker);
     });
   }
-  async function changeStatus(id,status){
-    if(!['unverified','confirmed','resolved','rejected'].includes(status))return;
-    const {error}=await db.from('incidents').update({status}).eq('id',id);
-    if(error){showMessage('pageMessage','Status update failed: '+error.message,'error');return;}
-    showMessage('pageMessage',`Incident status updated to ${pretty(status)}.`,'good');await loadIncidents();
+
+  async function changeStatus(id, status) {
+    if (!['unverified','confirmed','resolved','rejected'].includes(status)) return;
+    const { error } = await db.from('incidents').update({ status }).eq('id', id);
+    if (error) {
+      showMessage('pageMessage', 'Status update failed: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', `Incident status updated to ${pretty(status)}.`, 'good');
+    await loadIncidents();
   }
-  async function deleteIncident(id){
-    if(!confirm('Permanently delete this incident report? This cannot be undone.'))return;
-    const {error}=await db.from('incidents').delete().eq('id',id);
-    if(error){showMessage('pageMessage','Delete failed: '+error.message,'error');return;}
-    showMessage('pageMessage','Incident report deleted.','good');await loadIncidents();
+
+  async function deleteIncident(id) {
+    if (!confirm('Permanently delete this incident report? This cannot be undone.')) return;
+    const { error } = await db.from('incidents').delete().eq('id', id);
+    if (error) {
+      showMessage('pageMessage', 'Delete failed: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', 'Incident report deleted.', 'good');
+    await loadIncidents();
   }
-  async function loadAdmins(){
-    $('adminList').innerHTML='<div class="empty">Loading administrator list…</div>';
-    const {data,error}=await db.rpc('get_admin_users');
-    if(error){$('adminList').innerHTML='<div class="empty">Could not load administrators: '+esc(error.message)+'</div>';return;}
-    if(!data||!data.length){$('adminList').innerHTML='<div class="empty">No administrator accounts found.</div>';return;}
-    $('adminList').innerHTML=data.map(a=>{
-      const roleControl=a.role==='owner'?'<span class="role">Protected owner</span>':`<select aria-label="Role for ${esc(a.email)}" data-role-user="${esc(a.user_id)}"><option value="admin" ${a.role==='admin'?'selected':''}>Administrator</option><option value="moderator" ${a.role==='moderator'?'selected':''}>Moderator</option></select>`;
-      const remove=a.role==='owner'?'':`<button class="btn danger" data-remove-admin="${esc(a.user_id)}">Remove</button>`;
-      return `<div class="admin-row"><div><strong>${esc(a.email||'Unknown email')}</strong><small>${esc(pretty(a.role))} · Added ${esc(dateText(a.created_at))}</small></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">${roleControl}${remove}</div></div>`;
+
+  async function loadAdmins() {
+    $('adminList').innerHTML = '<div class="empty">Loading administrator list…</div>';
+    const { data, error } = await db.rpc('get_admin_users');
+    if (error) {
+      $('adminList').innerHTML = '<div class="empty">Could not load administrators: ' + esc(error.message) + '</div>';
+      return;
+    }
+    if (!data || !data.length) {
+      $('adminList').innerHTML = '<div class="empty">No administrator accounts found.</div>';
+      return;
+    }
+    $('adminList').innerHTML = data.map(a => {
+      const roleControl = a.role === 'owner'
+        ? '<span class="role">Protected owner</span>'
+        : `<select aria-label="Role for ${esc(a.email)}" data-role-user="${esc(a.user_id)}"><option value="admin" ${a.role === 'admin' ? 'selected' : ''}>Administrator</option><option value="moderator" ${a.role === 'moderator' ? 'selected' : ''}>Moderator</option></select>`;
+      const remove = a.role === 'owner' ? '' : `<button class="btn danger" data-remove-admin="${esc(a.user_id)}">Remove</button>`;
+      return `<div class="admin-row"><div><strong>${esc(a.email || 'Unknown email')}</strong><small>${esc(pretty(a.role))} · Added ${esc(dateText(a.created_at))}</small></div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">${roleControl}${remove}</div></div>`;
     }).join('');
   }
-  $('loginForm').addEventListener('submit',async e=>{
-    e.preventDefault();hideMessage('loginMessage');
-    const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-    if(error){showMessage('loginMessage',error.message,'error');return;}await checkRoleAndStart(data.session);
+
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    hideMessage('loginMessage');
+    const { data, error } = await db.auth.signInWithPassword({
+      email: $('email').value.trim(),
+      password: $('password').value
+    });
+    if (error) {
+      showMessage('loginMessage', error.message, 'error');
+      return;
+    }
+    await checkRoleAndStart(data.session);
   });
-  $('signOutBtn').addEventListener('click',async()=>{
-    stopLiveUpdates();await db.auth.signOut();currentRole=null;incidents=[];setSignedInUI(false);
+
+  $('signOutBtn').addEventListener('click', async () => {
+    stopLiveUpdates();
+    await db.auth.signOut();
+    currentRole = null;
+    incidents = [];
+    setSignedInUI(false);
   });
-  $('refreshBtn').addEventListener('click',loadIncidents);$('reloadAdminsBtn').addEventListener('click',loadAdmins);
-  $('statusTabs').addEventListener('click',e=>{
-    const button=e.target.closest('[data-status]');if(!button)return;activeStatus=button.dataset.status;
-    document.querySelectorAll('#statusTabs .tab').forEach(x=>x.classList.toggle('active',x===button));renderReports();
+
+  $('refreshBtn').addEventListener('click', loadIncidents);
+  $('reloadAdminsBtn').addEventListener('click', loadAdmins);
+
+  $('statusTabs').addEventListener('click', e => {
+    const button = e.target.closest('[data-status]');
+    if (!button) return;
+    activeStatus = button.dataset.status;
+    document.querySelectorAll('#statusTabs .tab').forEach(x => x.classList.toggle('active', x === button));
+    renderReports();
   });
-  $('reportList').addEventListener('click',async e=>{
-    const button=e.target.closest('[data-action]');if(!button)return;const {action,id}=button.dataset;
-    if(action==='delete')await deleteIncident(id);else await changeStatus(id,action);
+
+  $('reportList').addEventListener('click', async e => {
+    const button = e.target.closest('[data-action]');
+    if (!button) return;
+    const { action, id } = button.dataset;
+    if (action === 'delete') await deleteIncident(id);
+    else await changeStatus(id, action);
   });
-  $('addAdminForm').addEventListener('submit',async e=>{
-    e.preventDefault();const email=$('newAdminEmail').value.trim(),role=$('newAdminRole').value;
-    const {error}=await db.rpc('add_admin_by_email',{p_email:email,p_role:role});
-    if(error){showMessage('pageMessage','Could not add administrator: '+error.message,'error');return;}
-    $('addAdminForm').reset();showMessage('pageMessage',`${email} now has ${pretty(role)} access.`,'good');await loadAdmins();
+
+  $('addAdminForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('newAdminEmail').value.trim();
+    const role = $('newAdminRole').value;
+    const { error } = await db.rpc('add_admin_by_email', { p_email: email, p_role: role });
+    if (error) {
+      showMessage('pageMessage', 'Could not add administrator: ' + error.message, 'error');
+      return;
+    }
+    $('addAdminForm').reset();
+    showMessage('pageMessage', `${email} now has ${pretty(role)} access.`, 'good');
+    await loadAdmins();
   });
-  $('adminList').addEventListener('change',async e=>{
-    const select=e.target.closest('[data-role-user]');if(!select)return;
-    const {error}=await db.rpc('set_admin_role',{p_user_id:select.dataset.roleUser,p_role:select.value});
-    if(error){showMessage('pageMessage','Role change failed: '+error.message,'error');await loadAdmins();return;}
-    showMessage('pageMessage','Administrator role updated.','good');await loadAdmins();
+
+  $('adminList').addEventListener('change', async e => {
+    const select = e.target.closest('[data-role-user]');
+    if (!select) return;
+    const { error } = await db.rpc('set_admin_role', {
+      p_user_id: select.dataset.roleUser,
+      p_role: select.value
+    });
+    if (error) {
+      showMessage('pageMessage', 'Role change failed: ' + error.message, 'error');
+      await loadAdmins();
+      return;
+    }
+    showMessage('pageMessage', 'Administrator role updated.', 'good');
+    await loadAdmins();
   });
-  $('adminList').addEventListener('click',async e=>{
-    const button=e.target.closest('[data-remove-admin]');if(!button)return;
-    if(!confirm('Remove this person’s administrator access? Their public account and incident reports will remain.'))return;
-    const {error}=await db.rpc('remove_admin',{p_user_id:button.dataset.removeAdmin});
-    if(error){showMessage('pageMessage','Could not remove access: '+error.message,'error');return;}
-    showMessage('pageMessage','Administrator access removed. The user account was not deleted.','good');await loadAdmins();
+
+  $('adminList').addEventListener('click', async e => {
+    const button = e.target.closest('[data-remove-admin]');
+    if (!button) return;
+    if (!confirm('Remove this person’s administrator access? Their public account and incident reports will remain.')) return;
+    const { error } = await db.rpc('remove_admin', { p_user_id: button.dataset.removeAdmin });
+    if (error) {
+      showMessage('pageMessage', 'Could not remove access: ' + error.message, 'error');
+      return;
+    }
+    showMessage('pageMessage', 'Administrator access removed. The user account was not deleted.', 'good');
+    await loadAdmins();
   });
-  db.auth.getSession().then(({data})=>checkRoleAndStart(data.session));
-  db.auth.onAuthStateChange((_event,session)=>{if(!session){stopLiveUpdates();currentRole=null;setSignedInUI(false);}});
+
+  db.auth.getSession().then(({ data }) => checkRoleAndStart(data.session));
+  db.auth.onAuthStateChange((_event, session) => {
+    if (!session) {
+      stopLiveUpdates();
+      currentRole = null;
+      setSignedInUI(false);
+    }
+  });
 })();
 </script>
 </body>
