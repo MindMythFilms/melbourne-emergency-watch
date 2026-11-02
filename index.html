@@ -64,8 +64,11 @@ main{max-width:1320px;margin:30px auto;padding:0 24px}
 .mapnote{font-size:11px;background:#fbfcfd;padding:11px 16px}
 .form{padding:20px}.formgrid{gap:15px}
 label{font-size:12px;letter-spacing:.01em;color:#334d61}
-input,select,textarea{border:1px solid #d4e0e8;border-radius:11px;padding:12px 13px;background:#fbfdfe;transition:border-color .18s,box-shadow .18s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#19a7a1;box-shadow:0 0 0 3px #19a7a11c;background:#fff}
+input,select,textarea{color:var(--ink);-webkit-text-fill-color:var(--ink);border:1px solid #d4e0e8;border-radius:11px;padding:12px 13px;background:#fbfdfe;transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus,textarea:focus{color:var(--ink);-webkit-text-fill-color:var(--ink);outline:none;border-color:#19a7a1;box-shadow:0 0 0 3px #19a7a11c;background:#fff}
+input::placeholder,textarea::placeholder{color:#718397;opacity:1}
+body.dark input,body.dark select,body.dark textarea{color:#f2f7fa;-webkit-text-fill-color:#f2f7fa;background:#0a1b2b;border-color:#385168}
+body.dark input::placeholder,body.dark textarea::placeholder{color:#a8bbca;opacity:1}
 textarea{min-height:115px}
 button,.btn{border-radius:11px;background:linear-gradient(135deg,#159c98,#117b86);padding:11px 16px;box-shadow:0 5px 13px #128f8b26;transition:transform .18s,filter .18s,box-shadow .18s}
 button:hover,.btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 8px 18px #128f8b30}
