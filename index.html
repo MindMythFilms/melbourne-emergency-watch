@@ -336,6 +336,32 @@ body.dark .map-filters select{background:#0a1b2b;color:#f2f7fa;border-color:#385
 #map{height:min(60vh,520px);min-height:340px}#report-panel{margin-top:12px}#community-reports-panel,#official-alerts-panel{margin-top:12px}#community-reports-panel .reportlist,#official-alerts-panel .reportlist{padding:4px 13px 14px;max-height:none;overflow:visible}#nwsAlertStatus{font-size:13px;margin:10px 13px!important}}
 @media(max-width:370px){.map-filters{grid-template-columns:1fr}.map-filters .pill{grid-column:auto}}
 
+
+/* Keep map filters and action buttons in separate, non-overlapping tracks. */
+#map-panel .map-toolbar{display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);align-items:end;gap:14px 20px;width:100%}
+#map-panel .map-actions{display:grid;grid-template-columns:repeat(2,minmax(112px,max-content));align-items:stretch;gap:9px;min-width:0}
+#map-panel .map-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;align-items:end;gap:10px;min-width:0;width:100%}
+#map-panel .map-filters label{display:block;min-width:0;width:100%;max-width:none;box-sizing:border-box}
+#map-panel .map-filters select,#map-panel #sourceFilter,#map-panel #mapFilter{display:block;width:100%;min-width:0;max-width:none;box-sizing:border-box}
+#map-panel .map-actions>*{min-width:0;max-width:100%;box-sizing:border-box;white-space:normal;text-align:center}
+#map-panel .map-filters .pill{align-self:end;white-space:nowrap}
+@media(max-width:1100px){
+ #map-panel .map-toolbar{grid-template-columns:minmax(0,1fr)}
+ #map-panel .map-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #map-panel .map-filters{grid-template-columns:repeat(2,minmax(0,1fr)) auto}
+}
+@media(max-width:650px){
+ #map-panel .map-toolbar{gap:10px}
+ #map-panel .map-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #map-panel .map-filters{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+ #map-panel .map-filters .pill{grid-column:1/-1;justify-self:start}
+ #map-panel .map-actions>*{min-height:42px;font-size:13px}
+}
+@media(max-width:370px){
+ #map-panel .map-filters{grid-template-columns:minmax(0,1fr)}
+ #map-panel .map-filters .pill{grid-column:auto}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
