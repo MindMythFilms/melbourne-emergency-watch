@@ -1415,14 +1415,14 @@ const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard Count
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="radar",showEvacuation=mode==="evacuation";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="radar",showEvacuation=mode==="evacuation",showRoutes=mode==="both"||mode==="evacuation";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
   if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
  if(showRadar){if(!map.hasLayer(rainRadarLayer))rainRadarLayer.addTo(map)}else if(map.hasLayer(rainRadarLayer))map.removeLayer(rainRadarLayer);
  if(showEvacuation){if(!map.hasLayer(evacuationZoneLayer))evacuationZoneLayer.addTo(map)}else if(map.hasLayer(evacuationZoneLayer))map.removeLayer(evacuationZoneLayer);
- if(showEvacuation){if(!map.hasLayer(evacuationRouteLayer))evacuationRouteLayer.addTo(map)}else if(map.hasLayer(evacuationRouteLayer))map.removeLayer(evacuationRouteLayer);
+ if(showRoutes){if(!map.hasLayer(evacuationRouteLayer))evacuationRouteLayer.addTo(map)}else if(map.hasLayer(evacuationRouteLayer))map.removeLayer(evacuationRouteLayer);
  const officialList=$("nwsAlertList"),communityList=$("latestReports");
  if(officialList)officialList.hidden=!showOfficial;
  if(communityList)communityList.hidden=!showCommunity;
@@ -1432,7 +1432,7 @@ function applySourceFilter(){
  const radarStatus=$("rainRadarStatus");if(radarStatus)radarStatus.hidden=!showRadar;
  const evacStatus=$("evacuationStatus");if(evacStatus)evacStatus.hidden=!showEvacuation;
 }
-/* Official Florida evacuation-zone reference polygons; routes remain linked to the FDEM county map PDF. */
+/* Official Florida evacuation-zone polygons and designated route lines. */
 let evacuationFetchInProgress=false;
 let evacuationRouteFetchInProgress=false;
 async function loadEvacuationRoutes(){
@@ -1441,7 +1441,7 @@ async function loadEvacuationRoutes(){
  const status=$("evacuationUpdated");
  try{
   const endpoint="https://services.arcgis.com/f5HgUpxURgEzTccH/ArcGIS/rest/services/EvacuationRoutes/FeatureServer/6/query";
-  const params=new URLSearchParams({where:"County='Brevard'",outFields:"NAME,County",returnGeometry:"true",outSR:"4326",f:"geojson"});
+  const params=new URLSearchParams({where:"County LIKE '%Brevard%'",outFields:"*",returnGeometry:"true",outSR:"4326",f:"geojson"});
   const response=await fetch(endpoint+"?"+params.toString(),{headers:{Accept:"application/geo+json"},cache:"no-store"});
   if(!response.ok)throw new Error("Evacuation routes HTTP "+response.status);
   const data=await response.json();
