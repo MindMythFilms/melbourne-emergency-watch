@@ -225,7 +225,7 @@ footer{font-size:14px}
 .legend-items>span{display:grid;grid-template-columns:20px 1fr;grid-template-rows:auto auto;column-gap:9px;align-items:center;padding:9px 10px;background:#fff;border:1px solid #dce6ee;border-radius:11px;min-width:0}
 .legend-items b{font-size:15px;line-height:1.3;color:#183247}
 .legend-items small{grid-column:2;font-size:13px;line-height:1.35;color:#586d7e}
-.legend-symbol{grid-row:1/3;display:block;width:16px;height:16px;border:2px solid #fff;box-shadow:0 0 0 1px #536779;border-radius:50%}.power-symbol{width:auto!important;height:auto!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#facc15;font-size:23px;font-style:normal;font-weight:900;line-height:16px;text-shadow:-1px -1px 0 #754b00,1px 1px 0 #754b00}
+.legend-symbol{grid-row:1/3;display:block;width:16px;height:16px;border:2px solid #fff;box-shadow:0 0 0 1px #536779;border-radius:50%}.power-symbol{width:auto!important;height:auto!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#facc15;font-size:23px;font-style:normal;font-weight:900;line-height:16px;text-shadow:-1px -1px 0 #754b00,1px 1px 0 #754b00}.water-symbol{width:auto!important;height:auto!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-size:19px;line-height:16px}
 .community-symbol{background:#0f766e}
 .extreme-symbol{background:#b91c1c}
 .severe-symbol{background:#ea580c}
@@ -1291,15 +1291,15 @@ body:not(.dark) footer{color:#526b7b!important}
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
    <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
-   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
-   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div>
+   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
+   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
    <div class="map-basemap-card"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div>
    <section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section>
   </aside>
   <div class="map-stage"><div id="map"></div><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
- <div class="nws-legend" id="nwsLegend" aria-label="Map legend"><div class="legend-heading"><strong>Map legend</strong><span>Colors identify the source and severity</span></div><div class="legend-items"><span><i class="legend-symbol community-symbol"></i><b>Community report</b><small>Unverified submission</small></span><span><i class="legend-symbol power-symbol" aria-hidden="true">⚡</i><b>Power outage</b><small>MassOutage utility data</small></span><span><i class="legend-symbol extreme-symbol"></i><b>Extreme</b><small>NWS official alert</small></span><span><i class="legend-symbol severe-symbol"></i><b>Severe</b><small>NWS official alert</small></span><span><i class="legend-symbol moderate-symbol"></i><b>Moderate</b><small>NWS official alert</small></span><span><i class="legend-symbol minor-symbol"></i><b>Minor</b><small>NWS official alert</small></span><span><i class="legend-symbol unknown-symbol"></i><b>Unspecified</b><small>NWS severity not provided</small></span></div><p class="legend-note">Colored outlined areas show NWS alert coverage. Circular pins show point locations. Community reports are not independently verified.</p></div>
+ <div class="nws-legend" id="nwsLegend" aria-label="Map legend"><div class="legend-heading"><strong>Map legend</strong><span>Colors identify the source and severity</span></div><div class="legend-items"><span><i class="legend-symbol community-symbol"></i><b>Community report</b><small>Unverified submission</small></span><span><i class="legend-symbol power-symbol" aria-hidden="true">⚡</i><b>Power outage</b><small>MassOutage utility data</small></span><span><i class="legend-symbol water-symbol" aria-hidden="true">💧</i><b>Water-level gauge</b><small>USGS live gage-height reading</small></span><span><i class="legend-symbol extreme-symbol"></i><b>Extreme</b><small>NWS official alert</small></span><span><i class="legend-symbol severe-symbol"></i><b>Severe</b><small>NWS official alert</small></span><span><i class="legend-symbol moderate-symbol"></i><b>Moderate</b><small>NWS official alert</small></span><span><i class="legend-symbol minor-symbol"></i><b>Minor</b><small>NWS official alert</small></span><span><i class="legend-symbol unknown-symbol"></i><b>Unspecified</b><small>NWS severity not provided</small></span></div><p class="legend-note">Colored outlined areas show NWS alert coverage. Circular pins show point locations. Community reports are not independently verified.</p></div>
  <div class="mapnote">Satellite imagery is not live and may be outdated. Community pins are unverified resident submissions. Official NWS alerts are shown separately with colored warning areas and alert markers. CoastWatch FL is not an emergency service. Imagery © Esri and its contributors.</div>
 </section>
 <section class="panel" id="report-panel"><div class="panelhead"><h2>Submit a hazard observation</h2></div><div class="form"><form id="reportForm"><div class="formgrid">
@@ -1398,22 +1398,62 @@ map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
 // COASTWATCH_NWS_ALERTS_V2 — isolated official-alert overlay; never modifies community report loading.
 const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
-let powerOutageFetchInProgress=false;
+const usgsWaterLayer=L.featureGroup().addTo(map);
+let powerOutageFetchInProgress=false,usgsWaterFetchInProgress=false;
 let nwsAlertFetchInProgress=false;
 const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard County; used only when NWS supplies no geometry.
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
+  if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
  const officialList=$("nwsAlertList"),communityList=$("latestReports");
  if(officialList)officialList.hidden=!showOfficial;
  if(communityList)communityList.hidden=!showCommunity;
  const status=$("nwsAlertStatus");if(status)status.hidden=!showOfficial;
   const powerStatus=$("powerOutageStatus");if(powerStatus)powerStatus.hidden=!showPower;
+  const waterStatus=$("usgsWaterStatus");if(waterStatus)waterStatus.hidden=!showWater;
 }
+async function loadUSGSWaterLevels(){
+ if(usgsWaterFetchInProgress||document.visibilityState==="hidden")return;usgsWaterFetchInProgress=true;
+ const count=$("usgsWaterCount"),updated=$("usgsWaterUpdated");
+ try{
+  const url="https://api.waterdata.usgs.gov/ogcapi/v0/collections/latest-continuous/items?f=json&limit=500&state_code=12&county_code=009&parameter_code=00065";
+  const response=await fetch(url,{headers:{Accept:"application/geo+json, application/json"},cache:"no-store"});
+  if(!response.ok)throw new Error("USGS HTTP "+response.status);
+  const payload=await response.json();
+  const features=Array.isArray(payload.features)?payload.features:[];
+  const latestBySite=new Map();
+  features.forEach(feature=>{
+   const p=feature.properties||{},id=p.monitoring_location_id||p.id;
+   if(!id||!feature.geometry||p.value==null)return;
+   const previous=latestBySite.get(id);
+   if(!previous||new Date(p.time||0)>new Date(previous.properties?.time||0))latestBySite.set(id,feature);
+  });
+  usgsWaterLayer.clearLayers();
+  const waterIcon=L.divIcon({className:"mew-usgs-water-icon",html:'<span style="display:block;color:#38bdf8;font-size:25px;line-height:30px;text-shadow:-1px -1px 0 #063b61,1px 1px 0 #063b61,0 2px 4px #000b">💧</span>',iconSize:[30,30],iconAnchor:[15,15]});
+  latestBySite.forEach(feature=>{
+   const p=feature.properties||{},coords=feature.geometry?.coordinates;
+   if(!Array.isArray(coords)||coords.length<2)return;
+   const value=Number(p.value),unit=p.unit_of_measure||"unit not reported";
+   const station=esc(p.monitoring_location_name||p.monitoring_location_id||"USGS monitoring station");
+   const timestamp=p.time?new Date(p.time).toLocaleString():"Time not reported";
+   const status=String(p.approval_status||"").toLowerCase()==="approved"?"Approved":"Provisional / subject to revision";
+   const popupHtml='<div style="min-width:210px"><strong>💧 USGS water-level monitoring</strong><div style="margin-top:5px"><b>'+station+'</b></div><div><b>Latest gage height:</b> '+esc(Number.isFinite(value)?value.toLocaleString(undefined,{maximumFractionDigits:3}):p.value)+' '+esc(unit)+'</div><div><b>Reading time:</b> '+esc(timestamp)+'</div><div><b>Data status:</b> '+esc(status)+'</div><small>Source: U.S. Geological Survey · Live monitoring observation. A gauge reading does not confirm flooding at nearby roads or properties.</small><p><a href="https://waterdata.usgs.gov/monitoring-location/'+encodeURIComponent(p.monitoring_location_id||"")+'" target="_blank" rel="noopener noreferrer">Open USGS station details ↗</a></p></div>';
+   L.marker([coords[1],coords[0]],{icon:waterIcon,zIndexOffset:300}).bindPopup(popupHtml).addTo(usgsWaterLayer);
+  });
+  if(count)count.textContent=latestBySite.size+" live water-level "+(latestBySite.size===1?"station":"stations");
+  if(updated)updated.textContent="USGS · Gage height · Updated "+new Date().toLocaleTimeString();
+ }catch(error){
+  console.warn("CoastWatch USGS water data unavailable:",error);
+  if(count)count.textContent="Water data unavailable";
+  if(updated)updated.textContent="USGS feed unavailable · Try again later";
+ }finally{usgsWaterFetchInProgress=false;}
+}
+
 async function loadPowerOutages(){
  if(powerOutageFetchInProgress)return;powerOutageFetchInProgress=true;
  const count=$("powerOutageCount"),updated=$("powerOutageUpdated");
@@ -1660,7 +1700,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();loadPublicZones();loadPowerOutages();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);
+loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
