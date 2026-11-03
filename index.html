@@ -1891,4 +1891,22 @@ async function checkForSiteUpdates(){
  finally{mewPageCheckBusy=false}
 }
 setInterval(checkForSiteUpdates,180000);
+
+<script>
+/* Keep the active-zone panel in the desktop sidebar; float it over the map on mobile. */
+(()=> {
+ const panel=document.getElementById("mapZonesCard");
+ const stage=document.querySelector("#map-panel .map-stage");
+ const sidebar=document.querySelector("#map-panel .map-sidebar");
+ if(!panel||!stage||!sidebar)return;
+ const mobile=window.matchMedia("(max-width: 700px)");
+ const placePanel=()=>{
+  const target=mobile.matches?stage:sidebar;
+  if(panel.parentElement!==target)target.appendChild(panel);
+ };
+ placePanel();
+ if(mobile.addEventListener)mobile.addEventListener("change",placePanel);
+ else mobile.addListener(placePanel);
+})();
+</script>
 </script></body></html>
