@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-mobile-community-popup-position-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-evacuation-radar-layers-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1291,9 +1291,9 @@ body:not(.dark) footer{color:#526b7b!important}
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
    <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
-   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
+   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
    <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
-   <div class="map-basemap-card"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div>
+   <div class="map-basemap-card"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
    <section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section>
   </aside>
   <div class="map-stage"><div id="map"></div><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
@@ -1399,23 +1399,53 @@ map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
 const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
 const usgsWaterLayer=L.featureGroup().addTo(map);
+const evacuationZoneLayer=L.featureGroup();
+const rainRadarLayer=L.tileLayer.wms("https://opengeo.ncep.noaa.gov/geoserver/kmlb/ows",{layers:"kmlb:SR_BREF",format:"image/png",transparent:true,version:"1.1.1",opacity:.68,attribution:"Radar: NOAA/NWS RIDGE II · KMLB"});
 let powerOutageFetchInProgress=false,usgsWaterFetchInProgress=false;
 let nwsAlertFetchInProgress=false;
 const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard County; used only when NWS supplies no geometry.
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="both"||mode==="evacuation";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
   if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
+ if(showRadar){if(!map.hasLayer(rainRadarLayer))rainRadarLayer.addTo(map)}else if(map.hasLayer(rainRadarLayer))map.removeLayer(rainRadarLayer);
+ if(showEvacuation){if(!map.hasLayer(evacuationZoneLayer))evacuationZoneLayer.addTo(map)}else if(map.hasLayer(evacuationZoneLayer))map.removeLayer(evacuationZoneLayer);
  const officialList=$("nwsAlertList"),communityList=$("latestReports");
  if(officialList)officialList.hidden=!showOfficial;
  if(communityList)communityList.hidden=!showCommunity;
  const status=$("nwsAlertStatus");if(status)status.hidden=!showOfficial;
   const powerStatus=$("powerOutageStatus");if(powerStatus)powerStatus.hidden=!showPower;
   const waterStatus=$("usgsWaterStatus");if(waterStatus)waterStatus.hidden=!showWater;
+ const radarStatus=$("rainRadarStatus");if(radarStatus)radarStatus.hidden=!showRadar;
+ const evacStatus=$("evacuationStatus");if(evacStatus)evacStatus.hidden=!showEvacuation;
+}
+/* Official Florida evacuation-zone reference polygons; routes remain linked to the FDEM county map PDF. */
+let evacuationFetchInProgress=false;
+async function loadEvacuationZones(){
+ if(evacuationFetchInProgress||document.visibilityState==="hidden")return;
+ evacuationFetchInProgress=true;
+ const status=$("evacuationUpdated");
+ try{
+  const endpoint="https://services.arcgis.com/3wFbqsFPLeKqOlIK/ArcGIS/rest/services/NCS_Map_with_P_Surge_WFL1/FeatureServer/6/query";
+  const params=new URLSearchParams({where:"County_Name='Brevard'",outFields:"County_Name,EZone",returnGeometry:"true",outSR:"4326",f:"geojson"});
+  const response=await fetch(endpoint+"?"+params.toString(),{headers:{Accept:"application/geo+json"},cache:"no-store"});
+  if(!response.ok)throw new Error("Evacuation zones HTTP "+response.status);
+  const data=await response.json();
+  if(data.error)throw new Error(data.error.message||"GIS service error");
+  evacuationZoneLayer.clearLayers();
+  const features=(data.features||[]).filter(f=>f.geometry);
+  if(features.length){
+   L.geoJSON(data,{style:f=>{const z=String(f.properties?.EZone||"").toUpperCase();const palette={A:"#e53935",B:"#f57c00",C:"#fbc02d",D:"#8bc34a",E:"#42a5f5",F:"#8e24aa",T:"#ad1457"};const color=palette[z]||"#e53935";return{color,weight:2,opacity:.95,fillColor:color,fillOpacity:.13,dashArray:"5 4"};},onEachFeature:(f,layer)=>{const zone=String(f.properties?.EZone||"Unspecified");layer.bindPopup("<strong>Brevard County evacuation zone "+esc(zone)+"</strong><br><small>Preparedness reference only. This is not an evacuation order. Follow Brevard Emergency Management for current instructions.</small>");}}).addTo(evacuationZoneLayer);
+   if(status)status.textContent=features.length+" zone areas loaded · FDEM reference data";
+  }else if(status)status.textContent="No zone polygons returned; use the official county map PDF.";
+ }catch(error){
+  console.warn("CoastWatch evacuation-zone feed unavailable:",error);
+  if(status)status.textContent="Zone overlay temporarily unavailable · official PDF link below.";
+ }finally{evacuationFetchInProgress=false;}
 }
 async function loadUSGSWaterLevels(){
  if(usgsWaterFetchInProgress||document.visibilityState==="hidden")return;usgsWaterFetchInProgress=true;
@@ -1700,7 +1730,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);
+loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
