@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-evacuation-link-contrast-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-evacuation-routes-loader-fix-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1434,9 +1434,10 @@ function applySourceFilter(){
 }
 /* Official Florida evacuation-zone reference polygons; routes remain linked to the FDEM county map PDF. */
 let evacuationFetchInProgress=false;
+let evacuationRouteFetchInProgress=false;
 async function loadEvacuationRoutes(){
- if(evacuationFetchInProgress||document.visibilityState==="hidden")return;
- evacuationFetchInProgress=true;
+ if(evacuationRouteFetchInProgress||document.visibilityState==="hidden")return;
+ evacuationRouteFetchInProgress=true;
  const status=$("evacuationUpdated");
  try{
   const endpoint="https://services.arcgis.com/f5HgUpxURgEzTccH/ArcGIS/rest/services/EvacuationRoutes/FeatureServer/6/query";
@@ -1455,7 +1456,7 @@ async function loadEvacuationRoutes(){
  }catch(error){
   console.warn("CoastWatch evacuation-route feed unavailable:",error);
   if(status)status.textContent="Route overlay temporarily unavailable · official county map PDF below.";
- }finally{evacuationFetchInProgress=false;}
+ }finally{evacuationRouteFetchInProgress=false;}
 }
 async function loadEvacuationZones(){
  if(evacuationFetchInProgress||document.visibilityState==="hidden")return;
