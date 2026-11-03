@@ -505,6 +505,52 @@ body.dark #map-panel .map-filters select{background:#0a1b2b!important;color:#edf
 }
 @media(max-width:350px){#map-panel .map-filters{grid-template-columns:minmax(0,1fr)!important}}
 
+
+/* Stable non-overlapping filter layout; each control owns exactly half the row. */
+#map-panel .map-filter-area{
+ display:block!important;position:relative!important;clear:both!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ margin:12px 0 0!important;padding:0!important;box-sizing:border-box!important;
+}
+#map-panel .map-filter-status{
+ display:flex!important;position:static!important;align-items:center!important;
+ gap:10px!important;width:100%!important;margin:0 0 8px!important;
+}
+#map-panel .map-filters{
+ display:flex!important;position:static!important;flex-flow:row nowrap!important;
+ align-items:flex-start!important;justify-content:stretch!important;
+ gap:12px!important;width:100%!important;max-width:100%!important;
+ min-width:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;
+}
+#map-panel .map-filters>label{
+ display:block!important;position:static!important;float:none!important;
+ flex:1 1 0!important;width:50%!important;max-width:50%!important;min-width:0!important;
+ margin:0!important;padding:0!important;box-sizing:border-box!important;
+ font-size:13px!important;line-height:1.35!important;
+}
+#map-panel .map-filters>label select{
+ display:block!important;position:static!important;float:none!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ height:48px!important;min-height:48px!important;margin:5px 0 0!important;
+ padding:8px 30px 8px 12px!important;box-sizing:border-box!important;
+ font-family:Arial,system-ui,sans-serif!important;font-size:15px!important;
+ font-weight:500!important;line-height:normal!important;letter-spacing:normal!important;
+ text-align:left!important;text-indent:0!important;white-space:nowrap!important;
+ text-overflow:clip!important;overflow:hidden!important;
+ -webkit-appearance:menulist!important;appearance:auto!important;
+}
+#map-panel .map-filters>label select option{font-size:15px!important}
+@media(max-width:650px){
+ #map-panel .map-filter-area{margin-top:10px!important}
+ #map-panel .map-filters{gap:8px!important}
+ #map-panel .map-filters>label{font-size:11px!important}
+ #map-panel .map-filters>label select{height:46px!important;min-height:46px!important;padding:7px 23px 7px 8px!important;font-size:13px!important}
+}
+@media(max-width:350px){
+ #map-panel .map-filters{flex-direction:column!important}
+ #map-panel .map-filters>label{width:100%!important;max-width:100%!important;flex:1 1 auto!important}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
