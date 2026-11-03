@@ -305,6 +305,9 @@ main{margin:9px auto;padding:0 10px}
 /* Keep the top of the report form visible below the sticky header when the map shortcut is used. */
 #report-panel{scroll-margin-top:215px}
 @media(max-width:650px){#report-panel{scroll-margin-top:155px}}
+/* Use clear image-specific wording in the native file picker. */
+input#photos::file-selector-button{font-size:0}
+input#photos::file-selector-button::after{content:"Choose images";font-size:14px}
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
@@ -332,7 +335,7 @@ main{margin:9px auto;padding:0 10px}
 <div class="full"><label for="description">What did you observe? *</label><textarea id="description" maxlength="1500" required placeholder="Describe only what you personally observed. Do not include names or private information."></textarea></div>
 <div><label for="severity">Severity *</label><select id="severity" required><option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option><option value="critical">Critical</option></select></div>
 <div><label for="displayName">Display name (optional)</label><input id="displayName" maxlength="60" placeholder="Anonymous if blank"></div>
-<div class="full"><label for="photos">Photos (optional, up to 3)</label><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+<div class="full"><label for="photos">Photos (optional, up to 3)</label><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-label="Choose images">
 <div class="mew-photo-rules"><strong>Photo upload rules — please read before selecting images</strong><ul><li><strong>Only upload photos you personally took</strong> or have clear permission and legal rights to share. No copyrighted images taken from websites, social media, news, or other people.</li><li><strong>No logos, trademarks, watermarks, or branded signage.</strong></li><li><strong>No people in photos at all.</strong> This is an absolute rule, even if a person is in the background, their face is hidden, blurred, or not recognizable. Do not upload images containing bystanders, pedestrians, victims, children, police officers, firefighters, EMTs, or any other person.</li><li><strong>No license plates</strong> or other identifying vehicle details.</li><li>Do not show private information such as home addresses, documents, phone numbers, screens, or personal records.</li><li>No graphic, disturbing, sexual, threatening, misleading, or edited/manipulated images.</li><li>Photograph only from a safe, lawful location. Never approach danger or delay getting to safety to take a picture.</li></ul><p>Photos that break these rules may be rejected or removed. All photos remain private until an administrator completes a content and privacy review. Approval does not verify the incident.</p>
 <label class="mew-photo-ack"><input id="photoRulesAck" type="checkbox" disabled> I confirm that these photos follow the rules and that I have the right to submit them.</label></div>
 <div class="hint">JPEG, PNG, or WebP · Up to 3 photos · Maximum 5 MB each. Images are converted to JPEG and location metadata is removed.</div></div>
