@@ -164,7 +164,7 @@ async function loadMap(){refreshAdminMapSize();markers.forEach(m=>map.removeLaye
 
 /* Admin-only polygon zone editor. Leaflet.draw supports mouse and touch input. */
 const zoneLayers=L.featureGroup().addTo(map);
-let zones=[],pendingZoneLayer=null,zoneEditControl=null;
+let zones=[],pendingZoneLayer=null,zoneEditControl=null,zoneDrawHandler=null;
 function zoneMsg(text,kind=""){const el=$("zoneMessage");el.textContent=text;el.className="msg "+kind;}
 function zoneGeoJSON(layer){return layer.toGeoJSON().geometry;}
 function zoneStyle(z){return {color:z.color||"#e67e22",fillColor:z.color||"#e67e22",weight:3,opacity:.95,fillOpacity:.2};}
@@ -180,8 +180,8 @@ function renderZoneList(){
  const host=$("zoneList");
  host.innerHTML=zones.length?zones.map(z=>'<article class="report"><h3><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+esc(z.color)+';margin-right:7px"></span>'+esc(z.name)+'</h3><div class="meta">'+esc(z.zone_type)+' · '+(z.active?"Publicly visible":"Hidden")+'</div>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<div class="actions"><button class="gray" data-zone-toggle="'+z.id+'" data-active="'+(!z.active)+'">'+(z.active?"Hide zone":"Show zone")+'</button><button class="red" data-zone-delete="'+z.id+'">Delete zone</button></div></article>').join(""):'<div class="empty">No zones created yet. Choose “Draw a zone” to outline an area on the map.</div>';
 }
-$("startZoneDraw").onclick=()=>{if(!role){zoneMsg("Sign in as an administrator to draw zones.","error");return;}if(pendingZoneLayer)zoneLayers.removeLayer(pendingZoneLayer);$("zoneForm").classList.add("hidden");zoneMsg("Tap or click the map to place boundary points. Finish the polygon by tapping or clicking its first point, or double-clicking the final point.","");map.addControl(new L.Draw.Polygon(map,{allowIntersection:false,showArea:true,shapeOptions:{color:$("zoneColor").value,fillColor:$("zoneColor").value,fillOpacity:.2,weight:3}}));window.mewZoneDrawActive=true;};
-$("cancelZoneDraw").onclick=()=>{if(window.mewZoneDrawActive){map.removeControl(map._toolbars?.draw?map._toolbars.draw:null);window.mewZoneDrawActive=false;}if(pendingZoneLayer){zoneLayers.removeLayer(pendingZoneLayer);pendingZoneLayer=null;}$("zoneForm").classList.add("hidden");zoneMsg("Drawing cancelled.");};
+$("startZoneDraw").onclick=()=>{if(!role){zoneMsg("Sign in as an administrator to draw zones.","error");return;}if(pendingZoneLayer)zoneLayers.removeLayer(pendingZoneLayer);$("zoneForm").classList.add("hidden");zoneMsg("Tap or click the map to place boundary points. Finish the polygon by tapping or clicking its first point, or double-clicking the final point.","");zoneDrawHandler=new L.Draw.Polygon(map,{allowIntersection:false,showArea:true,shapeOptions:{color:$("zoneColor").value,fillColor:$("zoneColor").value,fillOpacity:.2,weight:3}});zoneDrawHandler.enable();window.mewZoneDrawActive=true;};
+$("cancelZoneDraw").onclick=()=>{if(window.mewZoneDrawActive&&zoneDrawHandler){zoneDrawHandler.disable();window.mewZoneDrawActive=false;}if(pendingZoneLayer){zoneLayers.removeLayer(pendingZoneLayer);pendingZoneLayer=null;}$("zoneForm").classList.add("hidden");zoneMsg("Drawing cancelled.");};
 $("refreshZones").onclick=loadAdminZones;
 $("discardZone").onclick=()=>{if(pendingZoneLayer)zoneLayers.removeLayer(pendingZoneLayer);pendingZoneLayer=null;$("zoneForm").classList.add("hidden");zoneMsg("Draft discarded.");};
 map.on(L.Draw.Event.CREATED,e=>{if(e.layerType!=="polygon")return;if(pendingZoneLayer)zoneLayers.removeLayer(pendingZoneLayer);pendingZoneLayer=e.layer;zoneLayers.addLayer(pendingZoneLayer);window.mewZoneDrawActive=false;$("zoneFormHeading").textContent="Save new zone";$("zoneName").value="";$("zoneDescription").value="";$("zoneColor").value="#e67e22";$("zoneActive").checked=true;$("zoneForm").classList.remove("hidden");zoneMsg("Polygon drawn. Add its details and save it.");$("zoneName").focus();});
