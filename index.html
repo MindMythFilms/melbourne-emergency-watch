@@ -1904,38 +1904,58 @@ function popup(r){const photo=approvedPhotos[r.id];const observed=String(r.descr
 let mewPublicZoneLayer=L.featureGroup().addTo(map);
 const mewPublicZoneBounds=new Map();
 const mewPublicZoneEntries=new Map();
+let mewPublicZonesLoading=null;
 async function loadPublicZones(){
- const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
- if(error){console.warn("CoastWatch FL zones unavailable:",error.message);const list=$("publicZoneList");if(list)list.innerHTML='<span class="map-zone-empty">Zone information is temporarily unavailable.</span>';return;}
- mewPublicZoneLayer.clearLayers();mewPublicZoneBounds.clear();mewPublicZoneEntries.clear();
- const zones=(data||[]).filter(z=>z.geometry&&["Polygon","MultiPolygon"].includes(z.geometry.type));
- const list=$("publicZoneList"),count=$("mapZonesCount");
- if(count)count.textContent=zones.length+(zones.length===1?" zone":" zones");
- if(list)list.innerHTML=zones.length?zones.map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
- mewBindPublicZoneButtons();
- zones.forEach(z=>{
-  const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
-  const color=z.color||"#ef3340";
-  const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
-  const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:color,fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
-  const outline=L.geoJSON(z.geometry,{style:{color:color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
-  const labelMarker=L.marker(casing.getBounds().getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
-  const group=L.featureGroup([casing,outline,labelMarker]);
-  group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(zoneType)+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<small>CoastWatch FL map zone · informational only</small>');
-  group.addTo(mewPublicZoneLayer);
-  casing.bringToFront();outline.bringToFront();labelMarker.bringToFront();
-  const bounds=casing.getBounds();
-  mewPublicZoneBounds.set(String(z.id),bounds);
-  mewPublicZoneEntries.set(String(z.id),{bounds,group});
- });
+ if(mewPublicZonesLoading)return mewPublicZonesLoading;
+ mewPublicZonesLoading=(async()=>{
+  const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
+  if(error){console.warn("CoastWatch FL zones unavailable:",error.message);const list=$("publicZoneList");if(list&&!list.children.length)list.innerHTML='<span class="map-zone-empty">Zone information is temporarily unavailable.</span>';return false;}
+  const zones=(data||[]).filter(z=>z.geometry&&["Polygon","MultiPolygon"].includes(z.geometry.type));
+  const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
+  zones.forEach(z=>{
+   const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
+   const bounds=casing.getBounds();
+   if(!bounds||!bounds.isValid())return;
+   const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
+   const color=z.color||"#ef3340";
+   const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
+   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
+   const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
+   const group=L.featureGroup([casing,outline,labelMarker]);
+   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(zoneType)+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<small>CoastWatch FL map zone · informational only</small>');
+   nextEntries.set(String(z.id),{bounds,group});
+   nextBounds.set(String(z.id),bounds);
+   nextLayers.push(group);
+  });
+  // Swap the map layer and lookup data only after the replacement data is fully prepared.
+  mewPublicZoneLayer.clearLayers();
+  nextLayers.forEach(group=>group.addTo(mewPublicZoneLayer));
+  mewPublicZoneEntries.clear();nextEntries.forEach((value,key)=>mewPublicZoneEntries.set(key,value));
+  mewPublicZoneBounds.clear();nextBounds.forEach((value,key)=>mewPublicZoneBounds.set(key,value));
+  const list=$("publicZoneList"),count=$("mapZonesCount");
+  if(count)count.textContent=nextEntries.size+(nextEntries.size===1?" zone":" zones");
+  if(list){
+   list.innerHTML=nextEntries.size?zones.filter(z=>nextEntries.has(String(z.id))).map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
+   mewBindPublicZoneButtons();
+  }
+  return true;
+ })().finally(()=>{mewPublicZonesLoading=null;});
+ return mewPublicZonesLoading;
 }
 function mewFocusPublicZone(id,button){
- const entry=mewPublicZoneEntries.get(String(id));
- if(!entry||!entry.bounds||!entry.bounds.isValid()){
-  if(button){button.disabled=true;button.querySelector("small")?.replaceChildren(document.createTextNode("Unavailable"));}
-  console.warn("CoastWatch FL: no valid map bounds for zone",id);
+ const key=String(id);
+ let entry=mewPublicZoneEntries.get(key);
+ if(!entry){
+  // A scheduled refresh may be in flight; wait for it rather than disabling a valid zone.
+  if(button){button.disabled=true;button.setAttribute("aria-busy","true");}
+  loadPublicZones().then(()=>{
+   entry=mewPublicZoneEntries.get(key);
+   if(entry)mewFocusPublicZone(key,button);
+   else if(button){button.disabled=false;button.removeAttribute("aria-busy");}
+  }).catch(error=>{console.warn("Could not refresh CoastWatch zone data:",error);if(button){button.disabled=false;button.removeAttribute("aria-busy");}});
   return;
  }
+ if(!entry.bounds||!entry.bounds.isValid())return;
  if(button){button.disabled=true;button.setAttribute("aria-busy","true");}
  map.stop();
  map.closePopup();
@@ -1956,12 +1976,6 @@ function mewBindPublicZoneButtons(){
    event.stopPropagation();
    mewFocusPublicZone(button.dataset.zoneFocus,button);
   },{capture:true});
-  button.addEventListener("keydown",event=>{
-   if(event.key==="Enter"||event.key===" "){
-    event.preventDefault();
-    mewFocusPublicZone(button.dataset.zoneFocus,button);
-   }
-  });
  });
 }
 
