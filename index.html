@@ -419,6 +419,72 @@ body.dark .map-filters select{background:#0a1b2b;color:#f2f7fa;border-color:#385
  #map-panel .map-filters select option{font-size:14px!important}
 }
 
+
+/* Compact filter rail: report count on the left, long readable selectors on the right. */
+#map-panel .map-filters{
+ display:grid!important;
+ grid-template-columns:minmax(92px,auto) minmax(0,1fr)!important;
+ grid-template-rows:auto auto!important;
+ align-items:center!important;
+ gap:10px 14px!important;
+ width:100%!important;
+ min-width:0!important;
+}
+#map-panel .map-filters .pill{
+ grid-column:1!important;
+ grid-row:1 / span 2!important;
+ justify-self:start!important;
+ align-self:center!important;
+ white-space:nowrap!important;
+ font-size:14px!important;
+ padding:8px 11px!important;
+}
+#map-panel .map-filters label{
+ grid-column:2!important;
+ width:100%!important;
+ min-width:0!important;
+ margin:0!important;
+ font-size:13px!important;
+ line-height:1.3!important;
+}
+#map-panel .map-filters label[for="sourceFilter"]{grid-row:1!important}
+#map-panel .map-filters label[for="mapFilter"]{grid-row:2!important}
+#map-panel .map-filters select,
+#map-panel .map-filters select:focus{
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ height:48px!important;
+ min-height:48px!important;
+ margin-top:4px!important;
+ padding:8px 38px 8px 12px!important;
+ box-sizing:border-box!important;
+ font-family:Arial,system-ui,sans-serif!important;
+ font-size:15px!important;
+ font-weight:500!important;
+ line-height:normal!important;
+ letter-spacing:normal!important;
+ text-align:left!important;
+ text-indent:0!important;
+ white-space:nowrap!important;
+ text-overflow:clip!important;
+ overflow:visible!important;
+ -webkit-appearance:menulist!important;
+ appearance:auto!important;
+}
+@media(max-width:650px){
+ #map-panel .map-filters{grid-template-columns:minmax(78px,auto) minmax(0,1fr)!important;gap:9px 10px!important}
+ #map-panel .map-filters .pill{font-size:12px!important;padding:7px 8px!important}
+ #map-panel .map-filters label{font-size:12px!important}
+ #map-panel .map-filters select,#map-panel .map-filters select:focus{height:46px!important;min-height:46px!important;font-size:14px!important;padding:7px 28px 7px 9px!important}
+}
+@media(max-width:350px){
+ #map-panel .map-filters{grid-template-columns:minmax(0,1fr)!important}
+ #map-panel .map-filters .pill{grid-column:1!important;grid-row:1!important}
+ #map-panel .map-filters label[for="sourceFilter"]{grid-column:1!important;grid-row:2!important}
+ #map-panel .map-filters label[for="mapFilter"]{grid-column:1!important;grid-row:3!important}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
