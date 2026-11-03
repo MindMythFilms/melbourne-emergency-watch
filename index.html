@@ -1207,6 +1207,14 @@ body:not(.dark) footer{color:#526b7b!important}
  }
 }
 
+
+
+/* High-visibility public zone overlays: labels and bold boundaries remain visible at county scale. */
+.mew-zone-label-icon{background:transparent!important;border:0!important;}
+.mew-zone-label{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:190px;padding:6px 10px;border:2px solid #fff;border-radius:9px;background:#071a2cef;color:#fff;text-align:center;white-space:normal;box-shadow:0 2px 12px #000b,0 0 0 2px #071a2c;transform:translate(-50%,-50%);}
+.mew-zone-label b{font-size:12px;line-height:1.2;font-weight:900;letter-spacing:.02em;text-shadow:0 1px 2px #000;}
+.mew-zone-label small{font-size:9px;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#b9f5f1;}
+@media(max-width:650px){.mew-zone-label{max-width:145px;padding:5px 7px;border-width:1.5px}.mew-zone-label b{font-size:10px}.mew-zone-label small{font-size:8px}}
 </style></head>
 <body>
 <header class="site-header">
@@ -1498,10 +1506,17 @@ async function loadPublicZones(){
  if(error){console.warn("CoastWatch FL zones unavailable:",error.message);return;}
  mewPublicZoneLayer.clearLayers();
  (data||[]).forEach(z=>{
-  if(!z.geometry||z.geometry.type!=="Polygon")return;
-  const layer=L.geoJSON(z.geometry,{style:{color:z.color,fillColor:z.color,weight:3,opacity:.95,fillOpacity:.2}});
-  layer.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc((z.zone_type||"zone").replaceAll("_"," "))+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>': '')+'<small>CoastWatch FL map zone · informational only</small>');
-  layer.addTo(mewPublicZoneLayer);
+  if(!z.geometry||!["Polygon","MultiPolygon"].includes(z.geometry.type))return;
+  const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
+  const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:null});
+  // A wide white casing keeps the perimeter distinct from both map styles.
+  const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:8,opacity:1,fillColor:z.color||"#e04b45",fillOpacity:.30,lineCap:"round",lineJoin:"round"}});
+  const outline=L.geoJSON(z.geometry,{style:{color:z.color||"#e04b45",weight:4,opacity:1,fillColor:z.color||"#e04b45",fillOpacity:.22,dashArray:"8 4",lineCap:"round",lineJoin:"round"}});
+  const labelMarker=L.marker(casing.getBounds().getCenter(),{icon:label,interactive:false,keyboard:false,zIndexOffset:900});
+  const group=L.featureGroup([casing,outline,labelMarker]);
+  group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(zoneType)+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>': '')+'<small>CoastWatch FL map zone · informational only</small>');
+  group.addTo(mewPublicZoneLayer);
+ });
  });
 }
 
