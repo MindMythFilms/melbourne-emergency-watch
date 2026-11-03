@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-road-status-unverified-labels-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-compact-zone-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1211,10 +1211,10 @@ body:not(.dark) footer{color:#526b7b!important}
 
 /* High-visibility public zone overlays: labels and bold boundaries remain visible at county scale. */
 .mew-zone-label-icon{background:transparent!important;border:0!important;}
-.mew-zone-label{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:190px;padding:6px 10px;border:1.5px solid #fff;border-radius:9px;background:#071a2cb8;color:#fff;text-align:center;white-space:normal;box-shadow:0 2px 7px #0008;transform:translate(-50%,-50%);}
-.mew-zone-label b{font-size:12px;line-height:1.2;font-weight:900;letter-spacing:.02em;text-shadow:0 1px 2px #000;}
-.mew-zone-label small{font-size:9px;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#b9f5f1;}
-@media(max-width:650px){.mew-zone-label{max-width:145px;padding:5px 7px;border-width:1.5px}.mew-zone-label b{font-size:10px}.mew-zone-label small{font-size:8px}}
+.mew-zone-label{display:flex;flex-direction:column;align-items:center;gap:1px;width:max-content;max-width:none;padding:4px 7px;border:1.5px solid #fff;border-radius:7px;background:#071a2ce8;color:#fff;text-align:center;white-space:nowrap;box-shadow:0 2px 7px #0009;transform:translate(-50%,-50%);}
+.mew-zone-label b{font-size:10px;line-height:1.05;font-weight:900;letter-spacing:.04em;text-shadow:0 1px 2px #000;}
+.mew-zone-label small{font-size:7px;line-height:1.05;font-weight:850;text-transform:uppercase;letter-spacing:.08em;color:#b9f5f1;}
+@media(max-width:650px){.mew-zone-label{padding:3px 6px;border-width:1px}.mew-zone-label b{font-size:9px}.mew-zone-label small{font-size:6px}}
 
 
 /* Active zone finder and county-scale visibility for designated map areas. */
@@ -1971,12 +1971,13 @@ async function loadPublicZones(){
    if(!bounds||!bounds.isValid())return;
    const isUnverified=String(z.description||"").startsWith("UNVERIFIED:");
    const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
-   const situation=String(z.name||"").toLowerCase().includes("washout")?"ROAD WASHOUT":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSURE");
+   const isWashout=String(z.name||"").toLowerCase().includes("washout");
+   const situation=isWashout?"WASHOUT":(zoneType==="information"?"ROAD STATUS":"CLOSED");
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
    const detailDescription=String(z.description||"").replace(/^UNVERIFIED:\s*/,"");
    const color=z.color||"#ef3340";
    const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
-   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(displayStatus)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
+   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(situation)+'</b><small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
    group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>Community-reported information · not independently verified by CoastWatch FL</small>');
