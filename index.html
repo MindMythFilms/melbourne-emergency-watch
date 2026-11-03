@@ -923,14 +923,245 @@ body:not(.dark) .panelhead h2,body:not(.dark) .report strong{color:#f0f8fb!impor
  #mapReportHint{max-width:calc(100vw - 84px)!important;text-align:right!important;line-height:1.3!important}
 }
 
+
+/* COASTWATCH FL — coastal intelligence visual system */
+:root{
+ --cw-bg:#041321;--cw-bg2:#071d30;--cw-panel:#082238;--cw-panel2:#0b2b43;
+ --cw-line:#174b65;--cw-line-bright:#087e9d;--cw-text:#f2f8fc;--cw-muted:#a8c2d2;
+ --cw-cyan:#25d8e8;--cw-teal:#08b8ae;--cw-red:#f22f50;--cw-red2:#c9143b;
+ --cw-shadow:0 18px 48px #0007;
+}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{background:radial-gradient(ellipse at 12% 4%,#0b3049 0,transparent 38%),linear-gradient(180deg,#03111e 0%,#061b2c 55%,#041321 100%)!important;color:var(--cw-text)!important;font-family:Inter,Manrope,system-ui,-apple-system,"Segoe UI",sans-serif!important}
+.site-header{position:sticky!important;top:0;z-index:1200;background:#03111ef2!important;border-bottom:1px solid #15516b!important;backdrop-filter:blur(18px);padding:9px 22px!important;min-height:76px!important;display:block!important}
+.site-header-inner{max-width:1600px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex!important;align-items:center;gap:12px;min-width:250px;color:#fff!important;text-decoration:none}
+.brand-logo-img{display:block;width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 0 12px #08b8ae30)}
+.brand-copy strong{display:block;font-size:clamp(20px,2vw,28px)!important;line-height:1.05;letter-spacing:-.04em;color:#f4fbff}
+.brand-copy strong em{font-style:normal;color:var(--cw-cyan)}
+.brand-copy small{display:block;color:#a9c7d6!important;font-size:11px;letter-spacing:.02em;margin-top:5px}
+.site-nav{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.site-nav .nav-link{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;margin:0!important;border-radius:10px;color:#c7dfeb!important;text-decoration:none;font-size:13px;font-weight:750;transition:.2s}
+.site-nav .nav-link:hover,.site-nav .nav-link.active{background:#0b354e;color:var(--cw-cyan)!important;box-shadow:inset 0 -2px 0 var(--cw-cyan)}
+.site-nav .theme-toggle{margin:0 4px;padding:10px 12px;border:1px solid #23617d;background:#082238;color:#e7f6ff;border-radius:10px;font-size:12px;min-height:42px}
+.site-nav .nav-report{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:11px;background:linear-gradient(120deg,#ff3b5b,#c80c37);border:1px solid #ff7890;color:white!important;text-decoration:none;font-size:13px;font-weight:850;box-shadow:0 8px 24px #e91e4840}
+main{max-width:1600px!important;margin:0 auto!important;padding:20px 24px 36px!important}
+.mew-safety-announcement{background:#302719!important;border:1px solid #7b5b25!important;border-left:4px solid #e6ad43!important;color:#f3dfb8!important;border-radius:13px!important;box-shadow:0 8px 26px #0002}
+.mew-safety-announcement p,.mew-safety-announcement span{color:inherit}
+.mew-safety-main a{color:#ffe09b!important}
+.mew-safety-details{color:#f2dfbd!important}
+.hero-visual{position:relative;isolation:isolate;overflow:hidden;min-height:330px;margin:18px 0 22px!important;padding:42px 42px 36px!important;border:1px solid #14526d;border-radius:20px;background:
+ radial-gradient(ellipse at 78% 80%,#ff6a342e 0,transparent 28%),
+ radial-gradient(ellipse at 68% 65%,#f23b6530 0,transparent 36%),
+ linear-gradient(105deg,#06182a 0%,#092b43eF 42%,#102d45a8 100%)!important;box-shadow:var(--cw-shadow)}
+.hero-visual:before{content:"";position:absolute;z-index:-1;inset:0;background:
+ radial-gradient(ellipse at 73% 100%,#f28a3a9c 0%,#b74b5b65 13%,transparent 36%),
+ linear-gradient(180deg,transparent 50%,#031321a8 100%),
+ repeating-linear-gradient(165deg,transparent 0 54px,#8bb8c31a 55px,#8bb8c300 57px);
+ opacity:.9}
+.hero-visual:after{content:"";position:absolute;z-index:-1;right:-5%;bottom:-58%;width:75%;height:100%;border-radius:50%;background:radial-gradient(ellipse,#0b9caa66 0%,#07334c55 42%,transparent 70%);filter:blur(8px)}
+.hero-copy{position:relative;z-index:2;max-width:760px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:9px;color:#83e6e9!important;font-size:11px!important;font-weight:850;letter-spacing:.18em}
+.hero-eyebrow i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#20e0c2;box-shadow:0 0 12px #20e0c2}
+.hero-visual h1{margin:16px 0 12px!important;color:#f4f9ff!important;font-size:clamp(36px,5.2vw,66px)!important;line-height:.99!important;letter-spacing:-.055em!important;font-weight:900!important}
+.hero-visual h1 em{font-style:normal;color:#32d6e6;text-shadow:0 0 28px #21c8df35}
+.hero-visual p{max-width:650px;margin:0!important;color:#d3e5ef!important;font-size:clamp(15px,1.6vw,20px)!important;line-height:1.5}
+.hero-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-links a{display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border:1px solid #19769a;border-radius:11px;background:#08283fca;color:#e8faff!important;text-decoration:none;font-size:13px;font-weight:800;box-shadow:inset 0 1px #ffffff0c;transition:.2s}
+.hero-links a span{font-size:18px;color:var(--cw-cyan)}
+.hero-links a:hover{border-color:var(--cw-cyan);background:#0a3b55;transform:translateY(-1px)}
+.hero-caption{position:absolute;right:34px;bottom:30px;display:flex;flex-direction:column;gap:5px;text-align:right;color:#d6e8ee}
+.hero-caption strong{font-size:10px;letter-spacing:.2em;color:#56e4e2}
+.hero-caption span{font-size:11px;line-height:1.5;color:#c0d3dc}
+.hero-palm{position:absolute;right:8%;top:10%;font-size:170px;line-height:1;color:#020c16;opacity:.22;transform:rotate(-15deg);filter:blur(.3px)}
+.hero-horizon{position:absolute;right:0;bottom:0;width:70%;height:42%;background:linear-gradient(180deg,transparent,#f4784730 45%,#0a8c9d33 47%,#05253b);clip-path:polygon(0 40%,12% 32%,20% 36%,30% 22%,44% 28%,57% 17%,70% 25%,82% 12%,100% 24%,100% 100%,0 100%)}
+.hero-sun{position:absolute;right:25%;bottom:28%;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#ffd59a 0,#ff8a55 44%,#e64c6466 70%,transparent 72%);filter:blur(2px);opacity:.7}
+.layout{display:block!important}
+.panel{background:linear-gradient(145deg,#09253a,#061b2c)!important;border:1px solid #14506b!important;border-radius:20px!important;box-shadow:var(--cw-shadow)!important;color:var(--cw-text)!important;overflow:hidden}
+.panelhead{background:linear-gradient(100deg,#0a2a42,#071d30)!important;border-bottom:1px solid #164b65!important;color:#f4fbff!important}
+.map-workspace-head{display:flex!important;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px!important}
+.map-heading-copy{display:flex!important;align-items:center;gap:14px;min-width:0}
+.map-heading-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#063c51;color:#36e1e9;font-size:31px;box-shadow:0 0 26px #11c8d333}
+.map-heading-copy h2{margin:0!important;color:#f5fbff!important;font-size:25px!important;letter-spacing:-.035em}
+.map-heading-copy span{display:block;color:#b7d2df!important;font-size:13px;margin-top:3px}
+.map-live-state{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid #087f73;border-radius:99px;background:#073a3a;color:#d9fffa;font-size:12px;font-weight:850;white-space:nowrap}
+.map-live-state i{width:8px;height:8px;border-radius:50%;background:#10e28a;box-shadow:0 0 12px #10e28a}
+.map-dashboard{display:grid;grid-template-columns:290px minmax(0,1fr);gap:0;padding:0;background:#061a2a}
+.map-sidebar{display:flex;flex-direction:column;gap:13px;padding:18px;background:linear-gradient(180deg,#08273d,#061b2c);border-right:1px solid #174d66}
+.map-location-button{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #00a9bf;border-radius:99px;background:linear-gradient(120deg,#07516a,#07364d);color:#f1fdff;font-size:14px;font-weight:850;box-shadow:0 0 22px #08c7d51c}
+.map-location-button span{color:#3de8ec;font-size:20px}
+.map-filter-card,.map-basemap-card{padding:14px;border:1px solid #174a63;border-radius:14px;background:#071f32}
+.map-filter-card h3{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:#f2faff;font-size:15px}
+.map-filter-card h3 span{color:#32dbe7;font-size:20px}
+.map-filters{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important}
+.map-filters>label{display:flex!important;flex-direction:column!important;gap:6px!important;width:100%!important;min-width:0!important;color:#d5e8f1!important;font-size:12px!important;font-weight:800!important}
+.map-filters>label select{width:100%!important;min-width:0!important;height:46px!important;padding:9px 34px 9px 11px!important;border:1px solid #21627d!important;border-radius:10px!important;background:#061a2b!important;color:#effaff!important;font-size:13px!important}
+.map-count-card{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #086c70;border-radius:14px;background:linear-gradient(125deg,#063d48,#082d40)}
+.map-count-icon{font-size:28px;color:#37e3df}
+.map-count-card strong{display:block;color:#24e1d0;font-size:22px;line-height:1.1}
+.map-count-card small{display:block;color:#c2e1e7;font-size:11px;margin-top:4px}
+.map-basemap-card>strong{display:block;margin-bottom:9px;color:#cfe3ed;font-size:12px}
+.map-basemap-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.map-basemap-buttons button{min-height:40px;padding:8px 6px;border:1px solid #285a70;border-radius:9px;background:#0a2a40;color:#cfe6ef;font-size:11px}
+.map-basemap-buttons button.active{border-color:#20c9d6;background:#0a4858;color:#f1ffff}
+.map-stage{position:relative;min-width:0;isolation:isolate}
+#map{height:clamp(610px,74vh,880px)!important;min-height:560px!important;width:100%!important;background:#061a2a}
+.map-report-tools{position:absolute!important;top:18px!important;right:18px!important;left:auto!important;z-index:700;display:flex;align-items:flex-end;flex-direction:column;gap:9px;max-width:calc(100% - 36px);pointer-events:none}
+.map-report-button{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:13px 21px;border:1px solid #ff91a4;border-radius:13px;background:linear-gradient(120deg,#ff3e61,#cf0b3c);color:white;font-size:15px;font-weight:900;box-shadow:0 12px 30px #e31a4c55,0 0 0 1px #ffffff18;cursor:pointer}
+.map-report-button.is-placing{background:linear-gradient(120deg,#0bbba9,#08756f);border-color:#9af7e8}
+#mapReportHint{max-width:300px;padding:9px 12px;border:1px solid #ffffff35;border-radius:10px;background:#031725ed;color:#ecfaff;font-size:12px;font-weight:750;text-align:right;box-shadow:0 6px 20px #0006}
+#map.is-selecting-location{cursor:crosshair}
+.mapnote{padding:12px 17px!important;border-top:1px solid #16475f!important;background:#061a29!important;color:#a9c6d5!important;font-size:11px!important}
+.nws-legend{padding:16px 19px!important;background:#071f32!important;border-top:1px solid #174a63!important;color:#eaf7fc!important}
+.legend-heading strong{color:#f4fbff!important}.legend-heading span,.legend-items small,.legend-note{color:#a9c3d1!important}
+.mobile-legend-toggle{display:none}
+#report-panel,#community-reports-panel,#official-alerts-panel,.mew-official-resources,#about{margin-top:20px!important}
+#report-panel .panelhead h2,#community-reports-panel h2,#official-alerts-panel h2,.mew-official-resources h2,#about h2{color:#f2faff!important}
+.form{padding:20px!important;background:#082237!important}
+.form label{color:#d8eaf2!important}
+.form input,.form select,.form textarea{background:#061a2b!important;color:#eff8fc!important;border-color:#31566c!important}
+.form input::placeholder,.form textarea::placeholder{color:#8da9b8!important}
+.form .hint,.section-subtitle{color:#a9c3d1!important}
+.form button[type=submit]{background:linear-gradient(120deg,#ff3d5d,#c80b39)!important;color:#fff!important;min-height:50px;border-radius:11px;box-shadow:0 10px 24px #d8144338}
+.location-confirmation{background:#0b3542!important;color:#d8f4f0!important}
+.reportlist{background:#082237!important;color:#e8f3f8!important}
+.report{border-bottom-color:#19445b!important}
+.report small,.report p{color:#b5cbd7!important}
+.report a{color:#42dce5!important}
+.pill{background:#063d48!important;color:#7ff5e8!important;border:1px solid #0d7477!important}
+.status{background:#0b3549!important;color:#d8f2fc!important}
+.status.error{background:#4a1e2a!important;color:#ffe0e5!important}
+.status.good{background:#0b3b32!important;color:#d6fff0!important}
+.mew-photo-rules{background:#302719!important;color:#f1dfbf!important}
+.mew-photo-rules>summary{color:#ffdb96!important}
+.mew-photo-rules-prompt{color:#e9c77f!important}
+.resource-grid a{background:#08283e!important;border:1px solid #174e68!important;color:#eaf7fc!important}
+.resource-grid a span{color:#a9c5d4!important}
+#about>div:last-child{color:#bed0db!important}
+#about a{color:#42dce5!important}
+footer{max-width:1550px!important;color:#8eabba!important}
+footer a{color:#50dbe4!important}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #49e6ee!important;outline-offset:3px!important}
+@media(max-width:900px){
+ .site-header{padding:9px 14px!important}.site-header-inner{align-items:flex-start;flex-direction:column;gap:8px}
+ .brand{min-width:0}.brand-logo-img{width:52px;height:52px}
+ .site-nav{width:100%;justify-content:flex-start;gap:3px}
+ .site-nav .nav-link{padding:8px 10px;font-size:12px}
+ .site-nav .nav-report{margin-left:auto;padding:10px 12px}
+ main{padding:13px 14px 28px!important}
+ .hero-visual{padding:30px 25px!important;min-height:300px}
+ .hero-caption{right:22px;bottom:17px}
+ .map-dashboard{grid-template-columns:250px minmax(0,1fr)}
+ #map{height:650px!important}
+}
+@media(max-width:650px){
+ .site-header{position:relative!important;padding:8px 10px!important}
+ .site-header-inner{gap:6px}
+ .brand-logo-img{width:43px;height:43px}
+ .brand-copy strong{font-size:19px!important}
+ .brand-copy small{font-size:9px}
+ .site-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .site-nav .nav-link{padding:8px 3px;font-size:11px}
+ .site-nav .theme-toggle{grid-column:1/3;width:100%;margin:0;min-height:38px}
+ .site-nav .nav-report{grid-column:3/5;width:100%;margin:0;min-height:38px;padding:8px 5px;font-size:11px}
+ main{padding:10px 10px 24px!important}
+ .mew-safety-announcement{margin-bottom:10px}
+ .hero-visual{margin:10px 0 14px!important;padding:24px 17px 26px!important;min-height:310px;border-radius:16px}
+ .hero-visual h1{font-size:clamp(34px,10vw,48px)!important}
+ .hero-visual p{font-size:14px!important;max-width:95%}
+ .hero-links{gap:7px;margin-top:18px}
+ .hero-links a{padding:9px 10px;font-size:11px}
+ .hero-caption{position:relative;right:auto;bottom:auto;margin-top:20px;text-align:left}
+ .hero-palm{right:-2%;top:8%;font-size:110px}
+ .map-workspace-head{padding:14px!important}
+ .map-heading-copy{gap:9px}
+ .map-heading-icon{width:39px;height:39px;font-size:25px}
+ .map-heading-copy h2{font-size:19px!important}
+ .map-heading-copy span{font-size:11px}
+ .map-live-state{padding:7px 9px;font-size:10px}
+ .map-dashboard{grid-template-columns:minmax(0,1fr);gap:0}
+ .map-sidebar{padding:12px;gap:10px;border-right:0;border-bottom:1px solid #174d66}
+ .map-location-button{min-height:44px}
+ .map-filter-card{padding:11px}
+ .map-filter-card h3{margin-bottom:8px}
+ .map-filters{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ .map-filters>label{font-size:11px!important}
+ .map-filters>label select{height:44px!important;font-size:12px!important;padding:8px 22px 8px 8px!important}
+ .map-count-card{padding:10px 12px}
+ .map-count-card strong{font-size:18px}
+ .map-basemap-card{padding:10px}
+ #map{height:68vh!important;min-height:450px!important;max-height:760px!important}
+ .map-report-tools{top:10px!important;right:10px!important;max-width:calc(100% - 20px)!important;gap:6px!important}
+ .map-report-button{min-height:43px;padding:9px 12px;font-size:12px}
+ #mapReportHint{max-width:calc(100vw - 80px);font-size:10px;padding:7px 9px}
+ .mobile-legend-toggle{display:block!important;width:100%;padding:11px;background:#092c43;color:#cce7ef;border-top:1px solid #174c64;border-radius:0;font-size:12px}
+ .nws-legend{display:none}
+ .nws-legend.expanded{display:block}
+ .legend-items{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #report-panel .form{padding:14px!important}
+ .formgrid{grid-template-columns:minmax(0,1fr)!important}
+ .formgrid>div:not(.full){grid-column:1/-1}
+}
+@media(max-width:370px){
+ .site-nav .nav-link{font-size:10px;padding:7px 1px}
+ .map-filters{grid-template-columns:minmax(0,1fr)!important}
+ .hero-links a{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
 </style></head>
 <body>
-<header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
+<header class="site-header">
+ <div class="site-header-inner">
+  <a class="brand" href="/" aria-label="CoastWatch FL home">
+   <img class="brand-logo-img" src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo">
+   <span class="brand-copy"><strong>CoastWatch <em>FL</em></strong><small>Community Hazard &amp; Weather Awareness</small></span>
+  </a>
+  <nav class="site-nav" aria-label="Main navigation">
+   <a class="nav-link active" href="#map-panel">Map</a>
+   <a class="nav-link" href="#official-alerts-panel">Alerts</a>
+   <a class="nav-link" href="#about">About</a>
+   <a class="nav-link" href="#safety-details">Safety</a>
+   <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">☼ Theme</button>
+   <a class="nav-report" href="#report-panel">＋ Report Hazard</a>
+  </nav>
+ </div>
+</header>
 <main>
 <section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
-<section class="hero hero-compact"><div class="hero-copy"><span class="hero-eyebrow"><i></i> BREVARD COUNTY · FLORIDA</span><h1>Stay aware.<br><em>Look out for each other.</em></h1><p>Community hazard reports and official weather alerts, together in one local map.</p><div class="hero-links"><a href="#map-panel">Explore the live map <span>↘</span></a><a href="#report-panel">Share a hazard <span>＋</span></a></div></div><div class="hero-side"><div class="hero-orbit hero-orbit-one"></div><div class="hero-orbit hero-orbit-two"></div><div class="hero-weather-mark" aria-hidden="true"><span>◌</span><b>FL</b></div><div class="hero-side-caption"><strong>LOCAL AWARENESS</strong><span>Powered by community observations<br>and National Weather Service alerts</span></div><div class="tools"><button class="secondary" id="satelliteBtn">Satellite view</button><button class="secondary" id="streetBtn">Street view</button></div></div></section>
+<section class="hero hero-visual">
+ <div class="hero-atmosphere" aria-hidden="true"><span class="hero-palm">♣</span><span class="hero-horizon"></span><span class="hero-sun"></span></div>
+ <div class="hero-copy">
+  <span class="hero-eyebrow"><i></i> BREVARD COUNTY · FLORIDA</span>
+  <h1>Stay informed.<br><em>Stay prepared.</em></h1>
+  <p>Real-time community observations and official National Weather Service alerts for Florida’s Space Coast.</p>
+  <div class="hero-links">
+   <a href="#official-alerts-panel"><span>ϟ</span> NWS Alerts</a>
+   <a href="#community-reports-panel"><span>♧</span> Community Reports</a>
+   <a href="#map-panel"><span>⌖</span> Live Hazard Map</a>
+  </div>
+ </div>
+ <div class="hero-caption"><strong>LOCAL AWARENESS</strong><span>Powered by community observations<br>and official weather information</span></div>
+</section>
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
-<section class="panel" id="map-panel"><div class="panelhead map-workspace-head"><div class="map-heading-copy"><h2>Live hazard map</h2><span>Community observations and official NWS alerts</span></div><div class="map-toolbar"><div class="map-actions"><button class="secondary" id="locateBtn" type="button" aria-label="Center map on your current location">My location</button></div><div class="map-filter-area"><div class="map-filter-status"><span class="pill" id="countLabel">Loading…</span><span>Map filters</span></div><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div></div></div><div class="map-stage"><div id="map"></div><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">＋ Report a hazard</button><span id="mapReportHint" aria-live="polite">Select a location directly on the map</span></div></div><button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button><div class="nws-legend" id="nwsLegend" aria-label="Map legend"><div class="legend-heading"><strong>Map legend</strong><span>Colors identify the source and severity</span></div><div class="legend-items"><span><i class="legend-symbol community-symbol"></i><b>Community report</b><small>Unverified submission</small></span><span><i class="legend-symbol extreme-symbol"></i><b>Extreme</b><small>NWS official alert</small></span><span><i class="legend-symbol severe-symbol"></i><b>Severe</b><small>NWS official alert</small></span><span><i class="legend-symbol moderate-symbol"></i><b>Moderate</b><small>NWS official alert</small></span><span><i class="legend-symbol minor-symbol"></i><b>Minor</b><small>NWS official alert</small></span><span><i class="legend-symbol unknown-symbol"></i><b>Unspecified</b><small>NWS severity not provided</small></span></div><p class="legend-note">Colored outlined areas show NWS alert coverage. Circular pins show point locations. Community reports are not independently verified.</p></div><div class="mapnote">Satellite imagery is not live and may be outdated. Community pins are unverified resident submissions. Official NWS alerts are shown separately with colored warning areas and alert markers. CoastWatch FL is not an emergency service. Imagery © Esri and its contributors.</div></section>
+<section class="panel" id="map-panel">
+ <div class="panelhead map-workspace-head">
+  <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
+  <div class="map-live-state"><i></i> Live updates</div>
+ </div>
+ <div class="map-dashboard">
+  <aside class="map-sidebar" aria-label="Map controls">
+   <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
+   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
+   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div>
+   <div class="map-basemap-card"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div>
+  </aside>
+  <div class="map-stage"><div id="map"></div><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ </div>
+ <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
+ <div class="nws-legend" id="nwsLegend" aria-label="Map legend"><div class="legend-heading"><strong>Map legend</strong><span>Colors identify the source and severity</span></div><div class="legend-items"><span><i class="legend-symbol community-symbol"></i><b>Community report</b><small>Unverified submission</small></span><span><i class="legend-symbol extreme-symbol"></i><b>Extreme</b><small>NWS official alert</small></span><span><i class="legend-symbol severe-symbol"></i><b>Severe</b><small>NWS official alert</small></span><span><i class="legend-symbol moderate-symbol"></i><b>Moderate</b><small>NWS official alert</small></span><span><i class="legend-symbol minor-symbol"></i><b>Minor</b><small>NWS official alert</small></span><span><i class="legend-symbol unknown-symbol"></i><b>Unspecified</b><small>NWS severity not provided</small></span></div><p class="legend-note">Colored outlined areas show NWS alert coverage. Circular pins show point locations. Community reports are not independently verified.</p></div>
+ <div class="mapnote">Satellite imagery is not live and may be outdated. Community pins are unverified resident submissions. Official NWS alerts are shown separately with colored warning areas and alert markers. CoastWatch FL is not an emergency service. Imagery © Esri and its contributors.</div>
+</section>
 <section class="panel" id="report-panel"><div class="panelhead"><h2>Submit a hazard observation</h2></div><div class="form"><form id="reportForm"><div class="formgrid">
 <div class="full"><label for="category">Hazard type *</label><select id="category" required><option value="">Choose a category</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding / storm surge</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Visible fire or smoke</option><option value="road_hazard">Road hazard / debris</option><option value="road_closure">Road closure / washout</option><option value="power_outage">Utility disruption</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other natural or environmental hazard</option></select></div>
 <input id="latitude" type="hidden"><input id="longitude" type="hidden"><div class="full"><div class="location-confirmation" id="locationConfirmation" role="status">No location selected yet. Choose a point on the map to continue.</div></div>
