@@ -1335,6 +1335,24 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
   width:100%!important;
  }
 }
+
+/* Desktop only: keep the complete map comfortably within a normal laptop viewport. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard>.map-stage{
+  display:block!important;
+  align-self:start!important;
+  height:clamp(460px,62vh,660px)!important;
+  min-height:0!important;
+  max-height:660px!important;
+ }
+ #map-panel>.map-dashboard>.map-stage #map{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:660px!important;
+ }
+}
 </style></head>
 <body>
 <header class="site-header">
