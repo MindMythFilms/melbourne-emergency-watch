@@ -1449,8 +1449,8 @@ async function loadEvacuationRoutes(){
   evacuationRouteLayer.clearLayers();
   const features=(data.features||[]).filter(f=>f.geometry);
   if(features.length){
-   L.geoJSON(data,{style:()=>({color:"#092b45",weight:9,opacity:.95,lineCap:"round",lineJoin:"round"}),interactive:false}).addTo(evacuationRouteLayer);
-   L.geoJSON(data,{style:()=>({color:"#ffd23f",weight:5,opacity:1,lineCap:"round",lineJoin:"round"}),onEachFeature:(f,layer)=>{const name=String(f.properties?.NAME||"Designated evacuation route");layer.bindPopup("<strong>"+esc(name)+"</strong><br><small>Designated evacuation route reference for Brevard County. Road conditions, closures and official evacuation instructions can change. Follow Brevard Emergency Management.</small>");}}).addTo(evacuationRouteLayer);
+   L.geoJSON(data,{style:()=>({color:"#092b45",weight:9,opacity:.5,lineCap:"round",lineJoin:"round"}),interactive:false}).addTo(evacuationRouteLayer);
+   L.geoJSON(data,{style:()=>({color:"#ffd23f",weight:5,opacity:.5,lineCap:"round",lineJoin:"round"}),onEachFeature:(f,layer)=>{const name=String(f.properties?.NAME||"Designated evacuation route");layer.bindPopup("<strong>"+esc(name)+"</strong><br><small>Designated evacuation route reference for Brevard County. Road conditions, closures and official evacuation instructions can change. Follow Brevard Emergency Management.</small>");}}).addTo(evacuationRouteLayer);
    if(status)status.textContent=features.length+" designated route segments drawn on map · Florida GIS";
   }else if(status)status.textContent="No Brevard route segments returned by GIS service.";
  }catch(error){
