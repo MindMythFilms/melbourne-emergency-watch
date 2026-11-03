@@ -1406,6 +1406,7 @@ const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
 const usgsWaterLayer=L.featureGroup().addTo(map);
 const evacuationZoneLayer=L.featureGroup();
+map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450";
 const shelterLayer=L.featureGroup();
 let shelterFetchInProgress=false;
 const rainRadarLayer=L.tileLayer.wms("https://nowcoast.noaa.gov/geoserver/observations/weather_radar/ows",{layers:"conus_base_reflectivity_mosaic",styles:"",format:"image/png",transparent:true,version:"1.1.1",opacity:.72,attribution:"Radar: NOAA/NWS MRMS via nowCOAST"});
@@ -1419,7 +1420,7 @@ const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard Count
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=mode==="shelters";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=mode==="both"||mode==="shelters";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
@@ -1487,7 +1488,7 @@ async function loadShelters(){
    const phone=String(p.org_main_phone||"").trim();
    const icon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+color+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">⌂</span>',iconSize:[42,42],iconAnchor:[21,21]});
    const popupHtml='<div style="min-width:220px"><strong>🏠 '+name+'</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+color+';color:#fff;font-weight:800">'+esc(labels[status])+'</div><div>'+address+'</div>'+(accessible?'<div><b>Wheelchair / ADA:</b> '+esc(accessible)+'</div>':'')+(pet?'<div><b>Pet information:</b> '+esc(pet)+'</div>':'')+(phone?'<div><b>Phone:</b> '+esc(phone)+'</div>':'')+'<small style="display:block;margin-top:8px">Source: FEMA National Shelter System. Status and capacity can change. A listed location is not a direction to evacuate. Confirm opening with Brevard County before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Check official Brevard shelter announcements</a></p></div>';
-   L.marker([lat,lng],{icon,title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300}).addTo(shelterLayer);
+   L.marker([lat,lng],{icon,pane:"mewShelterPane",title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300}).addTo(shelterLayer);
   });
   if(count)count.textContent=features.length+" shelter locations";
   if(updated)updated.textContent="FEMA data · refreshed "+new Date().toLocaleTimeString();
