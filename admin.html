@@ -78,6 +78,42 @@ body.dark .consentbox label{color:#eaf2f8}
 
 /* Desktop admin map-first workspace: reports and flags above, full-width map below. */
 @media(min-width:901px){.wrap{max-width:1600px;padding-left:28px;padding-right:28px}.content{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}.content>.panel:last-child{grid-column:1/-1}#map{height:clamp(620px,68vh,820px)}}
+
+/* CoastWatch coastal intelligence visual alignment */
+:root{--navy:#041725;--blue:#0c9f9a;--ink:#eaf6fb;--muted:#a8c3d1;--line:#19465e;--bg:#041321;--red:#ef3152;--green:#08b88c}
+body{background:radial-gradient(ellipse at 10% 0%,#0b3048 0,transparent 38%),linear-gradient(180deg,#041321,#071b2b)!important;color:#eaf6fb}
+header{position:sticky;top:0;z-index:1000;background:#03111ef2;border-bottom:1px solid #15516b;box-shadow:0 10px 35px #0005;backdrop-filter:blur(18px);padding:12px max(20px,calc((100% - 1500px)/2));flex-direction:row;justify-content:space-between;align-items:center}
+.admin-brand img{width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 0 12px #08b8ae30)}
+.admin-brand strong{font:800 21px Manrope,sans-serif;color:#f2fbff;letter-spacing:-.04em}
+.admin-brand small{color:#a9c7d6;text-transform:none;letter-spacing:0}
+.wrap{max-width:1600px;margin:25px auto;padding:0 25px}
+.panel,.stat,.consentbox{background:linear-gradient(145deg,#09253a,#061b2c)!important;border:1px solid #174a63!important;border-radius:17px;box-shadow:0 16px 42px #0004;color:#eff8fc}
+.stat{background:linear-gradient(145deg,#0b2b43,#071e30)!important}
+.stat b{color:#36d8d5!important}
+.stat span,.meta{color:#a9c3d1!important}
+.filters{background:#071f32!important;border-color:#174a63!important}
+.report{border-color:#19445b!important}
+.report h3{color:#f2faff!important}
+input,select,textarea{background:#061a2b!important;color:#eff8fc!important;border-color:#31566c!important}
+input::placeholder,textarea::placeholder{color:#8da9b8!important}
+button{background:linear-gradient(120deg,#0eaaa5,#08777e)!important;border:1px solid #2bc5c5!important;color:#f3ffff!important}
+button.gray{background:#17384d!important;border-color:#31566c!important;color:#e5f3f9!important}
+button.red{background:linear-gradient(120deg,#f13d5b,#bc1739)!important;border-color:#ff7c91!important}
+button.green{background:linear-gradient(120deg,#08a985,#087a69)!important;border-color:#35d4b3!important}
+.theme-toggle{background:#0b354c!important;color:#e6f8ff!important;border:1px solid #2a728b!important;box-shadow:none!important}
+.owner-badge{background:#f4c542!important;color:#1d2a3a!important}
+.signout-button{background:#bd2942!important;border-color:#ff9aa9!important}
+.tag{background:#073e47!important;color:#8ff5e5!important;border:1px solid #176a70}
+.msg{background:#0b3549!important;color:#d8f2fc!important}
+.msg.error{background:#4a1e2a!important;color:#ffe0e5!important}
+.msg.good{background:#0b3b32!important;color:#d6fff0!important}
+.empty{color:#a9c3d1!important}
+.consentbox label{color:#eaf6fb!important}
+.photo-card{background:#0b263a!important;border-color:#28516a!important}
+#map{border-radius:0 0 15px 15px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #49e6ee!important;outline-offset:3px!important}
+@media(max-width:600px){header{position:relative;flex-direction:column;align-items:flex-start;padding:10px 13px}.admin-brand img{width:52px;height:52px}.wrap{padding:0 11px;margin:15px auto}.row{width:100%;justify-content:flex-start}.theme-toggle{margin-left:auto}}
+
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
@@ -132,7 +168,7 @@ body.dark .consentbox label{color:#eaf2f8}
 const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO"),VERSION="mew-natural-hazards-2026-11-02-v3";
 const themeButton=document.getElementById("themeToggle");
 function applyTheme(theme){document.body.classList.toggle("dark",theme==="dark");themeButton.textContent=theme==="dark"?"☀️ Light mode":"🌙 Dark mode";themeButton.setAttribute("aria-pressed",String(theme==="dark"));}
-applyTheme(localStorage.getItem("mew-theme")||"light");
+applyTheme(localStorage.getItem("mew-theme")||"dark");
 themeButton.addEventListener("click",()=>{const next=document.body.classList.contains("dark")?"light":"dark";localStorage.setItem("mew-theme",next);applyTheme(next);});
 
 const cats=["flooding","coastal_flooding","storm_damage","tornado_damage","fire","road_hazard","road_closure","power_outage","erosion_washout","other_hazard"];
