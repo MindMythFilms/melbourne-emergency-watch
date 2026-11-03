@@ -364,12 +364,12 @@ body.dark .map-filters select{background:#0a1b2b;color:#f2f7fa;border-color:#385
 
 
 /* Full-width map filter dropdowns: keep their complete selected labels readable. */
-#map-panel .map-filters{display:grid;grid-template-columns:repeat(2,minmax(300px,1fr));align-items:end;gap:12px;width:100%;min-width:0}
+#map-panel .map-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end;gap:12px;width:100%;min-width:0}
 #map-panel .map-filters label{display:block;width:100%;min-width:0;max-width:none;font-size:14px!important;line-height:1.35}
 #map-panel .map-filters select,#map-panel #sourceFilter,#map-panel #mapFilter{display:block;width:100%;min-width:0;max-width:none;height:52px;min-height:52px;box-sizing:border-box;padding:10px 38px 10px 14px;font-family:inherit;font-size:16px!important;font-weight:500!important;line-height:1.3;letter-spacing:normal;text-overflow:clip;white-space:nowrap}
 #map-panel .map-filters .pill{grid-column:1/-1;justify-self:start}
-@media(max-width:900px){#map-panel .map-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){#map-panel .map-filters{grid-template-columns:minmax(0,1fr)}#map-panel .map-filters .pill{grid-column:auto}}
+@media(max-width:560px){#map-panel .map-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#map-panel .map-filters label{font-size:12px!important}#map-panel .map-filters select{height:44px;min-height:44px;padding:8px 25px 8px 9px;font-size:13px!important}#map-panel .map-filters .pill{grid-column:1/-1}}
+@media(max-width:360px){#map-panel .map-filters{grid-template-columns:minmax(0,1fr)}}
 
 </style></head>
 <body>
