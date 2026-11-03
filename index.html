@@ -1156,6 +1156,36 @@ body:not(.dark) footer{color:#526b7b!important}
  text-overflow:clip!important;
 }
 
+
+/* Definitive sidebar dropdown layout: one full-width control per row. */
+#map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-auto-flow:row!important;
+ align-items:stretch!important;
+ justify-items:stretch!important;
+ gap:10px!important;
+ width:100%!important;
+ min-width:0!important;
+}
+#map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters>label{
+ display:block!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+}
+#map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters>label select{
+ display:block!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ box-sizing:border-box!important;
+ padding-left:12px!important;
+ padding-right:34px!important;
+ font-size:14px!important;
+ letter-spacing:0!important;
+}
+
 </style></head>
 <body>
 <header class="site-header">
