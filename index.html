@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-unverified-zone-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-road-status-unverified-labels-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1970,13 +1970,16 @@ async function loadPublicZones(){
    const bounds=casing.getBounds();
    if(!bounds||!bounds.isValid())return;
    const isUnverified=String(z.description||"").startsWith("UNVERIFIED:");
-   const zoneType=isUnverified?"unverified":String(z.zone_type||"zone").replaceAll("_"," ");
+   const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
+   const situation=String(z.name||"").toLowerCase().includes("washout")?"ROAD WASHOUT":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSURE");
+   const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
+   const detailDescription=String(z.description||"").replace(/^UNVERIFIED:\\s*/,"");
    const color=z.color||"#ef3340";
    const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
-   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
+   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(displayStatus)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
-   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(zoneType)+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<small>CoastWatch FL map zone · informational only</small>');
+   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>Community-reported information · not independently verified by CoastWatch FL</small>');
    nextEntries.set(String(z.id),{bounds,group});
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
