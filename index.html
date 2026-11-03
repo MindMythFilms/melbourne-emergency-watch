@@ -1315,6 +1315,26 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  #map-panel>.map-dashboard>.map-stage{grid-column:2;grid-row:1;min-width:0!important;width:100%!important;height:100%!important}
  #map-panel>.map-dashboard>.map-stage #map{width:100%!important;height:clamp(620px,78vh,1000px)!important;min-height:560px!important}
 }
+
+/* Desktop only: stretch Leaflet across the entire map column, including the unused lower area. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard{align-items:stretch!important}
+ #map-panel>.map-dashboard>.map-stage{
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:stretch!important;
+  height:auto!important;
+  min-height:760px!important;
+  overflow:hidden!important;
+ }
+ #map-panel>.map-dashboard>.map-stage #map{
+  flex:1 1 auto!important;
+  height:100%!important;
+  min-height:760px!important;
+  max-height:none!important;
+  width:100%!important;
+ }
+}
 </style></head>
 <body>
 <header class="site-header">
