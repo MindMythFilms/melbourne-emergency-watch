@@ -432,6 +432,47 @@ body.dark .map-filters select{background:#0a1b2b;color:#f2f7fa;border-color:#385
 #map-panel .map-filters select,#map-panel .map-filters select:focus{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;height:42px!important;min-height:42px!important;margin:4px 0 0!important;padding:7px 24px 7px 8px!important;box-sizing:border-box!important;font-family:Arial,system-ui,sans-serif!important;font-size:13px!important;font-weight:500!important;line-height:normal!important;letter-spacing:normal!important;text-align:left!important;text-indent:0!important;white-space:nowrap!important;text-overflow:clip!important;overflow:visible!important;-webkit-appearance:menulist!important;appearance:auto!important}
 #map-panel .map-filters select option{font-size:14px!important}
 @media(max-width:350px){#map-panel .map-filters{grid-template-columns:1fr 1fr!important;grid-template-rows:auto auto!important}#map-panel .map-filters .pill{grid-column:1/-1!important;grid-row:1!important}#map-panel .map-filters label[for="sourceFilter"]{grid-column:1!important;grid-row:2!important}#map-panel .map-filters label[for="mapFilter"]{grid-column:2!important;grid-row:2!important}}
+
+/* Use the entire toolbar width for the report count and both readable filters. */
+#map-panel .map-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;gap:12px!important}
+#map-panel .map-actions{display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;width:100%!important;gap:9px!important}
+#map-panel .map-filters{
+ display:grid!important;
+ grid-template-columns:minmax(125px,auto) minmax(0,1fr) minmax(0,1fr)!important;
+ grid-template-rows:auto!important;
+ align-items:end!important;
+ gap:10px!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ box-sizing:border-box!important;
+}
+#map-panel .map-filters .pill{grid-column:1!important;grid-row:1!important;align-self:end!important;justify-self:start!important;white-space:nowrap!important;margin:0 0 2px!important}
+#map-panel .map-filters label{display:block!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;font-size:13px!important;line-height:1.3!important;box-sizing:border-box!important}
+#map-panel .map-filters label[for="sourceFilter"]{grid-column:2!important}
+#map-panel .map-filters label[for="mapFilter"]{grid-column:3!important}
+#map-panel .map-filters select,#map-panel .map-filters select:focus{
+ display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+ height:48px!important;min-height:48px!important;margin:5px 0 0!important;
+ padding:8px 34px 8px 12px!important;box-sizing:border-box!important;
+ font-family:Arial,system-ui,sans-serif!important;font-size:15px!important;font-weight:500!important;
+ line-height:normal!important;letter-spacing:normal!important;text-align:left!important;text-indent:0!important;
+ white-space:nowrap!important;text-overflow:clip!important;
+ -webkit-appearance:menulist!important;appearance:auto!important;
+}
+@media(max-width:650px){
+ #map-panel .map-filters{grid-template-columns:minmax(80px,auto) minmax(0,1fr) minmax(0,1fr)!important;gap:7px!important}
+ #map-panel .map-filters .pill{font-size:12px!important;padding:7px 8px!important}
+ #map-panel .map-filters label{font-size:11px!important}
+ #map-panel .map-filters select,#map-panel .map-filters select:focus{height:46px!important;min-height:46px!important;padding:7px 24px 7px 8px!important;font-size:13px!important}
+}
+@media(max-width:360px){
+ #map-panel .map-filters{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto auto!important}
+ #map-panel .map-filters .pill{grid-column:1/-1!important;grid-row:1!important}
+ #map-panel .map-filters label[for="sourceFilter"]{grid-column:1!important;grid-row:2!important}
+ #map-panel .map-filters label[for="mapFilter"]{grid-column:2!important;grid-row:2!important}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
