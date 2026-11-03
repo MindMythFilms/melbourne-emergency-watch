@@ -1245,6 +1245,9 @@ body:not(.dark) footer{color:#526b7b!important}
 .mew-community-leaflet-popup .leaflet-popup-tip{background:#fff}
 .map-stage .map-report-tools{z-index:500!important}
 @media(max-width:650px){.mew-community-leaflet-popup{margin-bottom:12px}.mew-community-leaflet-popup .leaflet-popup-content{margin:12px 13px 12px 13px;padding-top:40px;max-height:48vh;font-size:13px}.mew-community-leaflet-popup .leaflet-popup-close-button{top:5px!important;right:5px!important;width:64px!important;height:64px!important;font-size:48px!important;line-height:56px!important}}
+
+/* Keep map action overlays out of the way while an information popup is open. */
+.map-stage.mew-popup-visible .map-report-tools{display:none!important}
 </style></head>
 <body>
 <header class="site-header">
@@ -1389,6 +1392,9 @@ const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
+const mewMapStage=document.querySelector(".map-stage");
+map.on("popupopen",()=>mewMapStage?.classList.add("mew-popup-visible"));
+map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
 // COASTWATCH_NWS_ALERTS_V2 — isolated official-alert overlay; never modifies community report loading.
 const nwsAlertLayer=L.featureGroup().addTo(map);
 let nwsAlertFetchInProgress=false;
