@@ -899,6 +899,29 @@ body:not(.dark) .panelhead h2,body:not(.dark) .report strong{color:#f0f8fb!impor
 #map-panel .map-actions #locateBtn{width:auto!important;min-width:130px!important}
 @media(max-width:700px){#map-panel .map-actions{display:flex!important;justify-content:flex-end!important}#map-panel .map-actions #locateBtn{min-height:40px!important;width:auto!important;min-width:120px!important}}
 
+
+/* Keep the map report action clear of Leaflet's top-left zoom controls. */
+.map-report-tools{
+ left:auto!important;
+ right:16px!important;
+ align-items:flex-end!important;
+ flex-direction:column!important;
+}
+.map-report-button{max-width:min(270px,calc(100vw - 64px))!important}
+#mapReportHint{max-width:min(300px,calc(100vw - 64px))!important;text-align:right!important}
+@media(max-width:700px){
+ .map-report-tools{
+  left:auto!important;
+  right:10px!important;
+  top:10px!important;
+  align-items:flex-end!important;
+  flex-direction:column!important;
+  max-width:calc(100% - 20px)!important;
+ }
+ .map-report-button{max-width:calc(100vw - 84px)!important;min-height:42px!important}
+ #mapReportHint{max-width:calc(100vw - 84px)!important;text-align:right!important;line-height:1.3!important}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
