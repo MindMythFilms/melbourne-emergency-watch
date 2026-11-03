@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-coastwatch-layout-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-coastwatch-coastal-intelligence-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1108,6 +1108,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .hero-links a{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+
+/* Keep the optional light theme functional while the default remains dark. */
+body:not(.dark){background:linear-gradient(180deg,#edf5f8,#e6eff4)!important;color:#183247!important}
+body:not(.dark) .site-header{background:#071c2d!important}
+body:not(.dark) .mew-safety-announcement{background:#fff7e8!important;color:#634714!important}
+body:not(.dark) #report-panel,body:not(.dark) #community-reports-panel,body:not(.dark) #official-alerts-panel,body:not(.dark) .mew-official-resources,body:not(.dark) #about{background:#fff!important;border-color:#cbdde6!important;color:#183247!important}
+body:not(.dark) #report-panel .panelhead,body:not(.dark) #community-reports-panel .panelhead,body:not(.dark) #official-alerts-panel .panelhead,body:not(.dark) .mew-official-resources .panelhead,body:not(.dark) #about .panelhead{background:#f4f8fa!important;border-color:#d5e3e9!important}
+body:not(.dark) #report-panel .panelhead h2,body:not(.dark) #community-reports-panel h2,body:not(.dark) #official-alerts-panel h2,body:not(.dark) .mew-official-resources h2,body:not(.dark) #about h2{color:#102b3e!important}
+body:not(.dark) .form,body:not(.dark) .reportlist{background:#fff!important;color:#183247!important}
+body:not(.dark) .form label,body:not(.dark) .report strong{color:#183247!important}
+body:not(.dark) .form input,body:not(.dark) .form select,body:not(.dark) .form textarea{background:#fff!important;color:#183247!important;border-color:#b8ccd7!important}
+body:not(.dark) .form .hint,body:not(.dark) .section-subtitle,body:not(.dark) .report small,body:not(.dark) .report p{color:#536b7b!important}
+body:not(.dark) .report{border-bottom-color:#d7e3e9!important}
+body:not(.dark) #about>div:last-child{color:#415b6d!important}
+body:not(.dark) footer{color:#526b7b!important}
 
 </style></head>
 <body>
