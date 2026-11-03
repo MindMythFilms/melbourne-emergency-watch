@@ -1466,7 +1466,7 @@ async function loadShelters(){
  shelterFetchInProgress=true;
  const count=$("shelterCount"),updated=$("shelterUpdated");
  try{
-  const params=new URLSearchParams({where:"state = 'FL' AND (fips_code = '12009' OR county_parish LIKE '%Brevard%')",outFields:"*",returnGeometry:"true",outSR:"4326",f:"json"});
+  const params=new URLSearchParams({where:"state = 'FL'",geometry:"-81.05,27.75,-80.35,28.85",geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelIntersects",inSR:"4326",outFields:"*",returnGeometry:"true",outSR:"4326",f:"json",resultRecordCount:"500"});
   const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);
   let response;try{response=await fetch("https://gis.fema.gov/arcgis/rest/services/NSS/FEMA_NSS/MapServer/5/query?"+params.toString(),{headers:{Accept:"application/json"},cache:"no-store",signal:controller.signal});}finally{clearTimeout(timeout);}
   if(!response.ok)throw new Error("FEMA shelter service HTTP "+response.status);
