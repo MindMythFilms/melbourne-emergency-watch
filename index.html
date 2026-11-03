@@ -1353,6 +1353,24 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
   max-height:660px!important;
  }
 }
+
+/* Desktop: make the actual Leaflet map canvas occupy the full map column height. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard>.map-stage{
+  display:block!important;
+  height:clamp(460px,62vh,660px)!important;
+  min-height:460px!important;
+  max-height:660px!important;
+  align-self:stretch!important;
+ }
+ #map-panel>.map-dashboard>.map-stage>#map{
+  display:block!important;
+  height:clamp(460px,62vh,660px)!important;
+  min-height:460px!important;
+  max-height:660px!important;
+  width:100%!important;
+ }
+}
 </style></head>
 <body>
 <header class="site-header">
