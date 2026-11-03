@@ -1746,13 +1746,14 @@ async function loadPublicZones(){
   const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
   const color=z.color||"#ef3340";
   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
-  // Solid, high-contrast casing and fill remain legible at county-wide zoom levels.
-  const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:11,opacity:1,fillColor:color,fillOpacity:.42,lineCap:"round",lineJoin:"round"}});
-  const outline=L.geoJSON(z.geometry,{style:{color:color,weight:7,opacity:1,fillColor:color,fillOpacity:.34,lineCap:"round",lineJoin:"round"}});
-  const labelMarker=L.marker(casing.getBounds().getCenter(),{icon:label,interactive:false,keyboard:false,zIndexOffset:1200});
+  // Translucent zone shading keeps streets, imagery, and hazard markers visible.
+  const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:color,fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
+  const outline=L.geoJSON(z.geometry,{style:{color:color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
+  const labelMarker=L.marker(casing.getBounds().getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
   const group=L.featureGroup([casing,outline,labelMarker]);
   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(zoneType)+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<small>CoastWatch FL map zone · informational only</small>');
   group.addTo(mewPublicZoneLayer);
+  casing.bringToFront();outline.bringToFront();labelMarker.bringToFront();
   mewPublicZoneBounds.set(String(z.id),casing.getBounds());
  });
 }
@@ -1760,7 +1761,7 @@ document.addEventListener("click",e=>{
  const item=e.target.closest("[data-zone-focus]");
  if(!item)return;
  const bounds=mewPublicZoneBounds.get(item.dataset.zoneFocus);
- if(bounds&&bounds.isValid()){map.fitBounds(bounds,{padding:[45,45],maxZoom:13});}
+ if(bounds&&bounds.isValid()){map.fitBounds(bounds,{padding:[45,45],maxZoom:13});const zone=mewPublicZoneLayer.getLayers().find(g=>g.getBounds&&g.getBounds().equals(bounds));if(zone)zone.openPopup(bounds.getCenter());}
 });
 
 async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
