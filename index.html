@@ -297,7 +297,7 @@ main{margin:9px auto;padding:0 10px}
 }
 
 /* Desktop map-first layout: give the community map the space it deserves. */
-@media(min-width:901px){main{max-width:1600px;padding-left:28px;padding-right:28px}.layout{grid-template-columns:minmax(0,2.1fr) minmax(320px,.78fr);gap:22px;align-items:start}#map{height:clamp(650px,72vh,850px)}}
+@media(min-width:901px){main{max-width:1800px;padding-left:32px;padding-right:32px}.layout{grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}#map-panel{grid-column:1/-1}#map{height:clamp(760px,82vh,1100px)}#report-panel{grid-column:1/-1}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
