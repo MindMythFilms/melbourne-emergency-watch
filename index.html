@@ -1351,11 +1351,11 @@ window.mewAcceptConsent=async function(){
  if(!document.getElementById("termsCheck").checked){error.textContent="Please check the agreement box before continuing.";error.classList.remove("hidden");return;}
  accept.disabled=true;accept.textContent="Saving…";
  const version="coastwatch-fl-terms-2026-11-03-v2",key="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",url="https://lqzxzlaxvfjuklyzxbex.supabase.co";
- let sid=sessionStorage.getItem("mew_browser_session");if(!sid){sid=crypto.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random();sessionStorage.setItem("mew_browser_session",sid);}
- try{const response=await fetch(url+"/rest/v1/rpc/record_mew_terms_acceptance",{method:"POST",headers:{"apikey":key,"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({p_terms_version:version,p_browser_session_id:sid,p_age_attested:false})});if(!response.ok)throw new Error("HTTP "+response.status);sessionStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}
+ let sid=localStorage.getItem("mew_browser_session")||sessionStorage.getItem("mew_browser_session");if(!sid){sid=crypto.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random();}localStorage.setItem("mew_browser_session",sid);
+ try{const response=await fetch(url+"/rest/v1/rpc/record_mew_terms_acceptance",{method:"POST",headers:{"apikey":key,"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({p_terms_version:version,p_browser_session_id:sid,p_age_attested:false})});if(!response.ok)throw new Error("HTTP "+response.status);localStorage.setItem("mew_accepted_version",version);sessionStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}
  catch(e){error.textContent="We couldn't save your agreement. Please try again.";error.classList.remove("hidden");accept.disabled=false;accept.textContent="I agree — continue";}
 };
-(()=>{if(sessionStorage.getItem("mew_accepted_version")==="coastwatch-fl-terms-2026-11-03-v2")document.getElementById("consentOverlay").remove();})();
+(()=>{const version="coastwatch-fl-terms-2026-11-03-v2";const previouslyAccepted=localStorage.getItem("mew_accepted_version")||sessionStorage.getItem("mew_accepted_version");if(previouslyAccepted===version){localStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
