@@ -1472,6 +1472,11 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  #map-panel>.nws-legend,
  #map-panel>.mapnote{position:relative!important;clear:both!important}
 }
+
+/* Nudge the Active Map Zones overlay slightly lower on compact screens. */
+@media(max-width:700px){
+ .map-stage #mapZonesCard{transform:translateY(18px)!important}
+}
 </style></head>
 <body>
 <header class="site-header">
