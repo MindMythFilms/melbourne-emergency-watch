@@ -1428,6 +1428,50 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  #map-panel .map-stage #mapZonesCard *{pointer-events:auto!important}
  #map-panel .map-stage #mapZonesCard .map-zone-item{cursor:pointer!important}
 }
+
+/* Desktop layout repair: place resource cards in a real second grid row, clear of the legend. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard{
+  display:grid!important;
+  grid-template-columns:340px minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;
+  align-items:stretch!important;
+ }
+ #map-panel>.map-dashboard>.map-sidebar{
+  grid-column:1!important;
+  grid-row:1 / span 2!important;
+  min-width:0!important;
+  width:auto!important;
+ }
+ #map-panel>.map-dashboard>.map-stage{
+  grid-column:2!important;
+  grid-row:1!important;
+  display:block!important;
+  align-self:stretch!important;
+  height:clamp(460px,62vh,660px)!important;
+  min-height:0!important;
+  max-height:660px!important;
+  overflow:hidden!important;
+ }
+ #map-panel>.map-dashboard>.map-stage>#map{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:660px!important;
+ }
+ #map-panel>.map-dashboard>#map-resource-strip{
+  grid-column:2!important;
+  grid-row:2!important;
+  align-self:start!important;
+  position:relative!important;
+  z-index:1!important;
+  margin:0!important;
+ }
+ #map-panel>.mobile-legend-toggle,
+ #map-panel>.nws-legend,
+ #map-panel>.mapnote{position:relative!important;clear:both!important}
+}
 </style></head>
 <body>
 <header class="site-header">
@@ -2081,7 +2125,7 @@ setInterval(checkForSiteUpdates,180000);
    if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
    if(stage.parentElement!==dashboard)dashboard.appendChild(stage);
    if(zones.parentElement!==stage)stage.appendChild(zones);
-   if(strip.parentElement!==stage)stage.appendChild(strip);
+   if(strip.parentElement!==dashboard)dashboard.appendChild(strip);
    resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==strip)strip.appendChild(card);});
   }else{
    if(stage.parentElement!==panel||stage.nextElementSibling!==heading)panel.insertBefore(stage,heading);
