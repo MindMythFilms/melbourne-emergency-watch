@@ -1107,7 +1107,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Keep the optional light theme functional while the default remains dark. */
 body:not(.dark){background:linear-gradient(180deg,#edf5f8,#e6eff4)!important;color:#183247!important}
 body:not(.dark) .site-header{background:#071c2d!important}
-body:not(.dark) .mew-safety-announcement{background:#fff7e8!important;color:#634714!important}
+body:not(.dark) .mew-safety-announcement{background:#fff7e8!important;color:#634714!important}body:not(.dark) .mew-safety-announcement .mew-safety-main p,body:not(.dark) .mew-safety-announcement .mew-safety-main strong,body:not(.dark) .mew-safety-announcement .mew-safety-main a,body:not(.dark) .mew-safety-announcement .mew-safety-details summary{color:#49340e!important}
 body:not(.dark) #report-panel,body:not(.dark) #community-reports-panel,body:not(.dark) #official-alerts-panel,body:not(.dark) .mew-official-resources,body:not(.dark) #about{background:#fff!important;border-color:#cbdde6!important;color:#183247!important}
 body:not(.dark) #report-panel .panelhead,body:not(.dark) #community-reports-panel .panelhead,body:not(.dark) #official-alerts-panel .panelhead,body:not(.dark) .mew-official-resources .panelhead,body:not(.dark) #about .panelhead{background:#f4f8fa!important;border-color:#d5e3e9!important}
 body:not(.dark) #report-panel .panelhead h2,body:not(.dark) #community-reports-panel h2,body:not(.dark) #official-alerts-panel h2,body:not(.dark) .mew-official-resources h2,body:not(.dark) #about h2{color:#102b3e!important}
@@ -1392,14 +1392,15 @@ const $=id=>document.getElementById(id);
 
 const mewReportPanel=document.getElementById("report-panel"),mewMapPanel=document.getElementById("map-panel"),mewMapElement=document.getElementById("map"),mewReportPlaceholder=document.getElementById("mewMobileReportPlacement"),mewHero=document.querySelector(".hero-visual"),mewLayout=document.querySelector(".layout"),mewMapStage=document.querySelector("#map-panel .map-stage"),mewMapDashboard=document.querySelector("#map-panel .map-dashboard"),mewMapSidebar=document.querySelector("#map-panel .map-sidebar"),mewMapHeading=document.querySelector("#map-panel .map-workspace-head"),mewMobileLayout=window.matchMedia("(max-width:650px)");
 function mewPlaceReportPanel(){if(!mewReportPanel||!mewMapPanel||!mewMapElement||!mewReportPlaceholder)return;mewMapPanel.insertAdjacentElement("afterend",mewReportPanel);}
-function mewPlaceHero(){if(!mewHero||!mewMapPanel||!mewLayout)return;if(mewMobileLayout.matches){mewMapPanel.insertAdjacentElement("beforebegin",mewHero);}else{mewLayout.insertAdjacentElement("beforebegin",mewHero);}}
-function mewPlaceMapStage(){if(!mewMapStage||!mewMapPanel||!mewMapDashboard||!mewMapSidebar||!mewMapHeading)return;if(mewMobileLayout.matches){mewHero?.insertAdjacentElement("afterend",mewMapStage);}else{mewMapDashboard.appendChild(mewMapStage);}}
+function mewPlaceHero(){if(!mewHero||!mewMapPanel||!mewLayout)return;if(mewMobileLayout.matches){mewLayout.insertBefore(mewHero,mewMapPanel);}else{mewLayout.insertAdjacentElement("beforebegin",mewHero);}}
+function mewPlaceMapStage(){if(!mewMapStage||!mewMapPanel||!mewMapDashboard||!mewMapSidebar||!mewMapHeading)return;if(mewMobileLayout.matches){mewMapPanel.parentNode.insertBefore(mewMapStage,mewMapPanel);}else{mewMapDashboard.appendChild(mewMapStage);}}
 mewPlaceReportPanel();mewPlaceHero();mewPlaceMapStage();if(mewMobileLayout.addEventListener)mewMobileLayout.addEventListener("change",()=>{mewPlaceReportPanel();mewPlaceHero();mewPlaceMapStage();setTimeout(()=>map.invalidateSize(),80);});else mewMobileLayout.addListener(()=>{mewPlaceReportPanel();mewPlaceHero();mewPlaceMapStage();setTimeout(()=>map.invalidateSize(),80);});
 
 const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(mobileLegendButton&&mobileLegend){mobileLegend.classList.add("mobile-collapsed");mobileLegendButton.addEventListener("click",()=>{const expanded=mobileLegendButton.getAttribute("aria-expanded")==="true";mobileLegend.classList.toggle("mobile-collapsed",expanded);mobileLegendButton.setAttribute("aria-expanded",String(!expanded));mobileLegendButton.textContent=expanded?"＋ Map legend":"－ Hide map legend";});}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
+requestAnimationFrame(()=>requestAnimationFrame(()=>map.invalidateSize({pan:false})));
 const mewMapStage=document.querySelector(".map-stage");
 map.on("popupopen",()=>mewMapStage?.classList.add("mew-popup-visible"));
 map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
