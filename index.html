@@ -1186,6 +1186,27 @@ body:not(.dark) footer{color:#526b7b!important}
  letter-spacing:0!important;
 }
 
+
+/* Desktop-only correction: give the map sidebar enough width and stack filters. */
+@media(min-width:901px){
+ .map-dashboard{grid-template-columns:340px minmax(0,1fr)!important}
+ .map-dashboard>.map-sidebar{width:340px!important;min-width:340px!important}
+ #map-panel .map-dashboard .map-sidebar .map-filter-card{width:100%!important;min-width:0!important;padding:16px!important}
+ #map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-auto-flow:row!important;
+  gap:12px!important;
+  width:100%!important;
+ }
+ #map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters>label{display:block!important;width:100%!important;min-width:0!important}
+ #map-panel .map-dashboard .map-sidebar .map-filter-card .map-filters>label select{
+  display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+  height:50px!important;min-height:50px!important;padding:10px 38px 10px 13px!important;
+  font-size:15px!important;box-sizing:border-box!important;
+ }
+}
+
 </style></head>
 <body>
 <header class="site-header">
