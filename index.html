@@ -1371,6 +1371,52 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
   width:100%!important;
  }
 }
+
+/* Desktop: place radar, shelter and evacuation resources in the unused area below the map. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard>.map-stage{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:visible!important;
+ }
+ #map-panel>.map-dashboard>.map-stage>#map{
+  flex:0 0 clamp(460px,62vh,660px)!important;
+  height:clamp(460px,62vh,660px)!important;
+  min-height:460px!important;
+  max-height:660px!important;
+  width:100%!important;
+ }
+ #map-resource-strip{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+  padding:12px!important;
+  box-sizing:border-box!important;
+  background:#071d30!important;
+  border-top:1px solid #174d66!important;
+ }
+ #map-resource-strip>.map-count-card{
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:90px!important;
+  margin:0!important;
+  padding:12px!important;
+  box-sizing:border-box!important;
+ }
+ #map-resource-strip>.map-count-card>div{min-width:0!important}
+ #map-resource-strip>.map-count-card strong{font-size:15px!important;line-height:1.25!important}
+ #map-resource-strip>.map-count-card small{font-size:10px!important;line-height:1.4!important}
+ #map-resource-strip>.map-count-card a{font-size:11px!important;overflow-wrap:anywhere}
+}
+@media(min-width:901px) and (max-width:1150px){
+ #map-resource-strip{grid-template-columns:1fr!important}
+ #map-resource-strip>.map-count-card{min-height:70px!important}
+}
 </style></head>
 <body>
 <header class="site-header">
@@ -1956,24 +2002,37 @@ async function checkForSiteUpdates(){
 }
 setInterval(checkForSiteUpdates,180000);
 
-/* Keep Active Map Zones floating on the map on desktop and mobile. */
+/* Keep Active Map Zones over the map; move secondary resource cards below it on desktop only. */
 (()=>{
  const panel=document.getElementById("map-panel");
  const stage=panel?.querySelector(".map-stage");
  const heading=panel?.querySelector(".map-workspace-head");
  const dashboard=panel?.querySelector(".map-dashboard");
+ const sidebar=panel?.querySelector(".map-sidebar");
  const zones=document.getElementById("mapZonesCard");
- if(!panel||!stage||!heading||!dashboard||!zones)return;
+ const resourceIds=["rainRadarStatus","shelterStatus","evacuationStatus"];
+ if(!panel||!stage||!heading||!dashboard||!sidebar||!zones)return;
+ let strip=stage.querySelector("#map-resource-strip");
+ if(!strip){
+  strip=document.createElement("div");
+  strip.id="map-resource-strip";
+  strip.setAttribute("aria-label","Additional emergency resources");
+ }
  const desktop=window.matchMedia("(min-width: 901px)");
  const arrange=()=>{
   if(desktop.matches){
    if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
    if(stage.parentElement!==dashboard)dashboard.appendChild(stage);
+   if(zones.parentElement!==stage)stage.appendChild(zones);
+   if(strip.parentElement!==stage)stage.appendChild(strip);
+   resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==strip)strip.appendChild(card);});
   }else{
    if(stage.parentElement!==panel||stage.nextElementSibling!==heading)panel.insertBefore(stage,heading);
    if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
+   if(strip.parentElement)strip.remove();
+   resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==sidebar)sidebar.appendChild(card);});
+   if(zones.parentElement!==stage)stage.appendChild(zones);
   }
-  if(zones.parentElement!==stage)stage.appendChild(zones);
   requestAnimationFrame(()=>map.invalidateSize({pan:false}));
  };
  arrange();
