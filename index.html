@@ -1473,9 +1473,9 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  #map-panel>.mapnote{position:relative!important;clear:both!important}
 }
 
-/* Nudge the Active Map Zones overlay slightly lower on compact screens. */
-@media(max-width:700px){
- .map-stage #mapZonesCard{transform:translateY(18px)!important}
+/* Desktop only: nudge Active Map Zones slightly lower on the map. */
+@media(min-width:901px){
+ #map-panel .map-stage #mapZonesCard{transform:translateY(18px)!important}
 }
 </style></head>
 <body>
