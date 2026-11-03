@@ -1307,6 +1307,14 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  .map-stage .map-zone-item span{font-size:11px!important}
 }
 
+
+/* Desktop workspace: controls stay left and map sits directly beside them. */
+@media(min-width:901px){
+ #map-panel>.map-dashboard{display:grid!important;grid-template-columns:340px minmax(0,1fr)!important;align-items:stretch!important}
+ #map-panel>.map-dashboard>.map-sidebar{grid-column:1;grid-row:1;min-width:0!important;width:auto!important}
+ #map-panel>.map-dashboard>.map-stage{grid-column:2;grid-row:1;min-width:0!important;width:100%!important;height:100%!important}
+ #map-panel>.map-dashboard>.map-stage #map{width:100%!important;height:clamp(620px,78vh,1000px)!important;min-height:560px!important}
+}
 </style></head>
 <body>
 <header class="site-header">
@@ -1892,19 +1900,30 @@ async function checkForSiteUpdates(){
 }
 setInterval(checkForSiteUpdates,180000);
 
-/* Keep the active-zone panel in the desktop sidebar; float it over the map on mobile. */
-(()=> {
- const panel=document.getElementById("mapZonesCard");
- const stage=document.querySelector("#map-panel .map-stage");
- const sidebar=document.querySelector("#map-panel .map-sidebar");
- if(!panel||!stage||!sidebar)return;
- const mobile=window.matchMedia("(max-width: 700px)");
- const placePanel=()=>{
-  const target=mobile.matches?stage:sidebar;
-  if(panel.parentElement!==target)target.appendChild(panel);
+/* Restore desktop side-by-side map workspace; keep mobile map-first arrangement. */
+(()=>{
+ const panel=document.getElementById("map-panel");
+ const stage=panel?.querySelector(".map-stage");
+ const heading=panel?.querySelector(".map-workspace-head");
+ const dashboard=panel?.querySelector(".map-dashboard");
+ const sidebar=panel?.querySelector(".map-sidebar");
+ const zones=document.getElementById("mapZonesCard");
+ if(!panel||!stage||!heading||!dashboard||!sidebar||!zones)return;
+ const desktop=window.matchMedia("(min-width: 901px)");
+ const arrange=()=>{
+  if(desktop.matches){
+   if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
+   if(stage.parentElement!==dashboard)dashboard.appendChild(stage);
+   if(zones.parentElement!==sidebar)sidebar.appendChild(zones);
+  }else{
+   if(stage.parentElement!==panel||stage.nextElementSibling!==heading)panel.insertBefore(stage,heading);
+   if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
+   if(zones.parentElement!==stage)stage.appendChild(zones);
+  }
+  requestAnimationFrame(()=>map.invalidateSize({pan:false}));
  };
- placePanel();
- if(mobile.addEventListener)mobile.addEventListener("change",placePanel);
- else mobile.addListener(placePanel);
+ arrange();
+ if(desktop.addEventListener)desktop.addEventListener("change",arrange);
+ else desktop.addListener(arrange);
 })();
 </script></body></html>
