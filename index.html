@@ -302,6 +302,9 @@ main{margin:9px auto;padding:0 10px}
 /* Desktop map-first layout: give the community map the space it deserves. */
 @media(min-width:901px){main{max-width:1800px;padding-left:32px;padding-right:32px}.layout{grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}#map-panel{grid-column:1/-1}#map{height:clamp(760px,82vh,1100px)}#report-panel{grid-column:1/-1}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .map-submit-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:8px;background:#c62828;color:#fff;text-decoration:none;font-size:13px;font-weight:900;letter-spacing:.04em;white-space:nowrap;box-shadow:0 2px 7px #7f1d1d35}.map-submit-link:hover{background:#a91f1f;filter:brightness(1.04)}
+/* Keep the top of the report form visible below the sticky header when the map shortcut is used. */
+#report-panel{scroll-margin-top:215px}
+@media(max-width:650px){#report-panel{scroll-margin-top:155px}}
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
