@@ -706,6 +706,173 @@ body:not(.dark) .panelhead h2,body:not(.dark) .report strong{color:#f0f8fb!impor
 }
 @media(prefers-reduced-motion:reduce){.hero-eyebrow i{animation:none!important}}
 
+
+/* Definitive map-toolbar layout reset — removes legacy grid placements. */
+#map-panel .map-workspace-head{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:14px!important;
+ align-items:stretch!important;
+}
+#map-panel .map-heading-copy{display:block!important;min-width:0!important;margin:0!important}
+#map-panel .map-toolbar{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ justify-content:flex-start!important;
+ gap:13px!important;
+ width:100%!important;
+ min-width:0!important;
+}
+#map-panel .map-actions{
+ display:grid!important;
+ grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;
+ gap:9px!important;
+ width:100%!important;
+ min-width:0!important;
+}
+#map-panel .map-actions .map-submit-link,
+#map-panel .map-actions #locateBtn{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ min-width:0!important;
+ min-height:48px!important;
+ height:auto!important;
+ padding:10px 12px!important;
+ box-sizing:border-box!important;
+ white-space:normal!important;
+ text-align:center!important;
+ font-size:14px!important;
+ line-height:1.25!important;
+}
+#map-panel .map-filter-area{
+ display:block!important;
+ position:static!important;
+ float:none!important;
+ clear:both!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ margin:0!important;
+ padding:0!important;
+ box-sizing:border-box!important;
+}
+#map-panel .map-filter-status{
+ display:flex!important;
+ position:static!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ gap:10px!important;
+ width:100%!important;
+ margin:0 0 8px!important;
+ padding:0!important;
+ color:#a9c7d2!important;
+ font-size:11px!important;
+ font-weight:800!important;
+ letter-spacing:.12em!important;
+ text-transform:uppercase!important;
+}
+#map-panel .map-filter-status .pill{
+ order:2!important;
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 auto!important;
+ margin:0!important;
+ padding:7px 11px!important;
+ white-space:nowrap!important;
+ font-size:12px!important;
+ letter-spacing:normal!important;
+}
+#map-panel .map-filters{
+ display:flex!important;
+ flex-direction:row!important;
+ flex-wrap:nowrap!important;
+ align-items:stretch!important;
+ justify-content:stretch!important;
+ gap:10px!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ margin:0!important;
+ padding:0!important;
+ box-sizing:border-box!important;
+}
+#map-panel .map-filters>label{
+ display:flex!important;
+ flex:1 1 0!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ justify-content:flex-start!important;
+ position:static!important;
+ float:none!important;
+ grid-column:auto!important;
+ grid-row:auto!important;
+ width:0!important;
+ min-width:0!important;
+ max-width:none!important;
+ margin:0!important;
+ padding:0!important;
+ box-sizing:border-box!important;
+ color:#b8d0d9!important;
+ font-size:12px!important;
+ font-weight:800!important;
+ line-height:1.3!important;
+}
+#map-panel .map-filters>label select,
+#map-panel .map-filters>label select:focus{
+ display:block!important;
+ position:static!important;
+ float:none!important;
+ flex:0 0 auto!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:48px!important;
+ min-height:48px!important;
+ margin:5px 0 0!important;
+ padding:8px 28px 8px 10px!important;
+ box-sizing:border-box!important;
+ font-family:Arial,system-ui,sans-serif!important;
+ font-size:14px!important;
+ font-weight:600!important;
+ line-height:normal!important;
+ letter-spacing:normal!important;
+ text-align:left!important;
+ text-indent:0!important;
+ white-space:nowrap!important;
+ text-overflow:clip!important;
+ overflow:hidden!important;
+ -webkit-appearance:menulist!important;
+ appearance:auto!important;
+ background:#081d2d!important;
+ color:#eff8fa!important;
+ -webkit-text-fill-color:#eff8fa!important;
+ border:1px solid #3b6477!important;
+ border-radius:10px!important;
+}
+#map-panel .map-filters>label select option{
+ background:#0c263a!important;
+ color:#eff8fa!important;
+ font-size:14px!important;
+}
+@media(max-width:700px){
+ #map-panel .map-workspace-head{grid-template-columns:minmax(0,1fr)!important;padding:14px!important}
+ #map-panel .map-heading-copy h2{font-size:18px!important}
+ #map-panel .map-toolbar{gap:11px!important}
+ #map-panel .map-actions{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;gap:8px!important}
+ #map-panel .map-actions .map-submit-link,#map-panel .map-actions #locateBtn{min-height:46px!important;padding:9px 8px!important;font-size:13px!important}
+ #map-panel .map-filters{gap:8px!important}
+ #map-panel .map-filters>label{font-size:11px!important}
+ #map-panel .map-filters>label select,#map-panel .map-filters>label select:focus{height:46px!important;min-height:46px!important;padding:7px 22px 7px 8px!important;font-size:13px!important}
+}
+@media(max-width:350px){
+ #map-panel .map-filters{flex-direction:column!important}
+ #map-panel .map-filters>label{width:100%!important;flex:1 1 auto!important}
+}
+
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
@@ -953,7 +1120,7 @@ async function loadPublicZones(){
 }
 
 async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
-window.mewReports=data||[];markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+" reports";
+window.mewReports=data||[];markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+(data.length===1?" report":" reports");
 $("latestReports").innerHTML=data.slice(0,12).map(r=>`<div class="report"><strong>${esc(r.title||r.category.replaceAll("_"," "))}</strong><small>${esc(r.address||"Location on map")} · ${new Date(r.created_at).toLocaleString()}</small>${String(r.description||"").trim()?`<p class="report-description">${esc(r.description)}</p>`:""}<div><span class="pill">${reportStatusLabel(r.status)}</span></div>${approvedPhotos[r.id]?`<img src="${esc(approvedPhotos[r.id])}" alt="Administrator-approved community photo" class="mew-photo-zoom" role="button" tabindex="0" aria-label="Enlarge community report photo" style="width:100%;max-width:220px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px">`:""}<button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:9px;padding:9px 12px;font-size:14px">Report this listing</button></div>`).join("")||'<p class="hint">No community reports yet.</p>';
 data.forEach(r=>{if((mapFilter==="all"||r.category===mapFilter)&&Number.isFinite(+r.latitude)&&Number.isFinite(+r.longitude)){const color=r.status==="resolved"?"#64748b":r.status==="unverified"?"#0f766e":"#15803d";const m=L.circleMarker([r.latitude,r.longitude],{radius:10.7,color:"#fff",weight:2,fillColor:color,fillOpacity:.95}).addTo(map).bindPopup(popup(r));markers.push(m)}});applySourceFilter();}
 
