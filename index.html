@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-massoutage-backoff-cache-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-evacuation-link-contrast-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1248,6 +1248,12 @@ body:not(.dark) footer{color:#526b7b!important}
 
 /* Keep map action overlays out of the way while an information popup is open. */
 .map-stage.mew-popup-visible .map-report-tools{display:none!important}
+
+/* High-contrast official evacuation-map link in both themes */
+#evacuationStatus a{color:#087f83!important;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;font-weight:800}
+#evacuationStatus a:hover{color:#075e63!important;text-decoration-thickness:2px}
+body.dark #evacuationStatus a{color:#67e8df!important}
+body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 </style></head>
 <body>
 <header class="site-header">
