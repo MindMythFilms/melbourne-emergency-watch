@@ -1441,7 +1441,7 @@ async function loadEvacuationZones(){
  const status=$("evacuationUpdated");
  try{
   const endpoint="https://services.arcgis.com/3wFbqsFPLeKqOlIK/ArcGIS/rest/services/NCS_Map_with_P_Surge_WFL1/FeatureServer/6/query";
-  const params=new URLSearchParams({where:"County_Nam='Brevard'",outFields:"County_Nam,EZone",returnGeometry:"true",outSR:"4326",f:"geojson"});
+  const params=new URLSearchParams({where:"County_Name='Brevard'",outFields:"County_Name,EZone",returnGeometry:"true",outSR:"4326",f:"geojson"});
   const response=await fetch(endpoint+"?"+params.toString(),{headers:{Accept:"application/geo+json"},cache:"no-store"});
   if(!response.ok)throw new Error("Evacuation zones HTTP "+response.status);
   const data=await response.json();
