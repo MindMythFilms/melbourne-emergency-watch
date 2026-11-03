@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-evacuation-routes-loader-fix-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-unverified-zone-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1969,7 +1969,8 @@ async function loadPublicZones(){
    const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
    const bounds=casing.getBounds();
    if(!bounds||!bounds.isValid())return;
-   const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
+   const isUnverified=String(z.description||"").startsWith("UNVERIFIED:");
+   const zoneType=isUnverified?"unverified":String(z.zone_type||"zone").replaceAll("_"," ");
    const color=z.color||"#ef3340";
    const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(z.name||"CoastWatch zone")+'</b><small>'+esc(zoneType)+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
