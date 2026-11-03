@@ -1920,26 +1920,24 @@ async function checkForSiteUpdates(){
 }
 setInterval(checkForSiteUpdates,180000);
 
-/* Restore desktop side-by-side map workspace; keep mobile map-first arrangement. */
+/* Keep Active Map Zones floating on the map on desktop and mobile. */
 (()=>{
  const panel=document.getElementById("map-panel");
  const stage=panel?.querySelector(".map-stage");
  const heading=panel?.querySelector(".map-workspace-head");
  const dashboard=panel?.querySelector(".map-dashboard");
- const sidebar=panel?.querySelector(".map-sidebar");
  const zones=document.getElementById("mapZonesCard");
- if(!panel||!stage||!heading||!dashboard||!sidebar||!zones)return;
+ if(!panel||!stage||!heading||!dashboard||!zones)return;
  const desktop=window.matchMedia("(min-width: 901px)");
  const arrange=()=>{
   if(desktop.matches){
    if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
    if(stage.parentElement!==dashboard)dashboard.appendChild(stage);
-   if(zones.parentElement!==sidebar)sidebar.appendChild(zones);
   }else{
    if(stage.parentElement!==panel||stage.nextElementSibling!==heading)panel.insertBefore(stage,heading);
    if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
-   if(zones.parentElement!==stage)stage.appendChild(zones);
   }
+  if(zones.parentElement!==stage)stage.appendChild(zones);
   requestAnimationFrame(()=>map.invalidateSize({pan:false}));
  };
  arrange();
