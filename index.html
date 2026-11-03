@@ -534,6 +534,21 @@ map.on("click",e=>setSelectedLocation(e.latlng));
 const approvedPhotos={};
 function reportStatusLabel(status){return status==="unverified"?"Unverified community report":status==="resolved"?"Marked resolved · not independently verified":"Previously admin-reviewed · not official verification"}
 function popup(r){const photo=approvedPhotos[r.id];const observed=String(r.description||"").trim();return `<b>${esc(r.title||r.category.replaceAll("_"," "))}</b><br>${esc(r.address||"")}<br>${esc(reportStatusLabel(r.status))}<br>${new Date(r.created_at).toLocaleString()}<br><small>User-submitted information. Not official verification.</small>${observed?`<div style="margin-top:9px;padding:9px 10px;background:#f1f5f9;color:#172b3d;border:1px solid #dbe5ee;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere"><strong>What was observed</strong><br>${esc(observed)}</div>`:""}${photo?`<br><img src="${esc(photo)}" alt="Administrator-approved community photo" class="mew-photo-zoom" role="button" tabindex="0" aria-label="Enlarge community report photo" style="width:100%;max-width:220px;margin-top:8px;border-radius:8px">`:""}<br><button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:8px">Report this listing</button>`}
+
+/* Public read-only CoastWatch FL zone overlay. RLS exposes active zones only. */
+let mewPublicZoneLayer=L.featureGroup().addTo(map);
+async function loadPublicZones(){
+ const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
+ if(error){console.warn("CoastWatch FL zones unavailable:",error.message);return;}
+ mewPublicZoneLayer.clearLayers();
+ (data||[]).forEach(z=>{
+  if(!z.geometry||z.geometry.type!=="Polygon")return;
+  const layer=L.geoJSON(z.geometry,{style:{color:z.color,fillColor:z.color,weight:3,opacity:.95,fillOpacity:.2}});
+  layer.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc((z.zone_type||"zone").replaceAll("_"," "))+'</span>'+(z.description?'<p>'+esc(z.description)+'</p>': '')+'<small>CoastWatch FL map zone · informational only</small>');
+  layer.addTo(mewPublicZoneLayer);
+ });
+}
+
 async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
 window.mewReports=data||[];markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+" reports";
 $("latestReports").innerHTML=data.slice(0,12).map(r=>`<div class="report"><strong>${esc(r.title||r.category.replaceAll("_"," "))}</strong><small>${esc(r.address||"Location on map")} · ${new Date(r.created_at).toLocaleString()}</small>${String(r.description||"").trim()?`<p class="report-description">${esc(r.description)}</p>`:""}<div><span class="pill">${reportStatusLabel(r.status)}</span></div>${approvedPhotos[r.id]?`<img src="${esc(approvedPhotos[r.id])}" alt="Administrator-approved community photo" class="mew-photo-zoom" role="button" tabindex="0" aria-label="Enlarge community report photo" style="width:100%;max-width:220px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px">`:""}<button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:9px;padding:9px 12px;font-size:14px">Report this listing</button></div>`).join("")||'<p class="hint">No community reports yet.</p>';
@@ -587,7 +602,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();setInterval(loadReports,45000);
+loadReports();loadPublicZones();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
