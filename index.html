@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-compact-zone-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-specific-road-hazard-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1972,7 +1972,7 @@ async function loadPublicZones(){
    const isUnverified=String(z.description||"").startsWith("UNVERIFIED:");
    const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
    const isWashout=String(z.name||"").toLowerCase().includes("washout");
-   const situation=isWashout?"WASHOUT":(zoneType==="information"?"ROAD STATUS":"CLOSED");
+   const situation=isWashout?"ROAD WASHED OUT":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED");
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
    const detailDescription=String(z.description||"").replace(/^UNVERIFIED:\s*/,"");
    const color=z.color||"#ef3340";
@@ -1993,7 +1993,7 @@ async function loadPublicZones(){
   const list=$("publicZoneList"),count=$("mapZonesCount");
   if(count)count.textContent=nextEntries.size+(nextEntries.size===1?" zone":" zones");
   if(list){
-   list.innerHTML=nextEntries.size?zones.filter(z=>nextEntries.has(String(z.id))).map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>'+(String(z.name||"").toLowerCase().includes("washout")?'Road washout · Unverified':'Road closure · Unverified')+'</small><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
+   list.innerHTML=nextEntries.size?zones.filter(z=>nextEntries.has(String(z.id))).map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>'+(String(z.name||"").toLowerCase().includes("washout")?'Road washed out · Unverified':'Road closed · Unverified')+'</small><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
    mewBindPublicZoneButtons();
   }
   return true;
