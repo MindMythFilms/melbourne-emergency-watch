@@ -1912,6 +1912,7 @@ async function loadPublicZones(){
  const list=$("publicZoneList"),count=$("mapZonesCount");
  if(count)count.textContent=zones.length+(zones.length===1?" zone":" zones");
  if(list)list.innerHTML=zones.length?zones.map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
+ mewBindPublicZoneButtons();
  zones.forEach(z=>{
   const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
   const color=z.color||"#ef3340";
@@ -1928,17 +1929,41 @@ async function loadPublicZones(){
   mewPublicZoneEntries.set(String(z.id),{bounds,group});
  });
 }
-document.addEventListener("click",e=>{
- const item=e.target.closest("[data-zone-focus]");
- if(!item)return;
- e.preventDefault();
- e.stopPropagation();
- const entry=mewPublicZoneEntries.get(String(item.dataset.zoneFocus));
- if(!entry||!entry.bounds||!entry.bounds.isValid())return;
+function mewFocusPublicZone(id,button){
+ const entry=mewPublicZoneEntries.get(String(id));
+ if(!entry||!entry.bounds||!entry.bounds.isValid()){
+  if(button){button.disabled=true;button.querySelector("small")?.replaceChildren(document.createTextNode("Unavailable"));}
+  console.warn("CoastWatch FL: no valid map bounds for zone",id);
+  return;
+ }
+ if(button){button.disabled=true;button.setAttribute("aria-busy","true");}
  map.stop();
- map.fitBounds(entry.bounds,{padding:[70,70],maxZoom:14,animate:true,duration:.6});
- entry.group.openPopup(entry.bounds.getCenter());
-});
+ map.closePopup();
+ map.fitBounds(entry.bounds,{paddingTopLeft:[55,75],paddingBottomRight:[55,75],maxZoom:14,animate:true,duration:.7});
+ map.once("moveend",()=>{
+  entry.group.openPopup(entry.bounds.getCenter());
+  if(button){button.disabled=false;button.removeAttribute("aria-busy");}
+ });
+}
+function mewBindPublicZoneButtons(){
+ const list=$("publicZoneList");
+ if(!list)return;
+ list.querySelectorAll("[data-zone-focus]").forEach(button=>{
+  if(button.dataset.zoneBound==="true")return;
+  button.dataset.zoneBound="true";
+  button.addEventListener("click",event=>{
+   event.preventDefault();
+   event.stopPropagation();
+   mewFocusPublicZone(button.dataset.zoneFocus,button);
+  },{capture:true});
+  button.addEventListener("keydown",event=>{
+   if(event.key==="Enter"||event.key===" "){
+    event.preventDefault();
+    mewFocusPublicZone(button.dataset.zoneFocus,button);
+   }
+  });
+ });
+}
 
 async function loadReports(){const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
 window.mewReports=data||[];mewFeedbackCounts.clear();const {data:feedbackRows,error:feedbackError}=await db.rpc("get_public_incident_feedback");if(feedbackError)console.warn("Community feedback counts unavailable:",feedbackError.message);(feedbackRows||[]).forEach(row=>mewFeedbackCounts.set(row.incident_id,{still_there:Number(row.still_there)||0,no_longer_there:Number(row.no_longer_there)||0}));markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+(data.length===1?" report":" reports");
