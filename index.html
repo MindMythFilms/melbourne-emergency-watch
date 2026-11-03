@@ -1406,7 +1406,6 @@ const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
 const usgsWaterLayer=L.featureGroup().addTo(map);
 const evacuationZoneLayer=L.featureGroup();
-const evacuationRouteLayer=L.featureGroup();
 const rainRadarLayer=L.tileLayer.wms("https://opengeo.ncep.noaa.gov/geoserver/kmlb/ows",{layers:"kmlb:SR_BREF",format:"image/png",transparent:true,version:"1.1.1",opacity:.68,attribution:"Radar: NOAA/NWS RIDGE II · KMLB"});
 let powerOutageFetchInProgress=false,usgsWaterFetchInProgress=false;
 let powerOutageNextAllowedAt=0,powerOutageLastSuccessAt=null;
@@ -1415,14 +1414,13 @@ const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard Count
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="radar",showEvacuation=mode==="evacuation",showRoutes=mode==="both"||mode==="evacuation";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="radar",showEvacuation=mode==="evacuation";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
   if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
  if(showRadar){if(!map.hasLayer(rainRadarLayer))rainRadarLayer.addTo(map)}else if(map.hasLayer(rainRadarLayer))map.removeLayer(rainRadarLayer);
  if(showEvacuation){if(!map.hasLayer(evacuationZoneLayer))evacuationZoneLayer.addTo(map)}else if(map.hasLayer(evacuationZoneLayer))map.removeLayer(evacuationZoneLayer);
- if(showRoutes){if(!map.hasLayer(evacuationRouteLayer))evacuationRouteLayer.addTo(map)}else if(map.hasLayer(evacuationRouteLayer))map.removeLayer(evacuationRouteLayer);
  const officialList=$("nwsAlertList"),communityList=$("latestReports");
  if(officialList)officialList.hidden=!showOfficial;
  if(communityList)communityList.hidden=!showCommunity;
@@ -1432,32 +1430,8 @@ function applySourceFilter(){
  const radarStatus=$("rainRadarStatus");if(radarStatus)radarStatus.hidden=!showRadar;
  const evacStatus=$("evacuationStatus");if(evacStatus)evacStatus.hidden=!showEvacuation;
 }
-/* Official Florida evacuation-zone polygons and designated route lines. */
+/* Official Florida evacuation-zone reference polygons only. No route guidance is provided. */
 let evacuationFetchInProgress=false;
-let evacuationRouteFetchInProgress=false;
-async function loadEvacuationRoutes(){
- if(evacuationRouteFetchInProgress||document.visibilityState==="hidden")return;
- evacuationRouteFetchInProgress=true;
- const status=$("evacuationUpdated");
- try{
-  const endpoint="https://services.arcgis.com/f5HgUpxURgEzTccH/ArcGIS/rest/services/EvacuationRoutes/FeatureServer/6/query";
-  const params=new URLSearchParams({where:"County LIKE '%Brevard%'",outFields:"*",returnGeometry:"true",outSR:"4326",f:"geojson"});
-  const response=await fetch(endpoint+"?"+params.toString(),{headers:{Accept:"application/geo+json"},cache:"no-store"});
-  if(!response.ok)throw new Error("Evacuation routes HTTP "+response.status);
-  const data=await response.json();
-  if(data.error)throw new Error(data.error.message||"GIS service error");
-  evacuationRouteLayer.clearLayers();
-  const features=(data.features||[]).filter(f=>f.geometry);
-  if(features.length){
-   L.geoJSON(data,{style:()=>({color:"#092b45",weight:9,opacity:.5,lineCap:"round",lineJoin:"round"}),interactive:false}).addTo(evacuationRouteLayer);
-   L.geoJSON(data,{style:()=>({color:"#ffd23f",weight:5,opacity:.5,lineCap:"round",lineJoin:"round"}),onEachFeature:(f,layer)=>{const name=String(f.properties?.NAME||"Designated evacuation route");layer.bindPopup("<strong>"+esc(name)+"</strong><br><small>Designated evacuation route reference for Brevard County. Road conditions, closures and official evacuation instructions can change. Follow Brevard Emergency Management.</small>");}}).addTo(evacuationRouteLayer);
-   if(status)status.textContent=features.length+" designated route segments drawn on map · Florida GIS";
-  }else if(status)status.textContent="No Brevard route segments returned by GIS service.";
- }catch(error){
-  console.warn("CoastWatch evacuation-route feed unavailable:",error);
-  if(status)status.textContent="Route overlay temporarily unavailable · official county map PDF below.";
- }finally{evacuationRouteFetchInProgress=false;}
-}
 async function loadEvacuationZones(){
  if(evacuationFetchInProgress||document.visibilityState==="hidden")return;
  evacuationFetchInProgress=true;
@@ -1786,7 +1760,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();loadEvacuationRoutes();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);setInterval(loadEvacuationRoutes,3600000);
+loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
