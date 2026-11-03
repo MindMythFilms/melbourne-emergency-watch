@@ -1259,6 +1259,54 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 #map-panel>.map-stage{display:block!important;position:relative!important;width:100%!important;min-width:0!important;margin:0!important;border-radius:0!important;overflow:hidden!important}
 #map-panel>.map-stage #map{display:block!important;width:100%!important;height:clamp(390px,55vh,680px)!important;min-height:390px!important}
 @media(max-width:650px){#map-panel>.map-stage{border-bottom:1px solid #174d66!important}#map-panel>.map-stage #map{height:clamp(620px,82svh,820px)!important;min-height:620px!important}}
+
+
+/* Float active zone actions directly over the map instead of below the map controls. */
+.map-stage #mapZonesCard{
+ position:absolute!important;
+ z-index:650!important;
+ left:14px!important;
+ bottom:14px!important;
+ width:min(390px,calc(100% - 28px))!important;
+ max-height:36%!important;
+ overflow-y:auto!important;
+ overscroll-behavior:contain;
+ padding:11px!important;
+ border:1px solid #f0718580!important;
+ border-radius:13px!important;
+ background:rgba(7,24,40,.72)!important;
+ -webkit-backdrop-filter:blur(9px);
+ backdrop-filter:blur(9px);
+ box-shadow:0 8px 24px #0006!important;
+}
+.map-stage .map-zones-heading{margin-bottom:7px!important}
+.map-stage .map-zones-heading strong{font-size:12px!important}
+.map-stage .map-zones-heading span{background:#8e3048c9!important}
+.map-stage .map-zone-list{gap:6px!important}
+.map-stage .map-zone-item{
+ min-height:42px!important;
+ padding:8px 10px!important;
+ border-color:#f0809180!important;
+ background:rgba(54,29,45,.76)!important;
+}
+.map-stage .map-zone-item span{font-size:12px!important}
+.map-stage .map-zone-item small{font-size:10px!important}
+.map-stage .map-zone-item:hover,.map-stage .map-zone-item:focus-visible{
+ background:rgba(105,42,61,.92)!important;
+ border-color:#ff9cab!important;
+}
+@media(max-width:700px){
+ .map-stage #mapZonesCard{
+  left:10px!important;bottom:10px!important;
+  width:calc(100% - 20px)!important;
+  max-height:30%!important;
+  padding:9px!important;
+  border-radius:11px!important;
+ }
+ .map-stage .map-zone-item{min-height:38px!important;padding:7px 9px!important}
+ .map-stage .map-zone-item span{font-size:11px!important}
+}
+
 </style></head>
 <body>
 <header class="site-header">
@@ -1295,7 +1343,7 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 </section>
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
 <section class="panel" id="map-panel">
- <div class="map-stage"><div id="map"></div><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ <div class="map-stage"><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
  <div class="panelhead map-workspace-head">
   <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
   <div class="map-live-state"><i></i> Live updates</div>
@@ -1306,7 +1354,7 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
    <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option><option value="shelters">Shelters & emergency resources</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
    <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
    <div class="map-basemap-card"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
-   <section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section>
+   
   </aside>
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
