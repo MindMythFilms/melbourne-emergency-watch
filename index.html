@@ -1407,7 +1407,7 @@ const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard Count
 let sourceMode="both";
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="both"||mode==="evacuation";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="radar",showEvacuation=mode==="evacuation";
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
