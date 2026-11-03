@@ -305,9 +305,15 @@ main{margin:9px auto;padding:0 10px}
 /* Keep the top of the report form visible below the sticky header when the map shortcut is used. */
 #report-panel{scroll-margin-top:215px}
 @media(max-width:650px){#report-panel{scroll-margin-top:155px}}
-/* Use clear image-specific wording in the native file picker. */
-input#photos::file-selector-button{font-size:0}
-input#photos::file-selector-button::after{content:"Choose images";font-size:14px}
+/* Accessible custom image picker with a consistent label in light and dark themes. */
+.mew-file-picker{position:relative;display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface,#fff);color:var(--ink);}
+.mew-file-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;}
+.mew-file-picker-button{display:inline-flex;align-items:center;justify-content:center;margin:0;padding:9px 14px;border-radius:7px;background:#31465e;color:#fff!important;border:1px solid #71859d;font-size:14px;font-weight:800;cursor:pointer;}
+.mew-file-picker-button:hover{background:#405a76}
+.mew-file-picker:focus-within .mew-file-picker-button{outline:3px solid #60a5fa;outline-offset:2px}
+.mew-file-picker span{font-size:14px;color:var(--ink)}
+body.dark .mew-file-picker{background:#0d1a2a;border-color:#465a72;color:#f2f6fc}
+body.dark .mew-file-picker span{color:#e8eef7}
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
@@ -335,7 +341,7 @@ input#photos::file-selector-button::after{content:"Choose images";font-size:14px
 <div class="full"><label for="description">What did you observe? *</label><textarea id="description" maxlength="1500" required placeholder="Describe only what you personally observed. Do not include names or private information."></textarea></div>
 <div><label for="severity">Severity *</label><select id="severity" required><option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option><option value="critical">Critical</option></select></div>
 <div><label for="displayName">Display name (optional)</label><input id="displayName" maxlength="60" placeholder="Anonymous if blank"></div>
-<div class="full"><label for="photos">Photos (optional, up to 3)</label><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-label="Choose images">
+<div class="full"><label for="photos">Photos (optional, up to 3)</label><div class="mew-file-picker"><input id="photos" class="mew-file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-label="Choose images"><label class="mew-file-picker-button" for="photos">Choose images</label><span id="photosFileName" aria-live="polite">No images chosen</span></div>
 <div class="mew-photo-rules"><strong>Photo upload rules — please read before selecting images</strong><ul><li><strong>Only upload photos you personally took</strong> or have clear permission and legal rights to share. No copyrighted images taken from websites, social media, news, or other people.</li><li><strong>No logos, trademarks, watermarks, or branded signage.</strong></li><li><strong>No people in photos at all.</strong> This is an absolute rule, even if a person is in the background, their face is hidden, blurred, or not recognizable. Do not upload images containing bystanders, pedestrians, victims, children, police officers, firefighters, EMTs, or any other person.</li><li><strong>No license plates</strong> or other identifying vehicle details.</li><li>Do not show private information such as home addresses, documents, phone numbers, screens, or personal records.</li><li>No graphic, disturbing, sexual, threatening, misleading, or edited/manipulated images.</li><li>Photograph only from a safe, lawful location. Never approach danger or delay getting to safety to take a picture.</li></ul><p>Photos that break these rules may be rejected or removed. All photos remain private until an administrator completes a content and privacy review. Approval does not verify the incident.</p>
 <label class="mew-photo-ack"><input id="photoRulesAck" type="checkbox" disabled> I confirm that these photos follow the rules and that I have the right to submit them.</label></div>
 <div class="hint">JPEG, PNG, or WebP · Up to 3 photos · Maximum 5 MB each. Images are converted to JPEG and location metadata is removed.</div></div>
@@ -593,7 +599,7 @@ flagForm.addEventListener("submit",async e=>{
 
 
 async function jpegBlob(file){if(file.size>5*1024*1024)throw new Error("Each photo must be 5 MB or smaller.");const img=await createImageBitmap(file);const scale=Math.min(1,2000/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext("2d").drawImage(img,0,0,c.width,c.height);return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error("Image conversion failed")),"image/jpeg",.86))}
-$("photos").addEventListener("change",()=>{const hasPhotos=$("photos").files.length>0;$("photoRulesAck").disabled=!hasPhotos;if(!hasPhotos)$("photoRulesAck").checked=false;});
+$("photos").addEventListener("change",()=>{const files=$("photos").files;const hasPhotos=files.length>0;$("photoRulesAck").disabled=!hasPhotos;if(!hasPhotos)$("photoRulesAck").checked=false;$("photosFileName").textContent=hasPhotos?(files.length+" image"+(files.length===1?"":"s")+" selected"):"No images chosen";});
 $("reportForm").onsubmit=async e=>{e.preventDefault();const btn=$("submitBtn");btn.disabled=true;message("Submitting report…");try{
 const lat=Number($("latitude").value),lng=Number($("longitude").value);if(lat<27.5||lat>29||lng< -81.5||lng> -80.2)throw new Error("Location must be within the current CoastWatch FL service area.");
 const files=Array.from($("photos").files||[]);if(files.length>3)throw new Error("Choose no more than three photos.");const categoryNow=$("category").value;const recentDuplicate=(window.mewReports||[]).find(r=>r.category===categoryNow&&Date.now()-new Date(r.created_at).getTime()<12*60*60*1000&&Math.hypot((Number(r.latitude)-lat)*111,(Number(r.longitude)-lng)*85)<1);if(recentDuplicate&&!confirm("A similar community report was submitted nearby in the last 12 hours. Submit another anyway?"))throw new Error("Submission cancelled to avoid a duplicate report.");if(files.length&&!$("photoRulesAck").checked)throw new Error("Please confirm the photo upload rules before submitting images.");
