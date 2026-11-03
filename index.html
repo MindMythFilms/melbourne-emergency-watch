@@ -295,6 +295,9 @@ main{margin:9px auto;padding:0 10px}
  #map-panel>#report-panel{margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
  #map-panel>#report-panel .panelhead{border-bottom:1px solid var(--line)}
 }
+
+/* Desktop map-first layout: give the community map the space it deserves. */
+@media(min-width:901px){main{max-width:1600px;padding-left:28px;padding-right:28px}.layout{grid-template-columns:minmax(0,2.1fr) minmax(320px,.78fr);gap:22px;align-items:start}#map{height:clamp(650px,72vh,850px)}}
 </style></head>
 <body>
 <header><div class="brand"><a class="brand-logo" href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div class="brand-copy"><strong>CoastWatch FL</strong><small>Community reports · Local awareness</small></div></div><nav><a href="#map-panel">Map</a><a href="#report-panel">Report a hazard</a><a href="#about">About</a> <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button></nav></header>
