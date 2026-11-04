@@ -2112,6 +2112,9 @@ const mewPublicZoneBounds=new Map();
 const mewPublicZoneEntries=new Map();
 let mewPublicZonesLoading=null;
 async function loadPublicZones(){
+ // Never replace the active zone layers while a visitor is reading a map popup.
+ // The periodic refresh will retry on its next cycle after the popup closes.
+ if(map._popup&&map.hasLayer(map._popup))return false;
  if(mewPublicZonesLoading)return mewPublicZonesLoading;
  mewPublicZonesLoading=(async()=>{
   const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
@@ -2145,6 +2148,9 @@ async function loadPublicZones(){
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
   });
+  // A popup may have opened while the database request was in flight.
+  // Leave the current layers untouched; the next scheduled refresh will retry.
+  if(map._popup&&map.hasLayer(map._popup))return false;
   // Swap the map layer and lookup data only after the replacement data is fully prepared.
   mewPublicZoneLayer.clearLayers();
   mewPublicZoneEntries.clear();nextEntries.forEach((value,key)=>mewPublicZoneEntries.set(key,value));
@@ -2173,7 +2179,12 @@ function mewRefreshPublicZoneClusters(){
   else mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,"road").addTo(mewPublicZoneLayer);
  });
 }
-map.on("zoomend moveend",mewRefreshPublicZoneClusters);
+// Auto-pan on popup open emits moveend. Rebuilding clustered layers during that
+// movement removes the clicked feature and makes its popup disappear. Defer cluster
+// changes until no popup is open, then refresh once the visitor closes it.
+map.on("zoomend",mewRefreshPublicZoneClusters);
+map.on("moveend",()=>{if(!map._popup)mewRefreshPublicZoneClusters();});
+map.on("popupclose",()=>mewRefreshPublicZoneClusters());
 function mewRefreshZoneLabelVisibility(){
  const zoom=map.getZoom(),mobile=window.matchMedia("(max-width:700px)").matches;
  const minZoom=mobile?13:12;
