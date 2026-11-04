@@ -172,6 +172,41 @@ body:before{
 }
 .wrap{position:relative}
 .admin-tab-panel{background:transparent}
+
+/* Workspace navigation uses the full available width */
+.admin-tabs{
+ display:grid!important;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:10px!important;
+ width:100%;
+ min-height:76px;
+ padding:9px!important;
+ align-items:stretch!important;
+}
+.admin-tab{
+ width:100%;
+ min-width:0;
+ min-height:56px;
+ justify-content:center!important;
+ text-align:center;
+ white-space:normal;
+ font-size:13px!important;
+ letter-spacing:.01em;
+ border-radius:10px!important;
+ padding:12px 16px!important;
+}
+.admin-tab.active{
+ background:linear-gradient(135deg,#105365,#0b394b)!important;
+ box-shadow:inset 0 0 0 1px #38c9c0,0 5px 16px #03131f66!important;
+}
+@media(max-width:900px){
+ .admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .admin-tab{min-height:48px}
+}
+@media(max-width:480px){
+ .admin-tabs{gap:7px!important;padding:7px!important}
+ .admin-tab{font-size:12px!important;padding:10px 7px!important}
+}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
