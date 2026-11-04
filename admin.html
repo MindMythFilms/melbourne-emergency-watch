@@ -167,6 +167,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 <p>By selecting “I agree — enter website,” you confirm that you have read and understood these terms, voluntarily agree to them, and understand that you must not use the website if you disagree. If you do not agree, select “I do not agree — leave website.”</p></div><label><input id="adult" type="checkbox">I confirm I am at least 18 years old.</label><label><input id="agree" type="checkbox">I have read, understood, and agree to the Terms of Use &amp; Community Safety Agreement, including the assumption of risk and limitation/release of liability to the extent permitted by law.</label><div id="consentMsg" class="msg error hidden"></div><button id="accept" disabled>I agree — enter website</button><p class="meta">If you do not agree, select Decline and leave the website. This agreement should be reviewed by a Florida attorney.</p><button type="button" id="decline" class="gray">I do not agree — leave website</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 <script>
+(function(){
+ const adult=document.getElementById("adult"),agree=document.getElementById("agree"),button=document.getElementById("accept"),message=document.getElementById("consentMsg");
+ if(!adult||!agree||!button||!message)return;
+ const version="coastwatch-fl-terms-2026-11-03-v2";
+ function sync(){const ok=adult.checked&&agree.checked;button.disabled=!ok;button.setAttribute("aria-disabled",String(!ok));}
+ adult.addEventListener("change",sync);agree.addEventListener("change",sync);sync();
+ button.addEventListener("click",async function(event){
+  event.preventDefault();
+  if(!adult.checked||!agree.checked){sync();message.textContent="Please check both boxes before continuing.";message.classList.remove("hidden");return;}
+  button.disabled=true;button.textContent="Saving…";message.classList.add("hidden");
+  try{
+   let sid=sessionStorage.getItem("mew_admin_session");
+   if(!sid){sid=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random();sessionStorage.setItem("mew_admin_session",sid);}
+   const response=await fetch("https://lqzxzlaxvfjuklyzxbex.supabase.co/rest/v1/rpc/record_mew_terms_acceptance",{method:"POST",headers:{"apikey":"sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO","Authorization":"Bearer sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO","Content-Type":"application/json"},body:JSON.stringify({p_terms_version:version,p_browser_session_id:sid,p_age_attested:true})});
+   const body=await response.text();
+   if(!response.ok)throw new Error("Agreement save failed (HTTP "+response.status+"): "+body.slice(0,250));
+   if(!body||body==="null")throw new Error("The server did not confirm the agreement. Please try again.");
+   sessionStorage.setItem("mew_admin_accepted",version);document.getElementById("consent").remove();
+  }catch(err){message.textContent=err.message||"Could not save agreement.";message.classList.remove("hidden");button.textContent="I agree — enter website";sync();}
+ });
+ document.getElementById("decline").addEventListener("click",function(){document.getElementById("consent").innerHTML='<div class="consentbox"><h2>Access not accepted</h2><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use CoastWatch FL.</p></div>';});
+ if(sessionStorage.getItem("mew_admin_accepted")===version)document.getElementById("consent").remove();
+})();
+</script>
+<script>
 const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO"),VERSION="coastwatch-fl-terms-2026-11-03-v2";
 const themeButton=document.getElementById("themeToggle");
 function applyTheme(theme){document.body.classList.toggle("dark",theme==="dark");themeButton.textContent=theme==="dark"?"☀️ Light mode":"🌙 Dark mode";themeButton.setAttribute("aria-pressed",String(theme==="dark"));}
@@ -185,17 +210,7 @@ if("ResizeObserver" in window){const mapBox=document.getElementById("map");new R
 function msg(text,kind=""){const e=$("pageMsg");e.textContent=text;e.className="msg "+kind}
 map.whenReady(()=>{setTimeout(refreshAdminMapSize,100);});
 function sessionId(){let v=sessionStorage.getItem("mew_admin_session");if(!v){v=crypto.randomUUID();sessionStorage.setItem("mew_admin_session",v)}return v}
-function updateConsentButton(){
- const ready=$("adult").checked===true&&$("agree").checked===true;
- $("accept").disabled=!ready;
- $("accept").setAttribute("aria-disabled",String(!ready));
-}
-$("adult").addEventListener("change",updateConsentButton);
-$("agree").addEventListener("change",updateConsentButton);
-updateConsentButton();
-$("decline").onclick=()=>{$("consent").innerHTML='<div class="consentbox"><h2>Access not accepted</h2><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use CoastWatch FL.</p></div>'};
-$("accept").onclick=async()=>{try{const {data,error}=await db.rpc("record_mew_terms_acceptance",{p_terms_version:VERSION,p_browser_session_id:sessionId(),p_age_attested:true});if(error)throw error;if(!data)throw new Error("No acceptance ID returned");sessionStorage.setItem("mew_admin_accepted",VERSION);$("consent").remove()}catch(e){$("consentMsg").textContent=e.message;$("consentMsg").classList.remove("hidden")}};
-if(sessionStorage.getItem("mew_admin_accepted")===VERSION)$("consent").remove();
+// Terms consent is handled by the isolated script above.
 function setAuth(on){$("login").classList.toggle("hidden",on);$("dashboard").classList.toggle("hidden",!on);$("signout").classList.toggle("hidden",!on);$("role").classList.toggle("hidden",!on);if(on){$("role").textContent=role;refreshAdminMapSize();setTimeout(refreshAdminMapSize,180);setTimeout(refreshAdminMapSize,650)}}
 $("loginForm").onsubmit=async e=>{e.preventDefault();const {data,error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginMsg").textContent=error.message;$("loginMsg").classList.remove("hidden");return}await checkSession()};
 async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load()}
