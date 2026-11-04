@@ -294,6 +294,7 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
  locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
  if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
  if(singleRoadLayer){map.removeLayer(singleRoadLayer);singleRoadLayer=null;}
+ if(intersectionRoadLayer){map.removeLayer(intersectionRoadLayer);intersectionRoadLayer=null;}
  try{
   const roadA=await searchRoadGeometry(a);
   $("intersectionSearchMessage").textContent="Found "+a+". Now searching for "+b+"…";
