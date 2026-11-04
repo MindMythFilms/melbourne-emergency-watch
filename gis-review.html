@@ -30,7 +30,8 @@ async function countyRoadSearch(name){
  const data=await res.json(); if(data.error) throw new Error(data.error.message||"County GIS query failed");
  return (data.features||[]).filter(x=>x.geometry&&x.geometry.coordinates);
 }
-function featureLabel(f){const p=f.properties||{};return p.ADD_LBL||[p.LSt_PreDir,p.LSt_Name,p.LSt_Type,p.LSt_PosDir].filter(Boolean).join(" ")||"Unnamed county road";}\nfunction labelRoadFeature(feature,layer){const name=featureLabel(feature);if(name&&name!=="Unnamed county road")layer.bindTooltip(name,{permanent:true,direction:"center",className:"road-label",opacity:.96});}
+function featureLabel(f){const p=f.properties||{};return p.ADD_LBL||[p.LSt_PreDir,p.LSt_Name,p.LSt_Type,p.LSt_PosDir].filter(Boolean).join(" ")||"Unnamed county road";}
+function labelRoadFeature(feature,layer){const name=featureLabel(feature);if(name&&name!=="Unnamed county road")layer.bindTooltip(name,{permanent:true,direction:"center",className:"road-label",opacity:.96});}
 async function locateIntersection(){
  const a=document.getElementById("roadA").value,b=document.getElementById("roadB").value,status=document.getElementById("locatorStatus"),out=document.getElementById("locatorResults"),btn=document.getElementById("locate");
  if(!a.trim()||!b.trim()){status.textContent="Enter both road names.";return;}
