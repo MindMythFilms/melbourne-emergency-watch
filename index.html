@@ -1222,6 +1222,9 @@ body:not(.dark) footer{color:#526b7b!important}
 /* High-visibility close control on every designated public-zone popup. */
 .mew-public-zone-popup .leaflet-popup-close-button{top:6px!important;right:6px!important;width:38px!important;height:38px!important;padding:0!important;border:2px solid #fff!important;border-radius:9px!important;background:#dc2626!important;color:#fff!important;font-size:30px!important;font-weight:900!important;line-height:34px!important;text-align:center!important;opacity:1!important;box-shadow:0 2px 8px #0006!important;z-index:1200!important}
 .mew-public-zone-popup .leaflet-popup-close-button:hover{background:#b91c1c!important;color:#fff!important}
+/* Reserve a dedicated top-right area for the close control so it never covers zone titles. */
+.mew-public-zone-popup .mew-zone-popup-title{display:block;box-sizing:border-box;min-height:38px;padding-right:50px;line-height:1.35}
+
 .mew-public-zone-popup .leaflet-popup-close-button:focus-visible{outline:3px solid #2563eb!important;outline-offset:2px!important}
 .mew-zone-feedback{margin-top:10px;padding:10px;border:1px solid #d5dee8;border-radius:10px;background:#f6f8fb;color:#172b3f}
 .mew-zone-feedback strong{display:block;margin-bottom:5px;font-size:12px}
@@ -2208,7 +2211,7 @@ async function loadPublicZones(){
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label">'+(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
-   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))),{className:"mew-public-zone-popup"});
+   group.bindPopup('<strong class="mew-zone-popup-title">'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))),{className:"mew-public-zone-popup"});
    nextEntries.set(String(z.id),{bounds,group,labelMarker});
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
