@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-desktop-map-primary-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-mobile-map-report-overlay-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -2212,6 +2212,36 @@ document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-phot
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
 loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
+
+// Align the report action with the actual map canvas on small screens.
+// The basemap toolbar can wrap to multiple rows, so measure the map's real top edge.
+(function mewPositionMobileReportTools(){
+ const stage=document.querySelector("#map-panel .map-stage");
+ const canvas=document.getElementById("map");
+ const tools=document.querySelector("#map-panel .map-report-tools");
+ if(!stage||!canvas||!tools)return;
+ const update=()=>{
+  if(!window.matchMedia("(max-width:700px)").matches){
+   stage.style.removeProperty("--mew-map-canvas-top");
+   return;
+  }
+  const stageRect=stage.getBoundingClientRect();
+  const mapRect=canvas.getBoundingClientRect();
+  const offset=Math.max(0,mapRect.top-stageRect.top);
+  stage.style.setProperty("--mew-map-canvas-top",(offset+10)+"px");
+ };
+ update();
+ window.addEventListener("resize",update,{passive:true});
+ if("ResizeObserver" in window){
+  const observer=new ResizeObserver(update);
+  observer.observe(stage);
+  observer.observe(canvas);
+  const toolbar=document.getElementById("mapBasemapCard");
+  if(toolbar)observer.observe(toolbar);
+ }
+ requestAnimationFrame(()=>requestAnimationFrame(update));
+})();
+
 syncShelterToggle();
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
@@ -2314,6 +2344,31 @@ setInterval(checkForSiteUpdates,180000);
 @media (min-width: 901px) and (max-height: 800px) {
   #map-panel > .map-dashboard > .map-stage { height: 760px !important; min-height: 760px !important; }
   #map-panel > .map-dashboard > .map-stage > #map { min-height: 760px !important; }
+}
+</style>
+
+<style id="coastwatch-mobile-report-overlay-fix">
+@media (max-width:700px) {
+  /* Keep the report action on the map itself, below the basemap controls. */
+  #map-panel .map-stage .map-report-tools {
+    top: var(--mew-map-canvas-top, 270px) !important;
+    right: 10px !important;
+    left: auto !important;
+    z-index: 950 !important;
+    align-items: flex-end !important;
+    flex-direction: column !important;
+    max-width: calc(100% - 20px) !important;
+    gap: 6px !important;
+  }
+  #map-panel .map-stage .map-report-button {
+    min-height: 43px !important;
+    max-width: calc(100vw - 84px) !important;
+  }
+  #map-panel .map-stage #mapReportHint {
+    max-width: calc(100vw - 84px) !important;
+    text-align: right !important;
+    line-height: 1.3 !important;
+  }
 }
 </style>
 </body></html>
