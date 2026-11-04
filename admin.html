@@ -273,14 +273,17 @@ function findRoadCrossings(ga,gb){
  return unique;
 }
 async function searchRoadGeometry(road){
- const q=encodeURIComponent(road+", Melbourne, Florida, USA");
- const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=10&q="+q;
+ const q=encodeURIComponent(road+", Brevard County, Florida, USA");
+ const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+q;
  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
  if(!res.ok)throw new Error("OpenStreetMap search returned "+res.status+". Please wait before trying again.");
  const fc=await res.json();
  const features=(fc.features||[]).filter(f=>roadLineParts(f.geometry).some(line=>line.length>1));
  if(!features.length)throw new Error('Could not find mapped road geometry for "'+road+'". Try the road full official name.');
- return features[0];
+ // A named road can be split into many OSM ways. Keep every returned segment.
+ const geometries=features.flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+ if(!geometries.length)throw new Error('No usable mapped road segments were returned for "'+road+'".');
+ return {type:"GeometryCollection",geometries,featureCount:features.length,segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
@@ -298,10 +301,10 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
   const roadB=await searchRoadGeometry(b);
   const crossings=findRoadCrossings(roadA.geometry,roadB.geometry);
   if(!crossings.length)throw new Error("Both roads were found, but their mapped lines do not cross. No marker was placed. Check the road names or map coverage.");
-  const center=[28.0836,-80.6081];
-  const ranked=crossings.map(p=>({p,d:Math.hypot((p[0]-center[1])*Math.cos(center[0]*Math.PI/180),p[1]-center[0])})).sort((x,y)=>x.d-y.d);
+  const center=map.getCenter();
+  const ranked=crossings.map(p=>({p,d:Math.hypot((p[0]-center.lng)*Math.cos(center.lat*Math.PI/180),p[1]-center.lat)})).sort((x,y)=>x.d-y.d);
+  // Prefer the crossing nearest the current map view when roads cross more than once.
   const p=ranked[0].p;
-  if(ranked.length>1&&ranked[1].d-ranked[0].d<0.025)throw new Error("Found multiple possible crossings near Melbourne. Narrow the road names with a nearby area or landmark. No marker was placed.");
   locatedIntersection={lat:p[1],lng:p[0],label:a+" / "+b,display:a+" × "+b};
   map.setView([p[1],p[0]],17);
   locatedPreview=L.marker([p[1],p[0]],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" × "+b)).openPopup();
