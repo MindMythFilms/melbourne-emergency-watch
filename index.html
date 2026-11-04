@@ -2097,15 +2097,16 @@ async function loadPublicZones(){
    const isUnverified=rawDescription.startsWith("UNVERIFIED:");
    const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
    const isOpen=String(z.name||"").toUpperCase().startsWith("ROAD OPEN");
+   const isSignalOut=/traffic signal|traffic light/i.test(String(z.name||"")+" "+rawDescription);
    const isWashout=String(z.name||"").toLowerCase().includes("washout")||/washed out|washout/i.test(rawDescription);
    const isFlooded=/roadway flooded|outside lanes flooded|lanes flooded|flooded at|travel lanes underwater|standing water|water over (the )?roadway/i.test(rawDescription);
-   const situation=isOpen?"ROAD OPEN":(isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED")));
+   const situation=isSignalOut?"TRAFFIC SIGNAL OUT":(isOpen?"ROAD OPEN":(isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED"))));
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
    const detailDescription=rawDescription.replace(/^UNVERIFIED:\s*/,"");
    const sourceLabel=/\bFHP\b|Florida Highway Patrol/i.test(rawDescription)?"Official FHP report · current conditions not independently verified":/City of Melbourne/i.test(rawDescription)?"Official City of Melbourne advisory · not independently verified by CoastWatch FL":/City of West Melbourne|West Melbourne Police/i.test(rawDescription)?"Official West Melbourne update · not independently verified by CoastWatch FL":/Brevard County/i.test(rawDescription)?"Official Brevard County update · not independently verified by CoastWatch FL":"Source-reported information · not independently verified by CoastWatch FL";
    const color=z.color||"#ef3340";
    const outline=isPoint?L.circleMarker(bounds.getCenter(),{radius:5,color,weight:2,fillColor:color,fillOpacity:.2}):L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
-   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(situation)+'</b><small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
+   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label">'+(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
    group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>');
