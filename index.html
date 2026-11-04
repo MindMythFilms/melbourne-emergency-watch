@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-west-melbourne-boil-water-popup-mobile-fix-v3"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-mobile-horizontal-overflow-fix-v4"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -1621,6 +1621,24 @@ body.dark .mew-water-advisory p,body.dark .mew-water-advisory-meta{color:#e6d9c4
 body.dark .mew-water-advisory a{color:#83e4e8}
 @media(max-width:650px){.mew-water-advisory{padding:16px 14px;margin-bottom:14px;border-radius:14px}.mew-water-advisory-head{gap:9px;align-items:flex-start}.mew-water-advisory-icon{width:35px;height:35px;flex-basis:35px;font-size:20px}.mew-water-advisory-status{font-size:10px;padding:4px 7px}.mew-water-advisory p{font-size:13px}.mew-water-boil-step{padding:12px}.mew-water-boil-step strong{font-size:16px}}
 
+
+
+/* Prevent the mobile advisory and long URLs from widening the entire page. */
+@media(max-width:650px){
+ html,body{width:100%;max-width:100%;overflow-x:clip!important}
+ body{position:relative}
+ .mew-water-overlay{
+  left:0!important;right:0!important;width:100%!important;max-width:100%!important;
+  box-sizing:border-box!important;overflow-x:hidden!important;
+ }
+ .mew-water-overlay *{box-sizing:border-box;min-width:0}
+ .mew-water-overlay .mew-water-advisory{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+ }
+ .mew-water-advisory-meta,.mew-water-advisory-meta span,
+ .mew-water-advisory-meta a{min-width:0!important;max-width:100%!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+ #map-panel,.map-stage,.map-dashboard,.map-sidebar{min-width:0}
+}
 
 /* Dismissible boil-water notice modal, separate from map interactions */
 .mew-water-overlay[hidden]{display:none!important}
