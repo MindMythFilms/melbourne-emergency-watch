@@ -247,22 +247,69 @@ $("locateSingleRoadBtn").addEventListener("click",async()=>{
  }catch(err){$("intersectionSearchMessage").textContent=err.message;}
  finally{button.disabled=false;}
 });
-$("locateIntersectionBtn").addEventListener("click",()=>{
+function roadLineParts(geometry){
+ if(!geometry)return [];
+ if(geometry.type==="LineString")return [geometry.coordinates];
+ if(geometry.type==="MultiLineString")return geometry.coordinates;
+ if(geometry.type==="GeometryCollection")return (geometry.geometries||[]).flatMap(roadLineParts);
+ return [];
+}
+function segmentCrossing(a,b,c,d){
+ const x1=a[0],y1=a[1],x2=b[0],y2=b[1],x3=c[0],y3=c[1],x4=d[0],y4=d[1];
+ const den=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+ if(Math.abs(den)<1e-12)return null;
+ const t=((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4))/den;
+ const u=-((x1-x2)*(y1-y3)-(y1-y2)*(x1-x3))/den;
+ if(t < -1e-8 || t > 1+1e-8 || u < -1e-8 || u > 1+1e-8)return null;
+ return [x1+t*(x2-x1),y1+t*(y2-y1)];
+}
+function findRoadCrossings(ga,gb){
+ const aa=roadLineParts(ga),bb=roadLineParts(gb),hits=[];
+ for(const la of aa)for(const lb of bb)for(let i=1;i<la.length;i++)for(let j=1;j<lb.length;j++){
+  const p=segmentCrossing(la[i-1],la[i],lb[j-1],lb[j]);if(p)hits.push(p);
+ }
+ const unique=[];
+ for(const p of hits)if(!unique.some(q=>Math.abs(q[0]-p[0])<0.00001&&Math.abs(q[1]-p[1])<0.00001))unique.push(p);
+ return unique;
+}
+async function searchRoadGeometry(road){
+ const q=encodeURIComponent(road+", Melbourne, Florida, USA");
+ const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=10&q="+q;
+ const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
+ if(!res.ok)throw new Error("OpenStreetMap search returned "+res.status+". Please wait before trying again.");
+ const fc=await res.json();
+ const features=(fc.features||[]).filter(f=>roadLineParts(f.geometry).some(line=>line.length>1));
+ if(!features.length)throw new Error('Could not find mapped road geometry for "'+road+'". Try the road full official name.');
+ return features[0];
+}
+$("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
  if(!a||!b){$("intersectionSearchMessage").textContent="Enter both road names first.";return;}
- if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
+ const button=$("locateIntersectionBtn");button.disabled=true;
+ map.getContainer().style.cursor="";
+ $("intersectionSearchMessage").textContent="Finding the mapped geometry for "+a+"…";
  locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
- $("intersectionSearchMessage").textContent="Placement mode is ready. Zoom to the crossing, then click the exact intersection on the map. A draggable preview pin will appear; nothing is saved until you press Place marker here.";
- map.getContainer().style.cursor="crosshair";
- map.once("click",event=>{
-  map.getContainer().style.cursor="";
-  const p=event.latlng;
-  locatedIntersection={lat:p.lat,lng:p.lng,label:a+" / "+b,display:a+" × "+b};
-  locatedPreview=L.marker([p.lat,p.lng],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" / "+b)).openPopup();
+ if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
+ if(singleRoadLayer){map.removeLayer(singleRoadLayer);singleRoadLayer=null;}
+ try{
+  const roadA=await searchRoadGeometry(a);
+  $("intersectionSearchMessage").textContent="Found "+a+". Now searching for "+b+"…";
+  await new Promise(resolve=>setTimeout(resolve,1100));
+  const roadB=await searchRoadGeometry(b);
+  const crossings=findRoadCrossings(roadA.geometry,roadB.geometry);
+  if(!crossings.length)throw new Error("Both roads were found, but their mapped lines do not cross. No marker was placed. Check the road names or map coverage.");
+  const center=[28.0836,-80.6081];
+  const ranked=crossings.map(p=>({p,d:Math.hypot((p[0]-center[1])*Math.cos(center[0]*Math.PI/180),p[1]-center[0])})).sort((x,y)=>x.d-y.d);
+  const p=ranked[0].p;
+  if(ranked.length>1&&ranked[1].d-ranked[0].d<0.025)throw new Error("Found multiple possible crossings near Melbourne. Narrow the road names with a nearby area or landmark. No marker was placed.");
+  locatedIntersection={lat:p[1],lng:p[0],label:a+" / "+b,display:a+" × "+b};
+  map.setView([p[1],p[0]],17);
+  locatedPreview=L.marker([p[1],p[0]],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" × "+b)).openPopup();
   locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
   $("saveLocatedIntersection").disabled=!selectedIntersection;
-  $("intersectionSearchMessage").textContent="Position selected for "+a+" / "+b+". Drag the pin if needed, then press Place marker here to save.";
- });
+  $("intersectionSearchMessage").textContent="Intersection located from OpenStreetMap road geometry. Review the draggable pin, then press Place marker here to save. "+crossings.length+" mapped crossing"+(crossings.length===1?"":"s")+" found.";
+ }catch(err){$("intersectionSearchMessage").textContent=err.message||"Intersection search failed. No marker was saved.";}
+ finally{button.disabled=false;}
 });
 $("saveLocatedIntersection").addEventListener("click",async()=>{if(!selectedIntersection||!locatedIntersection){$("intersectionSearchMessage").textContent="Select a queued report and locate its intersection first.";return;}const {data,error}=await db.from("intersection_queue").select("*").eq("id",selectedIntersection).single();if(error||!data){$("intersectionSearchMessage").textContent="Could not load selected report.";return;}const {data:userData}=await db.auth.getUser();const label=data.road_a+" / "+data.road_b.replace(/\\bSun Lake Road\\b/ig,"Sunlake Road");const description="UNVERIFIED: "+data.condition+(data.direction?" · "+data.direction:"")+" · Source: "+(data.source_name||"reported source")+(data.reported_at?" · Reported: "+new Date(data.reported_at).toLocaleString():"");const p=locatedIntersection;const saved=await db.from("map_zones").insert({name:data.condition+" · "+label,description,zone_type:data.condition==="TRAFFIC SIGNAL OUT"?"information":"caution",color:data.condition==="ROAD FLOODED"?"#1677d2":"#d87917",geometry:{type:"Point",coordinates:[p.lng,p.lat]},active:true,created_by:userData.user?.id||null});if(saved.error){$("intersectionSearchMessage").textContent="Could not save marker: "+saved.error.message;return;}const updated=await db.from("intersection_queue").update({status:"placed",latitude:p.lat,longitude:p.lng,updated_at:new Date().toISOString()}).eq("id",data.id);if(updated.error){$("intersectionSearchMessage").textContent="Marker saved but queue update failed: "+updated.error.message;return;}if(locatedPreview)map.removeLayer(locatedPreview);locatedPreview=null;locatedIntersection=null;selectedIntersection=null;$("saveLocatedIntersection").disabled=true;$("intersectionSearchMessage").textContent="Placed "+label+" successfully. You can drag its marker later.";await loadIntersectionQueue();await loadAdminZones();});
 async function loadMap(){refreshAdminMapSize();markers.forEach(m=>map.removeLayer(m));markers=[];rows.filter(r=>["unverified","confirmed","resolved"].includes(r.status)).forEach(r=>{const lat=Number(r.latitude),lng=Number(r.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lng))return;const m=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:2,fillColor:r.status==="resolved"?"#64748b":r.status==="unverified"?"#d87917":"#167c58",fillOpacity:.95}).addTo(map).bindPopup(`<b>${esc(r.title||r.category)}</b><br>${esc(r.address||"")}<br>${esc(r.status)}`);markers.push(m)});await loadAdminZones();await loadIntersectionQueue();if(markers.length){const group=L.featureGroup(markers);map.fitBounds(group.getBounds().pad(0.18),{maxZoom:13})}requestAnimationFrame(()=>map.invalidateSize({pan:false}))}
