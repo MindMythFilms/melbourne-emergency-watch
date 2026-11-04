@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-mobile-map-report-overlay-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-official-source-road-status-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -2050,18 +2050,21 @@ async function loadPublicZones(){
    const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
    const bounds=casing.getBounds();
    if(!bounds||!bounds.isValid())return;
-   const isUnverified=String(z.description||"").startsWith("UNVERIFIED:");
+   const rawDescription=String(z.description||"");
+   const isUnverified=rawDescription.startsWith("UNVERIFIED:");
    const zoneType=String(z.zone_type||"zone").replaceAll("_"," ");
-   const isWashout=String(z.name||"").toLowerCase().includes("washout");
-   const situation=isWashout?"ROAD WASHED OUT":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED");
+   const isWashout=String(z.name||"").toLowerCase().includes("washout")||/washed out|washout/i.test(rawDescription);
+   const isFlooded=/roadway flooded|outside lanes flooded|lanes flooded|flooded at|travel lanes underwater|standing water/i.test(rawDescription);
+   const situation=isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED"));
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
-   const detailDescription=String(z.description||"").replace(/^UNVERIFIED:\s*/,"");
+   const detailDescription=rawDescription.replace(/^UNVERIFIED:\s*/,"");
+   const sourceLabel=/\bFHP\b|Florida Highway Patrol/i.test(rawDescription)?"Official FHP report · current conditions not independently verified":"Source-reported information · not independently verified by CoastWatch FL";
    const color=z.color||"#ef3340";
    const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(situation)+'</b><small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
-   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>Community-reported information · not independently verified by CoastWatch FL</small>');
+   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>');
    nextEntries.set(String(z.id),{bounds,group,labelMarker});
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
@@ -2075,7 +2078,7 @@ async function loadPublicZones(){
   const list=$("publicZoneList"),count=$("mapZonesCount");
   if(count)count.textContent=nextEntries.size+(nextEntries.size===1?" zone":" zones");
   if(list){
-   list.innerHTML=nextEntries.size?zones.filter(z=>nextEntries.has(String(z.id))).map(z=>'<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>'+(String(z.name||"").toLowerCase().includes("washout")?'Road washed out · Unverified':'Road closed · Unverified')+'</small><small>View</small></button>').join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
+   list.innerHTML=nextEntries.size?zones.filter(z=>nextEntries.has(String(z.id))).map(z=>{const d=String(z.description||"");const wash=/washout|washed out/i.test(String(z.name||"")+" "+d);const flooded=/roadway flooded|outside lanes flooded|lanes flooded|flooded at|travel lanes underwater|standing water/i.test(d);const status=wash?"Road washed out":(flooded?"Road flooded":(String(z.zone_type||"")==="information"?"Road status":"Road closed"));const source=/\bFHP\b|Florida Highway Patrol/i.test(d)?"FHP report · unverified":"Unverified";return '<button type="button" class="map-zone-item" data-zone-focus="'+esc(z.id)+'"><i style="--zone-color:'+esc(z.color||"#ef3340")+'"></i><span>'+esc(z.name||"Designated zone")+'</span><small>'+status+' · '+source+'</small><small>View</small></button>'}).join(""):'<span class="map-zone-empty">No active designated zones right now.</span>';
    mewBindPublicZoneButtons();
   }
   return true;
