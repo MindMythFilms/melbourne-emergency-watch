@@ -2688,21 +2688,7 @@ setInterval(checkForSiteUpdates,180000);
     z-index: 950 !important;
   }
 }
-</style>
 
-<script>
-/* Show the active boil-water notice on every site visit; dismissal lasts only until navigation/reload. */
-(function(){
- const overlay=document.getElementById('mewWaterOverlay');
- if(!overlay)return;
- let previousFocus=document.activeElement;
- overlay.hidden=false;
- const close=()=>{
-  overlay.hidden=true;
-  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
- };;
-</script>
-</body></html>
 
 /* Map style and shelter controls float over the map canvas on every screen size. */
 #map-panel>.map-stage{position:relative!important}
@@ -2724,3 +2710,18 @@ setInterval(checkForSiteUpdates,180000);
  #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons{gap:5px!important}
  #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons button{flex:1 1 0!important;min-width:0!important;min-height:34px!important;padding:5px 7px!important;font-size:11px!important}
 }
+</style>
+
+<script>
+/* Show the active boil-water notice on every site visit; dismissal lasts only until navigation/reload. */
+(function(){
+ const overlay=document.getElementById('mewWaterOverlay');
+ if(!overlay)return;
+ let previousFocus=document.activeElement;
+ overlay.hidden=false;
+ const close=()=>{
+  overlay.hidden=true;
+  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
+ };;
+</script>
+</body></html>
