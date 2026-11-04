@@ -2720,6 +2720,40 @@ setInterval(checkForSiteUpdates,180000);
  #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons{gap:5px!important}
  #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons button{flex:1 1 0!important;min-width:0!important;min-height:34px!important;padding:5px 7px!important;font-size:11px!important}
 }
+
+/* Public header readability: larger brand, navigation, and touch targets */
+.site-header{padding:13px 28px!important;min-height:94px!important}
+.site-header-inner{max-width:1720px;gap:32px}
+.brand{gap:16px;min-width:310px}
+.brand-logo-img{width:82px;height:82px;filter:drop-shadow(0 0 15px #08b8ae40)}
+.brand-copy strong{font-size:clamp(25px,2.25vw,34px)!important;letter-spacing:-.045em}
+.brand-copy small{font-size:12px;letter-spacing:.045em;margin-top:7px}
+.site-nav{gap:9px}
+.site-nav .nav-link{padding:14px 17px;font-size:15px;min-height:48px}
+.site-nav .theme-toggle{padding:13px 16px;font-size:14px;min-height:48px}
+.site-nav .nav-report{padding:14px 20px;font-size:15px;min-height:48px}
+@media(max-width:900px){
+ .site-header{padding:11px 18px!important}
+ .site-header-inner{gap:16px}
+ .brand{min-width:0;gap:12px}
+ .brand-logo-img{width:70px;height:70px}
+ .brand-copy strong{font-size:25px!important}
+ .brand-copy small{font-size:10px}
+ .site-nav{gap:5px}
+ .site-nav .nav-link{padding:11px 12px;font-size:14px}
+ .site-nav .theme-toggle,.site-nav .nav-report{padding:11px 13px;font-size:13px}
+}
+@media(max-width:600px){
+ .site-header{padding:10px 12px!important;min-height:0!important}
+ .site-header-inner{flex-direction:column;align-items:stretch;gap:10px}
+ .brand{justify-content:center;min-width:0}
+ .brand-logo-img{width:68px;height:68px}
+ .brand-copy strong{font-size:25px!important}
+ .brand-copy small{font-size:10px}
+ .site-nav{justify-content:center;gap:5px}
+ .site-nav .nav-link{padding:10px 11px;font-size:13px;min-height:42px}
+ .site-nav .theme-toggle,.site-nav .nav-report{padding:10px 12px;font-size:12px;min-height:42px}
+}
 </style>
 
 <script>
