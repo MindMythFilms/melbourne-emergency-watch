@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-west-melbourne-boil-water-advisory-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-west-melbourne-boil-water-popup-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -1621,6 +1621,19 @@ body.dark .mew-water-advisory p,body.dark .mew-water-advisory-meta{color:#e6d9c4
 body.dark .mew-water-advisory a{color:#83e4e8}
 @media(max-width:650px){.mew-water-advisory{padding:16px 14px;margin-bottom:14px;border-radius:14px}.mew-water-advisory-head{gap:9px;align-items:flex-start}.mew-water-advisory-icon{width:35px;height:35px;flex-basis:35px;font-size:20px}.mew-water-advisory-status{font-size:10px;padding:4px 7px}.mew-water-advisory p{font-size:13px}.mew-water-boil-step{padding:12px}.mew-water-boil-step strong{font-size:16px}}
 
+
+/* Dismissible boil-water notice modal, separate from map interactions */
+.mew-water-overlay[hidden]{display:none!important}
+.mew-water-overlay{position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;background:rgba(3,15,28,.76);backdrop-filter:blur(5px)}
+.mew-water-overlay .mew-water-advisory{position:relative;width:min(620px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;margin:auto;padding:24px;border-radius:18px;box-shadow:0 24px 80px #0007}
+.mew-water-close{position:absolute;right:12px;top:12px;width:38px;height:38px;padding:0;border:1px solid #c8914a;border-radius:10px;background:#fff5dc;color:#70370b;font-size:27px;line-height:1;cursor:pointer;box-shadow:none}
+.mew-water-close:hover{background:#ffe3a6}
+.mew-water-overlay .mew-water-advisory-head{padding-right:42px}
+.mew-water-dismiss{display:block;width:100%;margin-top:16px;padding:12px 14px;border-radius:10px;background:#754016;color:#fff;font-weight:800;cursor:pointer}
+.mew-water-dismiss:hover{background:#552e10}
+.mew-water-close:focus-visible,.mew-water-dismiss:focus-visible{outline:3px solid #138caa;outline-offset:3px}
+body.dark .mew-water-close{background:#48341d;color:#ffe1aa;border-color:#a97939}
+@media(max-width:650px){.mew-water-overlay{padding:12px}.mew-water-overlay .mew-water-advisory{max-height:calc(100dvh - 24px);padding:18px 14px}.mew-water-overlay .mew-water-advisory-head{padding-right:35px}.mew-water-close{top:8px;right:8px;width:34px;height:34px}}
 </style></head>
 <body>
 <header class="site-header">
@@ -1640,7 +1653,9 @@ body.dark .mew-water-advisory a{color:#83e4e8}
  </div>
 </header>
 <main>
-<section class="mew-water-advisory" role="alert" aria-labelledby="mew-water-advisory-title">
+<div class="mew-water-overlay" id="mewWaterOverlay" hidden>
+<section class="mew-water-advisory" role="dialog" aria-modal="true" aria-labelledby="mew-water-advisory-title">
+ <button type="button" class="mew-water-close" id="mewWaterClose" aria-label="Dismiss boil water notice">×</button>
  <div class="mew-water-advisory-head">
   <span class="mew-water-advisory-icon" aria-hidden="true">!</span>
   <div><div class="mew-water-advisory-kicker">Public water advisory · City of Melbourne</div><h2 id="mew-water-advisory-title">BOIL WATER NOTICE</h2></div>
@@ -1650,7 +1665,10 @@ body.dark .mew-water-advisory a{color:#83e4e8}
  <div class="mew-water-boil-step"><strong>Bring water to a rolling boil for 1 minute.</strong><span>Use boiled or bottled water for drinking, cooking, making ice, brushing teeth, and washing dishes.</span></div>
  <p>Continue following this precaution until the City officially lifts the notice. Do not assume water is safe simply because normal pressure has returned.</p>
  <div class="mew-water-advisory-meta"><span><strong>Questions:</strong> 321-608-5000</span><span><strong>After-hours emergency:</strong> 321-255-4622</span><span><a href="https://www.melbourneflorida.org/Government/Departments/Public-Works-Utilities/Precautionary-Boil-Water-Notices/Update-PBWN-Nov-3-1415" target="_blank" rel="noopener noreferrer">Official City notice and updates ↗</a></span></div>
+<button type="button" class="mew-water-dismiss" id="mewWaterDismiss">I understand — close notice</button>
 </section>
+</div>
+
 <section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
 <section class="hero hero-visual">
  <div class="hero-atmosphere" aria-hidden="true"><span class="hero-palm">🌴</span><span class="hero-horizon"></span><span class="hero-sun"></span></div>
@@ -2590,6 +2608,38 @@ setInterval(checkForSiteUpdates,180000);
   }
 }
 </style>
+
+<script>
+/* Show the advisory once per browser for this specific notice; keep the map accessible after dismissal. */
+(function(){
+ const key='coastwatch-boil-water-west-melbourne-2026-11-04-dismissed';
+ const overlay=document.getElementById('mewWaterOverlay');
+ if(!overlay)return;
+ let dismissed=false;
+ try{dismissed=localStorage.getItem(key)==='1'}catch(e){}
+ if(dismissed)return;
+ let previousFocus=document.activeElement;
+ overlay.hidden=false;
+ const close=()=>{
+  overlay.hidden=true;
+  try{localStorage.setItem(key,'1')}catch(e){}
+  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
+ };
+ document.getElementById('mewWaterClose').addEventListener('click',close);
+ document.getElementById('mewWaterDismiss').addEventListener('click',close);
+ overlay.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();close();return}
+  if(e.key==='Tab'){
+   const controls=[...overlay.querySelectorAll('a[href],button:not([disabled])')];
+   if(!controls.length)return;
+   const first=controls[0],last=controls[controls.length-1];
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+ });
+ document.getElementById('mewWaterClose').focus();
+})();
+</script>
 </body></html>
 
 /* Map style and shelter controls float over the map canvas on every screen size. */
