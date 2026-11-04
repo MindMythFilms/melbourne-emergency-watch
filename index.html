@@ -1600,7 +1600,7 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 </section>
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
 <section class="panel" id="map-panel">
- <div class="map-stage"><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="false">Shelters: Off</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ <div class="map-stage"><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
  <div class="panelhead map-workspace-head">
   <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
   <div class="map-live-state"><i></i> Live updates</div>
@@ -1759,7 +1759,7 @@ let powerOutageNextAllowedAt=0,powerOutageLastSuccessAt=null;
 let nwsAlertFetchInProgress=false;
 const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard County; used only when NWS supplies no geometry.
 let sourceMode="both";
-let sheltersVisible=false;
+let sheltersVisible=true;
 const shelterToggleButton=$("shelterToggleBtn");
 function syncShelterToggle(){if(!shelterToggleButton)return;shelterToggleButton.textContent="Shelters: "+(sheltersVisible?"On":"Off");shelterToggleButton.setAttribute("aria-pressed",String(sheltersVisible));}
 if(shelterToggleButton)shelterToggleButton.addEventListener("click",()=>{sheltersVisible=!sheltersVisible;syncShelterToggle();applySourceFilter();});
@@ -1826,7 +1826,8 @@ async function loadShelters(){
    const lng=Number(Array.isArray(coords)?coords[0]:g.x),lat=Number(Array.isArray(coords)?coords[1]:g.y);
    if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
    const raw=String(p.shelter_status_code||"").toUpperCase(),status=Object.prototype.hasOwnProperty.call(labels,raw)?raw:"UNKNOWN";
-   const color=palette[status]||"#64748b";
+   if(status!=="OPEN")return; // Public map displays only shelters explicitly marked OPEN by FEMA.
+   const color=palette[status]||"#16834a";
    const name=esc(p.shelter_name||"Shelter location");
    const address=[p.address_1,p.city,p.state,p.zip].filter(Boolean).map(esc).join(", ");
    const pet=String(p.pet_accommodations_desc||"").trim();
@@ -1850,8 +1851,8 @@ async function loadShelters(){
   }
   mewShelterItems=items;
   mewRefreshShelterClusters();
-  if(count)count.textContent=items.length?items.length+" shelter locations":"No FEMA shelter records returned for Brevard County";
-  if(updated)updated.textContent="FEMA + Brevard EOC · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
+  if(count)count.textContent=items.length?items.length+" open shelters":"No currently open shelter records returned for Brevard County";
+  if(updated)updated.textContent="Open shelters · FEMA + Brevard EOC · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
  }catch(error){
   console.warn("CoastWatch shelter locations unavailable:",error);
   // Keep the Brevard EOC-confirmed active shelter visible even if FEMA's feed fails.
