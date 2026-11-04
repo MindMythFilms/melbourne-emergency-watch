@@ -144,9 +144,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div id="zoneList" style="margin-top:12px"><div class="empty">Loading zones…</div></div>
  </div>
 </section>
-<section class="panel" id="intersectionQueuePanel"><div class="pad"><div class="row" style="justify-content:space-between"><div><strong>Intersection placement queue</strong><div class="meta">Select a reported intersection, search its road names, review the proposed map location, then place the marker. Saved markers can be dragged to correct their position.</div></div><span class="tag" id="intersectionQueueCount">Loading…</span></div><div id="intersectionQueue" style="margin-top:12px"><div class="empty">Loading reported intersections…</div></div><div id="intersectionPlacementMessage" class="msg hidden" aria-live="polite"></div></div></section>
+<section class="panel" id="intersectionQueuePanel"><div class="pad"><div class="row" style="justify-content:space-between"><div><strong>Intersection placement queue</strong><div class="meta">Select a reported road pair, zoom to its crossing, then click the exact location on the map. Review the draggable pin before saving.</div></div><span class="tag" id="intersectionQueueCount">Loading…</span></div><div id="intersectionQueue" style="margin-top:12px"><div class="empty">Loading reported intersections…</div></div><div id="intersectionPlacementMessage" class="msg hidden" aria-live="polite"></div></div></section>
 <div class="content"><section class="panel"><div class="filters"><select id="statusFilter"><option value="all">All statuses</option><option value="unverified">Published · unverified</option><option value="confirmed">Legacy · admin-reviewed</option><option value="resolved">Resolved</option><option value="rejected">Rejected</option><option value="expired">Expired — review needed</option></select><button id="refresh" class="gray">Refresh</button></div><div id="reports"><div class="empty">Loading…</div></div></section>
-<section class="panel"><div class="pad"><strong>Community flags</strong><div class="meta">Private reports submitted by visitors for moderator review.</div></div><div id="flagQueue"><div class="empty">Loading flags…</div></div></section><section class="panel" id="adminMapPanel"><div class="pad"><strong>Intersection map</strong><div class="meta">Street map with road labels. Search road names to locate an intersection, review the suggested point, and adjust it before saving.</div></div><div class="pad" id="intersectionSearch" style="padding-top:0"><div class="row" style="gap:10px;flex-wrap:wrap"><div class="field" style="flex:1;min-width:190px"><label for="roadSearchA">First road</label><input id="roadSearchA" placeholder="e.g. Babcock Street"></div><div class="field" style="flex:1;min-width:190px"><label for="roadSearchB">Cross street</label><input id="roadSearchB" placeholder="e.g. Florida Avenue"></div><button type="button" id="locateIntersectionBtn">Locate intersection</button><button type="button" id="locateSingleRoadBtn" class="gray">Locate single road</button><button type="button" class="green" id="saveLocatedIntersection" disabled>Place marker here</button></div><div id="intersectionSearchMessage" class="meta" aria-live="polite">Enter two road names or select Place on map from the queue to fill them automatically.</div></div><div id="map"></div></section></div>
+<section class="panel"><div class="pad"><strong>Community flags</strong><div class="meta">Private reports submitted by visitors for moderator review.</div></div><div id="flagQueue"><div class="empty">Loading flags…</div></div></section><section class="panel" id="adminMapPanel"><div class="pad"><strong>Intersection map</strong><div class="meta">Select a queued road pair, zoom to the crossing, and click its exact location on the map. Review the draggable pin before saving.</div></div><div class="pad" id="intersectionSearch" style="padding-top:0"><div class="row" style="gap:10px;flex-wrap:wrap"><div class="field" style="flex:1;min-width:190px"><label for="roadSearchA">First road</label><input id="roadSearchA" placeholder="e.g. Babcock Street"></div><div class="field" style="flex:1;min-width:190px"><label for="roadSearchB">Cross street</label><input id="roadSearchB" placeholder="e.g. Florida Avenue"></div><button type="button" id="locateIntersectionBtn">Locate intersection</button><button type="button" id="locateSingleRoadBtn" class="gray">Locate single road</button><button type="button" class="green" id="saveLocatedIntersection" disabled>Place marker here</button></div><div id="intersectionSearchMessage" class="meta" aria-live="polite">Enter two road names or select Place on map from the queue to fill them automatically.</div></div><div id="map"></div></section></div>
 </section></div>
 <div class="consent" id="consent"><div class="consentbox"><h2>Terms of Use &amp; Community Safety Agreement</h2><p class="meta">CoastWatch FL · Version 1.0 · Effective November 2, 2026</p><div style="max-height:48vh;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:14px;font-size:13px"><p><strong>Please read this agreement carefully.</strong> You may use CoastWatch FL only if you understand and agree to these terms. If you do not agree, select “I do not agree” and leave the website.</p>
 <h3>1. Volunteer community project — not an emergency service</h3>
@@ -247,67 +247,22 @@ $("locateSingleRoadBtn").addEventListener("click",async()=>{
  }catch(err){$("intersectionSearchMessage").textContent=err.message;}
  finally{button.disabled=false;}
 });
-$("locateIntersectionBtn").addEventListener("click",async()=>{
+$("locateIntersectionBtn").addEventListener("click",()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
  if(!a||!b){$("intersectionSearchMessage").textContent="Enter both road names first.";return;}
- const button=$("locateIntersectionBtn"),status=$("intersectionSearchMessage");
- button.disabled=true;status.textContent="Searching mapped road geometry for the crossing…";
- locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
  if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
- const core=v=>v.toLowerCase().replace(/\\b(northeast|northwest|southeast|southwest)\\b/g," ").replace(/\\b(ne|nw|se|sw|north|south|east|west|street|road|boulevard|avenue|st|rd|blvd|ave)\\b/g," ").replace(/[^a-z0-9]+/g," ").trim().split(/\\s+/).filter(Boolean);
- const regexFor=v=>core(v).map(x=>x.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&")).join(".*");
- const norm=v=>core(v).join("");
- try{
-  const bbox="27.90,-80.80,28.25,-80.45";
-  const ra=regexFor(a),rb=regexFor(b);
-  if(!ra||!rb)throw new Error("Enter recognizable road names.");
-  const query='[out:json][timeout:20];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["ref"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+');way["highway"]["ref"~"'+rb+'",i]('+bbox+'););out geom;';
-  const endpoints=["https://overpass.kumi.systems/api/interpreter","https://overpass-api.de/api/interpreter"];
-  let payload=null,lastError=null;
-  for(const endpoint of endpoints){
-   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),14000);
-   try{const response=await fetch(endpoint,{method:"POST",signal:controller.signal,headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});if(!response.ok)throw new Error("OpenStreetMap returned HTTP "+response.status);payload=await response.json();break;}
-   catch(err){lastError=err;}finally{clearTimeout(timer);}
-  }
-  if(!payload)throw new Error(lastError?.name==="AbortError"?"The map search timed out. Please try again.":lastError?.message||"OpenStreetMap is temporarily unavailable.");
-  const ways=payload.elements.filter(x=>x.type==="way"&&Array.isArray(x.geometry)&&x.geometry.length>1);
-  const matches=(name,input)=>{const n=norm(name||""),q=norm(input);return n&&q&&(n.includes(q)||q.includes(n));};
-  const waysA=ways.filter(w=>matches(w.tags?.name,a)||matches(w.tags?.ref,a)),waysB=ways.filter(w=>matches(w.tags?.name,b)||matches(w.tags?.ref,b));
-  if(!waysA.length||!waysB.length)throw new Error("Could not match "+(!waysA.length?a:b)+" against the road names or route numbers on the map. Try the label exactly as it appears on the map.");
-  const intersections=[];
-  const add=(lat,lon,wa,wb)=>{if(!Number.isFinite(lat)||!Number.isFinite(lon))return;if(!intersections.some(p=>Math.abs(p.lat-lat)<0.000002&&Math.abs(p.lon-lon)<0.000002))intersections.push({lat,lon,wayA:wa,wayB:wb});};
-  // First use shared OSM vertices when the road ways are explicitly connected.
-  const byCoord=new Map();
-  waysA.forEach(w=>w.geometry.forEach(p=>{const k=p.lat.toFixed(6)+","+p.lon.toFixed(6);if(!byCoord.has(k))byCoord.set(k,[]);byCoord.get(k).push({p,w});}));
-  waysB.forEach(w=>w.geometry.forEach(p=>{const k=p.lat.toFixed(6)+","+p.lon.toFixed(6);(byCoord.get(k)||[]).forEach(x=>add((p.lat+x.p.lat)/2,(p.lon+x.p.lon)/2,x.w,w));}));
-  // Also calculate geometric segment crossings: OSM often maps divided roads as separate ways without shared node IDs.
-  const segmentCross=(p1,p2,q1,q2)=>{
-   const lat0=(p1.lat+p2.lat+q1.lat+q2.lat)/4*Math.PI/180,scale=Math.cos(lat0);
-   const cv=p=>({x:p.lon*scale,y:p.lat});
-   const A=cv(p1),B=cv(p2),C=cv(q1),D=cv(q2),rx=B.x-A.x,ry=B.y-A.y,sx=D.x-C.x,sy=D.y-C.y,den=rx*sy-ry*sx;
-   if(Math.abs(den)<1e-12)return null;
-   const t=((C.x-A.x)*sy-(C.y-A.y)*sx)/den,u=((C.x-A.x)*ry-(C.y-A.y)*rx)/den;
-   if(t< -1e-8||t>1+1e-8||u< -1e-8||u>1+1e-8)return null;
-   return {lat:p1.lat+t*(p2.lat-p1.lat),lon:p1.lon+t*(p2.lon-p1.lon)};
-  };
-  for(const wa of waysA)for(const wb of waysB){
-   const ga=wa.geometry,gb=wb.geometry;
-   for(let x=1;x<ga.length;x++)for(let y=1;y<gb.length;y++){
-    const hit=segmentCross(ga[x-1],ga[x],gb[y-1],gb[y]);
-    if(hit)add(hit.lat,hit.lon,wa,wb);
-   }
-  }
-  if(!intersections.length)throw new Error("Both roads were found, but their mapped lines do not cross in OpenStreetMap. The roads may be mapped with a small gap; use Locate single road and position the marker at the visible crossing.");
-  const center=map.getCenter();
-  intersections.sort((x,y)=>Math.hypot(x.lat-center.lat,(x.lon-center.lng)*Math.cos(center.lat*Math.PI/180))-Math.hypot(y.lat-center.lat,(y.lon-center.lng)*Math.cos(center.lat*Math.PI/180)));
-  const hit=intersections[0],display=hit.wayA.tags.name+" × "+hit.wayB.tags.name;
-  locatedIntersection={lat:hit.lat,lng:hit.lon,label:a+" / "+b,display};
-  locatedPreview=L.marker([hit.lat,hit.lon],{draggable:true}).addTo(map).bindPopup("<b>Proposed road crossing</b><br>"+esc(display)).openPopup();
-  locatedPreview.on("dragend",()=>{const p=locatedPreview.getLatLng();locatedIntersection.lat=p.lat;locatedIntersection.lng=p.lng;});
-  map.setView([hit.lat,hit.lon],18);$("saveLocatedIntersection").disabled=!selectedIntersection;
-  status.textContent="Found "+intersections.length+" road crossing candidate(s): "+display+". Check the pin; drag it if needed, then place marker.";
- }catch(err){status.textContent=err.message;locatedIntersection=null;$("saveLocatedIntersection").disabled=true;}
- finally{button.disabled=false;}
+ locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
+ $("intersectionSearchMessage").textContent="Placement mode is ready. Zoom to the crossing, then click the exact intersection on the map. A draggable preview pin will appear; nothing is saved until you press Place marker here.";
+ map.getContainer().style.cursor="crosshair";
+ map.once("click",event=>{
+  map.getContainer().style.cursor="";
+  const p=event.latlng;
+  locatedIntersection={lat:p.lat,lng:p.lng,label:a+" / "+b,display:a+" × "+b};
+  locatedPreview=L.marker([p.lat,p.lng],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" / "+b)).openPopup();
+  locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
+  $("saveLocatedIntersection").disabled=!selectedIntersection;
+  $("intersectionSearchMessage").textContent="Position selected for "+a+" / "+b+". Drag the pin if needed, then press Place marker here to save.";
+ });
 });
 $("saveLocatedIntersection").addEventListener("click",async()=>{if(!selectedIntersection||!locatedIntersection){$("intersectionSearchMessage").textContent="Select a queued report and locate its intersection first.";return;}const {data,error}=await db.from("intersection_queue").select("*").eq("id",selectedIntersection).single();if(error||!data){$("intersectionSearchMessage").textContent="Could not load selected report.";return;}const {data:userData}=await db.auth.getUser();const label=data.road_a+" / "+data.road_b.replace(/\\bSun Lake Road\\b/ig,"Sunlake Road");const description="UNVERIFIED: "+data.condition+(data.direction?" · "+data.direction:"")+" · Source: "+(data.source_name||"reported source")+(data.reported_at?" · Reported: "+new Date(data.reported_at).toLocaleString():"");const p=locatedIntersection;const saved=await db.from("map_zones").insert({name:data.condition+" · "+label,description,zone_type:data.condition==="TRAFFIC SIGNAL OUT"?"information":"caution",color:data.condition==="ROAD FLOODED"?"#1677d2":"#d87917",geometry:{type:"Point",coordinates:[p.lng,p.lat]},active:true,created_by:userData.user?.id||null});if(saved.error){$("intersectionSearchMessage").textContent="Could not save marker: "+saved.error.message;return;}const updated=await db.from("intersection_queue").update({status:"placed",latitude:p.lat,longitude:p.lng,updated_at:new Date().toISOString()}).eq("id",data.id);if(updated.error){$("intersectionSearchMessage").textContent="Marker saved but queue update failed: "+updated.error.message;return;}if(locatedPreview)map.removeLayer(locatedPreview);locatedPreview=null;locatedIntersection=null;selectedIntersection=null;$("saveLocatedIntersection").disabled=true;$("intersectionSearchMessage").textContent="Placed "+label+" successfully. You can drag its marker later.";await loadIntersectionQueue();await loadAdminZones();});
 async function loadMap(){refreshAdminMapSize();markers.forEach(m=>map.removeLayer(m));markers=[];rows.filter(r=>["unverified","confirmed","resolved"].includes(r.status)).forEach(r=>{const lat=Number(r.latitude),lng=Number(r.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lng))return;const m=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:2,fillColor:r.status==="resolved"?"#64748b":r.status==="unverified"?"#d87917":"#167c58",fillOpacity:.95}).addTo(map).bindPopup(`<b>${esc(r.title||r.category)}</b><br>${esc(r.address||"")}<br>${esc(r.status)}`);markers.push(m)});await loadAdminZones();await loadIntersectionQueue();if(markers.length){const group=L.featureGroup(markers);map.fitBounds(group.getBounds().pad(0.18),{maxZoom:13})}requestAnimationFrame(()=>map.invalidateSize({pan:false}))}
