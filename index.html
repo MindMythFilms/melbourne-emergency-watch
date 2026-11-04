@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-south-mainland-official-map-pin-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-west-melbourne-boil-water-advisory-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -1599,7 +1599,29 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  .leaflet-control-attribution{max-width:65vw!important;font-size:8px!important;line-height:1.2!important}
 }
 
-\n/* Open roads stay green, but retain a visible caution reminder. */\n.mew-road-open-caution{margin:9px 0;padding:9px 11px;border:1px solid #e8b64d;border-left:4px solid #d99a20;border-radius:9px;background:#fff8e7;color:#604516;font-size:13px;line-height:1.45}.mew-road-open-caution strong{color:#8b5a08;letter-spacing:.04em}body.dark .mew-road-open-caution{background:#382d19;border-color:#8a682b;color:#f7e4bb}body.dark .mew-road-open-caution strong{color:#ffd27a}\n</style></head>
+\n/* Open roads stay green, but retain a visible caution reminder. */\n.mew-road-open-caution{margin:9px 0;padding:9px 11px;border:1px solid #e8b64d;border-left:4px solid #d99a20;border-radius:9px;background:#fff8e7;color:#604516;font-size:13px;line-height:1.45}.mew-road-open-caution strong{color:#8b5a08;letter-spacing:.04em}body.dark .mew-road-open-caution{background:#382d19;border-color:#8a682b;color:#f7e4bb}body.dark .mew-road-open-caution strong{color:#ffd27a}\n
+/* Active public water advisory */
+.mew-water-advisory{margin:0 0 18px;padding:20px 22px;border:1px solid #d79a37;border-left:7px solid #bd6a13;border-radius:16px;background:linear-gradient(125deg,#fff6df 0%,#fffaf0 62%,#fff1d2 100%);color:#26384a;box-shadow:0 10px 28px rgba(113,72,15,.12)}
+.mew-water-advisory-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mew-water-advisory-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:12px;background:#a94c12;color:#fff;font-size:23px;font-weight:900}
+.mew-water-advisory-kicker{font-size:11px;letter-spacing:.13em;font-weight:900;color:#92500e;text-transform:uppercase}
+.mew-water-advisory h2{margin:2px 0 0;font:900 clamp(19px,2.5vw,26px)/1.2 Manrope,sans-serif;color:#71360e;letter-spacing:-.5px}
+.mew-water-advisory-status{margin-left:auto;flex:0 0 auto;padding:5px 9px;border-radius:20px;background:#8d321c;color:#fff;font-size:11px;font-weight:900;letter-spacing:.07em}
+.mew-water-advisory p{margin:8px 0;color:#465363;font-size:14px;line-height:1.6}
+.mew-water-boil-step{margin:13px 0;padding:14px 16px;border:2px solid #d5a000;border-radius:12px;background:#ffdf63;color:#302300;box-shadow:inset 0 0 0 1px #fff7c7}
+.mew-water-boil-step strong{display:block;font-size:17px;line-height:1.4;color:#302300}
+.mew-water-boil-step span{display:block;margin-top:3px;font-size:13px;color:#49390a}
+.mew-water-advisory-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13px;color:#5a4b35}
+.mew-water-advisory a{color:#075f78;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.mew-water-advisory a:hover{color:#06475a}
+body.dark .mew-water-advisory{background:linear-gradient(125deg,#392b17,#252b31 70%,#302719);border-color:#936b2d;border-left-color:#f0ae43;color:#f5ead5}
+body.dark .mew-water-advisory h2{color:#ffd18a}
+body.dark .mew-water-advisory-kicker{color:#f4c477}
+body.dark .mew-water-advisory p,body.dark .mew-water-advisory-meta{color:#e6d9c4}
+body.dark .mew-water-advisory a{color:#83e4e8}
+@media(max-width:650px){.mew-water-advisory{padding:16px 14px;margin-bottom:14px;border-radius:14px}.mew-water-advisory-head{gap:9px;align-items:flex-start}.mew-water-advisory-icon{width:35px;height:35px;flex-basis:35px;font-size:20px}.mew-water-advisory-status{font-size:10px;padding:4px 7px}.mew-water-advisory p{font-size:13px}.mew-water-boil-step{padding:12px}.mew-water-boil-step strong{font-size:16px}}
+
+</style></head>
 <body>
 <header class="site-header">
  <div class="site-header-inner">
@@ -1618,6 +1640,17 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  </div>
 </header>
 <main>
+<section class="mew-water-advisory" role="alert" aria-labelledby="mew-water-advisory-title">
+ <div class="mew-water-advisory-head">
+  <span class="mew-water-advisory-icon" aria-hidden="true">!</span>
+  <div><div class="mew-water-advisory-kicker">Public water advisory · City of Melbourne</div><h2 id="mew-water-advisory-title">BOIL WATER NOTICE</h2></div>
+  <span class="mew-water-advisory-status">ACTIVE</span>
+ </div>
+ <p><strong>Applies to all City of West Melbourne water customers.</strong> The City of Melbourne has issued a precautionary boil water notice following a water main break. Even where water pressure has returned, the notice remains in effect until repairs are completed and testing confirms the water is safe.</p>
+ <div class="mew-water-boil-step"><strong>Bring water to a rolling boil for 1 minute.</strong><span>Use boiled or bottled water for drinking, cooking, making ice, brushing teeth, and washing dishes.</span></div>
+ <p>Continue following this precaution until the City officially lifts the notice. Do not assume water is safe simply because normal pressure has returned.</p>
+ <div class="mew-water-advisory-meta"><span><strong>Questions:</strong> 321-608-5000</span><span><strong>After-hours emergency:</strong> 321-255-4622</span><span><a href="https://www.melbourneflorida.org/Government/Departments/Public-Works-Utilities/Precautionary-Boil-Water-Notices/Update-PBWN-Nov-3-1415" target="_blank" rel="noopener noreferrer">Official City notice and updates ↗</a></span></div>
+</section>
 <section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
 <section class="hero hero-visual">
  <div class="hero-atmosphere" aria-hidden="true"><span class="hero-palm">🌴</span><span class="hero-horizon"></span><span class="hero-sun"></span></div>
