@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-satellite-street-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-desktop-map-primary-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -2275,7 +2275,48 @@ setInterval(checkForSiteUpdates,180000);
 })();
 
 
-</script></body></html>
+</script>
+<style id="coastwatch-desktop-map-primary">
+/* Desktop: make the live map the dominant workspace; preserve the existing mobile layout. */
+@media (min-width: 901px) {
+  main { max-width: 1920px !important; padding-left: 28px !important; padding-right: 28px !important; }
+  #map-panel > .map-dashboard {
+    grid-template-columns: minmax(250px, 275px) minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    align-items: stretch !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 16px !important;
+  }
+  #map-panel > .map-dashboard > .map-stage {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: clamp(760px, 84vh, 1120px) !important;
+    min-height: 760px !important;
+    max-height: 1120px !important;
+  }
+  #map-panel > .map-dashboard > .map-stage > #map {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 760px !important;
+    max-height: none !important;
+  }
+  #map-panel > .map-dashboard > #map-resource-strip {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+}
+@media (min-width: 901px) and (max-height: 800px) {
+  #map-panel > .map-dashboard > .map-stage { height: 760px !important; min-height: 760px !important; }
+  #map-panel > .map-dashboard > .map-stage > #map { min-height: 760px !important; }
+}
+</style>
+</body></html>
 
 /* Map style and shelter controls float over the map canvas on every screen size. */
 #map-panel>.map-stage{position:relative!important}
