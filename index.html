@@ -1219,6 +1219,14 @@ body:not(.dark) footer{color:#526b7b!important}
 .mew-zone-label{display:flex;flex-direction:column;align-items:center;gap:1px;width:max-content;max-width:none;padding:4px 7px;border:1.5px solid #fff;border-radius:7px;background:#071a2ce8;color:#fff;text-align:center;white-space:nowrap;box-shadow:0 2px 7px #0009;transform:translate(-50%,-50%);}
 .mew-zone-label b{font-size:10px;line-height:1.05;font-weight:900;letter-spacing:.04em;text-shadow:0 1px 2px #000;}
 .mew-zone-label small{font-size:7px;line-height:1.05;font-weight:850;text-transform:uppercase;letter-spacing:.08em;color:#b9f5f1;}
+.mew-zone-feedback{margin-top:10px;padding:10px;border:1px solid #d5dee8;border-radius:10px;background:#f6f8fb;color:#172b3f}
+.mew-zone-feedback strong{display:block;margin-bottom:5px;font-size:12px}
+.mew-zone-feedback-counts{display:flex;flex-wrap:wrap;gap:8px;margin:5px 0 8px;font-size:11px}
+.mew-zone-feedback-actions{display:flex;gap:7px;flex-wrap:wrap}
+.mew-zone-feedback-actions button{padding:7px 10px;border:1px solid #9aaaba;border-radius:8px;background:#fff;color:#172b3f;font-size:12px;font-weight:800;cursor:pointer}
+.mew-zone-feedback-actions button:disabled{opacity:.55;cursor:wait}
+.mew-zone-feedback small{display:block;margin-top:7px;color:#526477;font-size:10px;line-height:1.4}
+
 @media(max-width:650px){.mew-zone-label{padding:3px 6px;border-width:1px}.mew-zone-label b{font-size:9px}.mew-zone-label small{font-size:6px}}
 
 
@@ -2115,6 +2123,45 @@ let mewPublicZoneLayer=L.featureGroup().addTo(map);
 const mewPublicZoneBounds=new Map();
 const mewPublicZoneEntries=new Map();
 let mewPublicZonesLoading=null;
+function mewZoneFeedbackMarkup(z,counts){
+ const name=String(z.name||""),description=String(z.description||""),type=String(z.zone_type||"");
+ const threshold=type==="danger"||type==="restricted"||/(flood|road closed|washout|closure|closed)/i.test(name+" "+description)?5:3;
+ const still=Number(counts?.still_unsafe||0),safe=Number(counts?.safe_now||0);
+ return `<div class="mew-zone-feedback" data-zone-feedback-wrap="${esc(z.id)}"><strong>Are conditions still unsafe here?</strong><div class="mew-zone-feedback-counts"><span>⚠️ Still unsafe: <b data-zone-unsafe-count>${still}</b></span><span>✓ Safe now: <b data-zone-safe-count>${safe}</b></span></div><div class="mew-zone-feedback-actions"><button type="button" data-zone-vote="still_unsafe" data-zone-id="${esc(z.id)}">⚠️ Still unsafe</button><button type="button" data-zone-vote="safe_now" data-zone-id="${esc(z.id)}">✓ Safe now</button></div><small>Zone is hidden from the public map after ${threshold} “Safe now” votes and more safe votes than unsafe votes. Community feedback is not official clearance.</small></div>`;
+}
+function mewZoneVoterToken(){let token=localStorage.getItem("coastwatch_zone_feedback_token");if(!token){token=crypto.randomUUID();localStorage.setItem("coastwatch_zone_feedback_token",token);}return token;}
+document.addEventListener("click",async e=>{
+ const button=e.target.closest("[data-zone-vote]");
+ if(!button)return;
+ const wrap=button.closest("[data-zone-feedback-wrap]");
+ if(!wrap)return;
+ const buttons=wrap.querySelectorAll("button[data-zone-vote]");
+ buttons.forEach(b=>b.disabled=true);
+ const original=button.textContent;
+ button.textContent="Sending…";
+ try{
+  const {data,error}=await db.rpc("submit_public_map_zone_feedback",{p_zone_id:button.dataset.zoneId,p_voter_token:mewZoneVoterToken(),p_vote:button.dataset.zoneVote});
+  if(error)throw error;
+  const result=Array.isArray(data)?data[0]:data;
+  if(!result)throw new Error("No feedback result was returned.");
+  const unsafe=wrap.querySelector("[data-zone-unsafe-count]"),safe=wrap.querySelector("[data-zone-safe-count]");
+  if(unsafe)unsafe.textContent=Number(result.still_unsafe||0);
+  if(safe)safe.textContent=Number(result.safe_now||0);
+  if(result.community_cleared){
+   map.closePopup();
+   await loadPublicZones();
+   alert("The community reached the safe-now threshold. This zone has been hidden from the public map, but remains in the admin zone list. This is community feedback, not official clearance.");
+  }else{
+   button.textContent="Vote recorded";
+   buttons.forEach(b=>{if(b!==button)b.disabled=false;});
+  }
+ }catch(error){
+  console.warn("Map-zone feedback failed:",error);
+  alert(error.message||"Your vote could not be submitted. Please try again.");
+  buttons.forEach(b=>b.disabled=false);
+  button.textContent=original;
+ }
+});
 async function loadPublicZones(){
  // Never replace the active zone layers while a visitor is reading a map popup.
  // The periodic refresh will retry on its next cycle after the popup closes.
@@ -2123,6 +2170,9 @@ async function loadPublicZones(){
  mewPublicZonesLoading=(async()=>{
   const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
   if(error){console.warn("CoastWatch FL zones unavailable:",error.message);const list=$("publicZoneList");if(list&&!list.children.length)list.innerHTML='<span class="map-zone-empty">Zone information is temporarily unavailable.</span>';return false;}
+  const {data:feedbackRows,error:feedbackError}=await db.rpc("get_public_map_zone_feedback");
+  if(feedbackError)console.warn("Map-zone feedback counts unavailable:",feedbackError.message);
+  const feedbackByZone=new Map((feedbackRows||[]).map(row=>[String(row.zone_id),row]));
   const zones=(data||[]).filter(z=>z.geometry&&["Point","Polygon","MultiPolygon"].includes(z.geometry.type));
   const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
   zones.forEach(z=>{
@@ -2148,7 +2198,7 @@ async function loadPublicZones(){
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label">'+(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
-   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>');
+   group.bindPopup('<strong>'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))));
    nextEntries.set(String(z.id),{bounds,group,labelMarker});
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
