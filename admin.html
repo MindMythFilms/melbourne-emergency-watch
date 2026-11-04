@@ -216,47 +216,62 @@ $("locateSingleRoadBtn").addEventListener("click",async()=>{const road=$("roadSe
 $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
  if(!a||!b){$("intersectionSearchMessage").textContent="Enter both road names first.";return;}
- const button=$("locateIntersectionBtn");button.disabled=true;
- const status=$("intersectionSearchMessage");
- status.textContent="Searching OpenStreetMap for both roads…";
+ const button=$("locateIntersectionBtn"),status=$("intersectionSearchMessage");
+ button.disabled=true;status.textContent="Searching mapped road geometry for the crossing…";
  locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
  if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
- const normalize=v=>v.toLowerCase().replace(/\\b(street|road|boulevard|avenue|st|rd|blvd|ave)\\b/g,"").replace(/[^a-z0-9]/g,"");
- const term=v=>v.trim().replace(/\\b(street|road|boulevard|avenue)\\b/ig,"").trim();
- const escapeOverpass=v=>v.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&");
+ const core=v=>v.toLowerCase().replace(/\\b(northeast|northwest|southeast|southwest)\\b/g," ").replace(/\\b(ne|nw|se|sw|north|south|east|west|street|road|boulevard|avenue|st|rd|blvd|ave)\\b/g," ").replace(/[^a-z0-9]+/g," ").trim().split(/\\s+/).filter(Boolean);
+ const regexFor=v=>core(v).map(x=>x.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&")).join(".*");
+ const norm=v=>core(v).join("");
  try{
   const bbox="27.90,-80.80,28.25,-80.45";
-  const ra=escapeOverpass(term(a)),rb=escapeOverpass(term(b));
-  const query='[out:json][timeout:15];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+'););out body;>;out skel qt;';
+  const ra=regexFor(a),rb=regexFor(b);
+  if(!ra||!rb)throw new Error("Enter recognizable road names.");
+  const query='[out:json][timeout:20];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+'););out geom;';
   const endpoints=["https://overpass.kumi.systems/api/interpreter","https://overpass-api.de/api/interpreter"];
   let payload=null,lastError=null;
   for(const endpoint of endpoints){
-   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
-   try{
-    const response=await fetch(endpoint,{method:"POST",signal:controller.signal,headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});
-    if(!response.ok)throw new Error("OpenStreetMap returned HTTP "+response.status);
-    payload=await response.json();break;
-   }catch(err){lastError=err;}
-   finally{clearTimeout(timer);}
+   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),14000);
+   try{const response=await fetch(endpoint,{method:"POST",signal:controller.signal,headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});if(!response.ok)throw new Error("OpenStreetMap returned HTTP "+response.status);payload=await response.json();break;}
+   catch(err){lastError=err;}finally{clearTimeout(timer);}
   }
-  if(!payload)throw new Error(lastError?.name==="AbortError"?"The OpenStreetMap search timed out. Please try again in a moment.":(lastError?.message||"OpenStreetMap is temporarily unavailable."));
-  const ways=payload.elements.filter(x=>x.type==="way"&&Array.isArray(x.nodes));
-  const nodes=new Map(payload.elements.filter(x=>x.type==="node"&&Number.isFinite(x.lat)&&Number.isFinite(x.lon)).map(x=>[x.id,x]));
-  const matches=(name,input)=>{const n=normalize(name||""),q=normalize(input);return n&&q&&(n.includes(q)||q.includes(n));};
+  if(!payload)throw new Error(lastError?.name==="AbortError"?"The map search timed out. Please try again.":lastError?.message||"OpenStreetMap is temporarily unavailable.");
+  const ways=payload.elements.filter(x=>x.type==="way"&&Array.isArray(x.geometry)&&x.geometry.length>1);
+  const matches=(name,input)=>{const n=norm(name||""),q=norm(input);return n&&q&&(n.includes(q)||q.includes(n));};
   const waysA=ways.filter(w=>matches(w.tags?.name,a)),waysB=ways.filter(w=>matches(w.tags?.name,b));
-  if(!waysA.length||!waysB.length)throw new Error("OpenStreetMap found "+(!waysA.length?"no mapped way for "+a: "no mapped way for "+b)+". Try a shorter road name or use Locate single road.");
-  const byNodeA=new Map();waysA.forEach(w=>w.nodes.forEach(id=>{if(!byNodeA.has(id))byNodeA.set(id,[]);byNodeA.get(id).push(w)}));
-  const candidates=[];
-  waysB.forEach(w=>w.nodes.forEach(id=>{if(!byNodeA.has(id)||!nodes.has(id))return;const n=nodes.get(id);byNodeA.get(id).forEach(wa=>candidates.push({node:n,wayA:wa,wayB:w}));}));
-  const unique=[...new Map(candidates.map(c=>[c.node.id,c])).values()];
-  if(!unique.length)throw new Error("Both roads were found, but OpenStreetMap does not show them sharing a mapped node. The intersection may be mapped with a gap or a different road name. Use Locate single road to navigate and place the pin manually.");
-  unique.sort((x,y)=>Math.hypot(x.node.lat-28.0836,(x.node.lon+80.6081)*Math.cos(28*Math.PI/180))-Math.hypot(y.node.lat-28.0836,(y.node.lon+80.6081)*Math.cos(28*Math.PI/180)));
-  const chosen=unique[0],lat=chosen.node.lat,lng=chosen.node.lon;
-  locatedIntersection={lat,lng,label:a+" / "+b,display:chosen.wayA.tags.name+" × "+chosen.wayB.tags.name};
-  locatedPreview=L.marker([lat,lng],{draggable:true}).addTo(map).bindPopup("<b>OSM road intersection</b><br>"+esc(locatedIntersection.display)).openPopup();
+  if(!waysA.length||!waysB.length)throw new Error("Could not match "+(!waysA.length?a:b)+" to a mapped road. Try removing the directional suffix (NE/NW/SE/SW).");
+  const intersections=[];
+  const add=(lat,lon,wa,wb)=>{if(!Number.isFinite(lat)||!Number.isFinite(lon))return;if(!intersections.some(p=>Math.abs(p.lat-lat)<0.000002&&Math.abs(p.lon-lon)<0.000002))intersections.push({lat,lon,wayA:wa,wayB:wb});};
+  // First use shared OSM vertices when the road ways are explicitly connected.
+  const byCoord=new Map();
+  waysA.forEach(w=>w.geometry.forEach(p=>{const k=p.lat.toFixed(6)+","+p.lon.toFixed(6);if(!byCoord.has(k))byCoord.set(k,[]);byCoord.get(k).push({p,w});}));
+  waysB.forEach(w=>w.geometry.forEach(p=>{const k=p.lat.toFixed(6)+","+p.lon.toFixed(6);(byCoord.get(k)||[]).forEach(x=>add((p.lat+x.p.lat)/2,(p.lon+x.p.lon)/2,x.w,w));}));
+  // Also calculate geometric segment crossings: OSM often maps divided roads as separate ways without shared node IDs.
+  const segmentCross=(p1,p2,q1,q2)=>{
+   const lat0=(p1.lat+p2.lat+q1.lat+q2.lat)/4*Math.PI/180,scale=Math.cos(lat0);
+   const cv=p=>({x:p.lon*scale,y:p.lat});
+   const A=cv(p1),B=cv(p2),C=cv(q1),D=cv(q2),rx=B.x-A.x,ry=B.y-A.y,sx=D.x-C.x,sy=D.y-C.y,den=rx*sy-ry*sx;
+   if(Math.abs(den)<1e-12)return null;
+   const t=((C.x-A.x)*sy-(C.y-A.y)*sx)/den,u=((C.x-A.x)*ry-(C.y-A.y)*rx)/den;
+   if(t< -1e-8||t>1+1e-8||u< -1e-8||u>1+1e-8)return null;
+   return {lat:p1.lat+t*(p2.lat-p1.lat),lon:p1.lon+t*(p2.lon-p1.lon)};
+  };
+  for(const wa of waysA)for(const wb of waysB){
+   const ga=wa.geometry,gb=wb.geometry;
+   for(let x=1;x<ga.length;x++)for(let y=1;y<gb.length;y++){
+    const hit=segmentCross(ga[x-1],ga[x],gb[y-1],gb[y]);
+    if(hit)add(hit.lat,hit.lon,wa,wb);
+   }
+  }
+  if(!intersections.length)throw new Error("Both roads were found, but their mapped lines do not cross in OpenStreetMap. The roads may be mapped with a small gap; use Locate single road and position the marker at the visible crossing.");
+  const center=map.getCenter();
+  intersections.sort((x,y)=>Math.hypot(x.lat-center.lat,(x.lon-center.lng)*Math.cos(center.lat*Math.PI/180))-Math.hypot(y.lat-center.lat,(y.lon-center.lng)*Math.cos(center.lat*Math.PI/180)));
+  const hit=intersections[0],display=hit.wayA.tags.name+" × "+hit.wayB.tags.name;
+  locatedIntersection={lat:hit.lat,lng:hit.lon,label:a+" / "+b,display};
+  locatedPreview=L.marker([hit.lat,hit.lon],{draggable:true}).addTo(map).bindPopup("<b>Proposed road crossing</b><br>"+esc(display)).openPopup();
   locatedPreview.on("dragend",()=>{const p=locatedPreview.getLatLng();locatedIntersection.lat=p.lat;locatedIntersection.lng=p.lng;});
-  map.setView([lat,lng],18);$("saveLocatedIntersection").disabled=!selectedIntersection;
-  status.textContent="Found "+unique.length+" shared mapped intersection candidate(s): "+locatedIntersection.display+". Review the pin, adjust if needed, then save.";
+  map.setView([hit.lat,hit.lon],18);$("saveLocatedIntersection").disabled=!selectedIntersection;
+  status.textContent="Found "+intersections.length+" road crossing candidate(s): "+display+". Check the pin; drag it if needed, then place marker.";
  }catch(err){status.textContent=err.message;locatedIntersection=null;$("saveLocatedIntersection").disabled=true;}
  finally{button.disabled=false;}
 });
