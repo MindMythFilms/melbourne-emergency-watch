@@ -212,7 +212,41 @@ async function loadIntersectionQueue(){
 document.getElementById("intersectionQueue").addEventListener("click",e=>{const b=e.target.closest("[data-place-intersection]");if(!b)return;const id=b.dataset.placeIntersection;selectedIntersection=id;if(placementPreview){map.removeLayer(placementPreview);placementPreview=null;}document.querySelectorAll("[data-place-intersection]").forEach(x=>{x.disabled=false;x.textContent="Place on map";x.classList.remove("green")});b.textContent="Selected — locate below";b.classList.add("green");db.from("intersection_queue").select("road_a,road_b").eq("id",id).single().then(({data,error})=>{if(error){intersectionMsg("Could not load road names: "+error.message,"error");return;}$("roadSearchA").value=data.road_a;$("roadSearchB").value=data.road_b;$("saveLocatedIntersection").disabled=true;$("intersectionSearchMessage").textContent="Road names loaded. Press Locate intersection to center the map automatically.";});$("adminMapPanel").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>map.invalidateSize({pan:false}),350);});
 let locatedIntersection=null;let locatedPreview=null;
 let singleRoadLayer=null;
-$("locateSingleRoadBtn").addEventListener("click",async()=>{const road=$("roadSearchA").value.trim()||$("roadSearchB").value.trim();if(!road){$("intersectionSearchMessage").textContent="Enter a road name in either road field.";return;}$("locateSingleRoadBtn").disabled=true;$("intersectionSearchMessage").textContent="Searching for "+road+"…";try{const q=encodeURIComponent(road+", Melbourne, Florida, USA");const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&limit=5&q="+q;const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});if(!res.ok)throw new Error("Search service returned "+res.status);const fc=await res.json();const features=(fc.features||[]).filter(x=>x.geometry);if(!features.length)throw new Error("No matching road found. Try a shorter road name or add a nearby city/landmark.");const feature=features.find(x=>["LineString","MultiLineString"].includes(x.geometry.type))||features[0];if(singleRoadLayer)map.removeLayer(singleRoadLayer);if(["LineString","MultiLineString","Polygon","MultiPolygon"].includes(feature.geometry.type)){singleRoadLayer=L.geoJSON(feature,{style:{color:"#e67e22",weight:7,opacity:.9}}).addTo(map);const bounds=singleRoadLayer.getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:16});}else{const [lng,lat]=feature.geometry.coordinates;map.setView([lat,lng],16);singleRoadLayer=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:2,fillColor:"#e67e22",fillOpacity:1}).addTo(map);}const name=feature.properties?.display_name||road;$("intersectionSearchMessage").textContent="Located road: "+name+". Orange highlights the road when geometry is available. This is for navigation only; use two roads to place an intersection marker.";locatedIntersection=null;$("saveLocatedIntersection").disabled=true;}catch(err){$("intersectionSearchMessage").textContent=err.message;}finally{$("locateSingleRoadBtn").disabled=false;}});
+$("locateSingleRoadBtn").addEventListener("click",async()=>{
+ const road=$("roadSearchA").value.trim()||$("roadSearchB").value.trim();
+ if(!road){$("intersectionSearchMessage").textContent="Enter a road name in either road field.";return;}
+ const button=$("locateSingleRoadBtn");button.disabled=true;
+ $("intersectionSearchMessage").textContent="Searching for "+road+"…";
+ locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
+ if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
+ if(singleRoadLayer){map.removeLayer(singleRoadLayer);singleRoadLayer=null;}
+ try{
+  const q=encodeURIComponent(road+", Melbourne, Florida, USA");
+  const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&limit=5&q="+q;
+  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
+  if(!res.ok)throw new Error("Search service returned "+res.status);
+  const fc=await res.json(),features=(fc.features||[]).filter(x=>x.geometry);
+  if(!features.length)throw new Error("No matching road found. Try a shorter road name or add a nearby landmark.");
+  const feature=features.find(x=>["LineString","MultiLineString"].includes(x.geometry.type))||features[0];
+  if(["LineString","MultiLineString","Polygon","MultiPolygon"].includes(feature.geometry.type)){
+   singleRoadLayer=L.geoJSON(feature,{style:{color:"#e67e22",weight:7,opacity:.9}}).addTo(map);
+   const bounds=singleRoadLayer.getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:17});
+  }else{const [lng,lat]=feature.geometry.coordinates;map.setView([lat,lng],16);singleRoadLayer=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:2,fillColor:"#e67e22",fillOpacity:1}).addTo(map);}
+  const name=feature.properties?.display_name||road;
+  $("intersectionSearchMessage").textContent="Located "+name+". Now click the exact spot on the highlighted road where the marker belongs. The preview will be draggable before saving.";
+  // A map click selects the precise point along the road; it is not saved until the user presses Place marker here.
+  map.once("click",event=>{
+   const p=event.latlng;
+   locatedIntersection={lat:p.lat,lng:p.lng,label:road,display:name};
+   if(locatedPreview)map.removeLayer(locatedPreview);
+   locatedPreview=L.marker([p.lat,p.lng],{draggable:true}).addTo(map).bindPopup("<b>Proposed road marker</b><br>"+esc(road)).openPopup();
+   locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
+   $("saveLocatedIntersection").disabled=!selectedIntersection;
+   $("intersectionSearchMessage").textContent="Marker position selected on "+road+". Drag the pin to fine-tune it, then press Place marker here.";
+  });
+ }catch(err){$("intersectionSearchMessage").textContent=err.message;}
+ finally{button.disabled=false;}
+});
 $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
  if(!a||!b){$("intersectionSearchMessage").textContent="Enter both road names first.";return;}
