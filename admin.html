@@ -185,7 +185,14 @@ if("ResizeObserver" in window){const mapBox=document.getElementById("map");new R
 function msg(text,kind=""){const e=$("pageMsg");e.textContent=text;e.className="msg "+kind}
 map.whenReady(()=>{setTimeout(refreshAdminMapSize,100);});
 function sessionId(){let v=sessionStorage.getItem("mew_admin_session");if(!v){v=crypto.randomUUID();sessionStorage.setItem("mew_admin_session",v)}return v}
-$("adult").onchange=$("agree").onchange=()=>{$("accept").disabled=!($("adult").checked&&$("agree").checked)};
+function updateConsentButton(){
+ const ready=$("adult").checked===true&&$("agree").checked===true;
+ $("accept").disabled=!ready;
+ $("accept").setAttribute("aria-disabled",String(!ready));
+}
+$("adult").addEventListener("change",updateConsentButton);
+$("agree").addEventListener("change",updateConsentButton);
+updateConsentButton();
 $("decline").onclick=()=>{$("consent").innerHTML='<div class="consentbox"><h2>Access not accepted</h2><p>You chose not to agree to the Terms of Use &amp; Community Safety Agreement. You cannot use CoastWatch FL.</p></div>'};
 $("accept").onclick=async()=>{try{const {data,error}=await db.rpc("record_mew_terms_acceptance",{p_terms_version:VERSION,p_browser_session_id:sessionId(),p_age_attested:true});if(error)throw error;if(!data)throw new Error("No acceptance ID returned");sessionStorage.setItem("mew_admin_accepted",VERSION);$("consent").remove()}catch(e){$("consentMsg").textContent=e.message;$("consentMsg").classList.remove("hidden")}};
 if(sessionStorage.getItem("mew_admin_accepted")===VERSION)$("consent").remove();
