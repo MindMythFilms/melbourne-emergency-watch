@@ -5,8 +5,6 @@
 <meta name="mew-build" content="20261103-specific-road-hazard-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <style>
 :root{--navy:#10243b;--blue:#1769aa;--ink:#182536;--muted:#66758a;--line:#dce4ec;--bg:#f3f6f9;--green:#167c58;--amber:#b86a0a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -1513,10 +1511,6 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  .leaflet-control-attribution{max-width:65vw!important;font-size:8px!important;line-height:1.2!important}
 }
 
-/* Compact point clusters keep shelter, gauge and outage pins readable on phones. */
-.mew-point-cluster{display:flex!important;align-items:center;justify-content:center;width:42px!important;height:42px!important;border:3px solid #fff!important;border-radius:50%!important;background:#234b63!important;color:#fff!important;font:900 14px/1 system-ui,sans-serif!important;box-shadow:0 2px 9px #0008!important}
-.mew-point-cluster span{display:block}
-.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:transparent!important}
 </style></head>
 <body>
 <header class="site-header">
@@ -1642,7 +1636,6 @@ window.mewAcceptConsent=async function(){
 (()=>{const version="coastwatch-fl-terms-2026-11-03-v2";const previouslyAccepted=localStorage.getItem("mew_accepted_version")||sessionStorage.getItem("mew_accepted_version");if(previouslyAccepted===version){localStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="coastwatch-fl-terms-2026-11-03-v2";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
@@ -1670,17 +1663,11 @@ map.on("popupopen",()=>mewMapStage?.classList.add("mew-popup-visible"));
 map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
 // COASTWATCH_NWS_ALERTS_V2 — isolated official-alert overlay; never modifies community report loading.
 const nwsAlertLayer=L.featureGroup().addTo(map);
-function mewPointClusterOptions(){
- return {showCoverageOnHover:false,spiderfyOnMaxZoom:true,zoomToBoundsOnClick:true,removeOutsideVisibleBounds:true,maxClusterRadius:48,disableClusteringAtZoom:14,iconCreateFunction:cluster=>{
-  const count=cluster.getChildCount();
-  return L.divIcon({className:"mew-point-cluster",html:"<span>"+count+"</span>",iconSize:[42,42],iconAnchor:[21,21]});
- }};
-}
-const powerOutageLayer=L.markerClusterGroup(mewPointClusterOptions()).addTo(map);
-const usgsWaterLayer=L.markerClusterGroup(mewPointClusterOptions()).addTo(map);
+const powerOutageLayer=L.featureGroup().addTo(map);
+const usgsWaterLayer=L.featureGroup().addTo(map);
 const evacuationZoneLayer=L.featureGroup();
 map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450";
-const shelterLayer=L.markerClusterGroup(mewPointClusterOptions());
+const shelterLayer=L.featureGroup();
 let shelterFetchInProgress=false;
 const rainRadarLayer=L.tileLayer.wms("https://nowcoast.noaa.gov/geoserver/observations/weather_radar/ows",{layers:"conus_base_reflectivity_mosaic",styles:"",format:"image/png",transparent:true,version:"1.1.1",opacity:.72,attribution:"Radar: NOAA/NWS MRMS via nowCOAST"});
 rainRadarLayer.on("loading",()=>{const e=$("rainRadarUpdated");if(e)e.textContent="Connecting to NOAA radar…";});
