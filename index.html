@@ -2529,6 +2529,16 @@ setInterval(checkForSiteUpdates,180000);
     line-height: 1.3 !important;
   }
 }
+
+@media (min-width:701px) {
+  /* Place the report controls inside the map canvas, beneath the basemap toolbar. */
+  #map-panel .map-stage .map-report-tools {
+    top: 132px !important;
+    right: 18px !important;
+    left: auto !important;
+    z-index: 950 !important;
+  }
+}
 </style>
 </body></html>
 
