@@ -221,20 +221,11 @@ $("locateSingleRoadBtn").addEventListener("click",async()=>{
  if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
  if(singleRoadLayer){map.removeLayer(singleRoadLayer);singleRoadLayer=null;}
  try{
-  const q=encodeURIComponent(road+", Melbourne, Florida, USA");
-  const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&limit=5&q="+q;
-  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
-  if(!res.ok)throw new Error("Search service returned "+res.status);
-  const fc=await res.json(),features=(fc.features||[]).filter(x=>x.geometry);
-  if(!features.length)throw new Error("No matching road found. Try a shorter road name or add a nearby landmark.");
-  const feature=features.find(x=>["LineString","MultiLineString"].includes(x.geometry.type))||features[0];
-  if(["LineString","MultiLineString","Polygon","MultiPolygon"].includes(feature.geometry.type)){
-   singleRoadLayer=L.geoJSON(feature,{style:{color:"#e67e22",weight:7,opacity:.9}}).addTo(map);
-   const bounds=singleRoadLayer.getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:17});
-  }else{const [lng,lat]=feature.geometry.coordinates;map.setView([lat,lng],16);singleRoadLayer=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:2,fillColor:"#e67e22",fillOpacity:1}).addTo(map);}
-  const name=feature.properties?.display_name||road;
-  $("intersectionSearchMessage").textContent="Located "+name+". Now click the exact spot on the highlighted road where the marker belongs. The preview will be draggable before saving.";
-  // A map click selects the precise point along the road; it is not saved until the user presses Place marker here.
+  const roadData=await searchRoadGeometry(road);
+  singleRoadLayer=L.geoJSON(roadData.geometry,{style:{color:"#e67e22",weight:7,opacity:.95,lineCap:"round",lineJoin:"round"}}).addTo(map);
+  const bounds=singleRoadLayer.getBounds();if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:17});
+  const name=road+" ("+roadData.segmentCount+" mapped segments)";
+  $("intersectionSearchMessage").textContent="Located "+name+". Click the exact spot on the highlighted road where the marker belongs. The preview will be draggable before saving.";
   map.once("click",event=>{
    const p=event.latlng;
    locatedIntersection={lat:p.lat,lng:p.lng,label:road,display:name};
@@ -275,6 +266,10 @@ function findRoadCrossings(ga,gb){
  return unique;
 }
 async function searchRoadGeometry(road){
+ // Nominatim often returns only one short OSM way. Overpass retrieves every
+ // named road way in the Brevard/Melbourne area so the full road is drawn.
+ const suffix=/\\s+(road|rd|street|st|avenue|ave|boulevard|blvd|drive|dr|lane|ln|court|ct|highway|hwy)$/i;
+ const base=road.replace(suffix,"").trim().replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\async function searchRoadGeometry(road){
  const q=encodeURIComponent(road+", Brevard County, Florida, USA");
  const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+q;
  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
@@ -288,6 +283,27 @@ async function searchRoadGeometry(road){
  // Use a FeatureCollection of individual LineString features so Leaflet applies
  // the orange/blue path styles to every returned road segment.
  return {type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry})),featureCount:features.length,segmentCount:geometries.length};
+}");
+ const namePattern="^"+base+"( Road| Rd| Street| St| Avenue| Ave| Boulevard| Blvd| Drive| Dr| Lane| Ln| Court| Ct| Highway| Hwy)?$";
+ const query='[out:json][timeout:25];way["highway"]["name"~"'+namePattern.replace(/"/g,'\\"')+'",i](27.7,-81.0,28.8,-80.3);out geom;';
+ let geometries=[];
+ try{
+  const response=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)});
+  if(response.ok){
+   const data=await response.json();
+   geometries=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry?.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));
+  }
+ }catch(error){/* Fall back to Nominatim if Overpass is unavailable or blocked. */}
+ if(!geometries.length){
+  const q=encodeURIComponent(road+", Brevard County, Florida, USA");
+  const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+q;
+  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
+  if(!res.ok)throw new Error("OpenStreetMap search returned "+res.status+". Please wait before trying again.");
+  const fc=await res.json();
+  geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+ }
+ if(!geometries.length)throw new Error('Could not find mapped road geometry for "'+road+'". Try the road full official name.');
+ return {geometry:{type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry}))},segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
