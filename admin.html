@@ -249,6 +249,8 @@ $("locateSingleRoadBtn").addEventListener("click",async()=>{
 });
 function roadLineParts(geometry){
  if(!geometry)return [];
+ if(geometry.type==="Feature")return roadLineParts(geometry.geometry);
+ if(geometry.type==="FeatureCollection")return (geometry.features||[]).flatMap(roadLineParts);
  if(geometry.type==="LineString")return [geometry.coordinates];
  if(geometry.type==="MultiLineString")return geometry.coordinates;
  if(geometry.type==="GeometryCollection")return (geometry.geometries||[]).flatMap(roadLineParts);
@@ -283,7 +285,9 @@ async function searchRoadGeometry(road){
  // A named road can be split into many OSM ways. Keep every returned segment.
  const geometries=features.flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
  if(!geometries.length)throw new Error('No usable mapped road segments were returned for "'+road+'".');
- return {type:"GeometryCollection",geometries,featureCount:features.length,segmentCount:geometries.length};
+ // Use a FeatureCollection of individual LineString features so Leaflet applies
+ // the orange/blue path styles to every returned road segment.
+ return {type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry})),featureCount:features.length,segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
