@@ -217,38 +217,47 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
  const a=$("roadSearchA").value.trim(),b=$("roadSearchB").value.trim();
  if(!a||!b){$("intersectionSearchMessage").textContent="Enter both road names first.";return;}
  const button=$("locateIntersectionBtn");button.disabled=true;
- $("intersectionSearchMessage").textContent="Finding both roads and their shared intersection in OpenStreetMap…";
+ const status=$("intersectionSearchMessage");
+ status.textContent="Searching OpenStreetMap for both roads…";
  locatedIntersection=null;$("saveLocatedIntersection").disabled=true;
  if(locatedPreview){map.removeLayer(locatedPreview);locatedPreview=null;}
+ const normalize=v=>v.toLowerCase().replace(/\\b(street|road|boulevard|avenue|st|rd|blvd|ave)\\b/g,"").replace(/[^a-z0-9]/g,"");
+ const term=v=>v.trim().replace(/\\b(street|road|boulevard|avenue)\\b/ig,"").trim();
+ const escapeOverpass=v=>v.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&");
  try{
   const bbox="27.90,-80.80,28.25,-80.45";
-  const escRegex=v=>v.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/\\s+/g,"[\\\\s]+");
-  const roadPattern=v=>{const n=v.replace(/\\b(street|road|boulevard|avenue)\\b/ig,"").trim();return "^.*"+escRegex(n)+".*$";};
-  const ra=roadPattern(a),rb=roadPattern(b);
-  const query='[out:json][timeout:25];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+'););out body;>;out skel qt;';
-  const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+  const ra=escapeOverpass(term(a)),rb=escapeOverpass(term(b));
+  const query='[out:json][timeout:15];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+'););out body;>;out skel qt;';
+  const endpoints=["https://overpass.kumi.systems/api/interpreter","https://overpass-api.de/api/interpreter"];
   let payload=null,lastError=null;
   for(const endpoint of endpoints){
-   try{const response=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});if(!response.ok)throw new Error("OpenStreetMap search returned "+response.status);payload=await response.json();break;}catch(err){lastError=err;}
+   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+   try{
+    const response=await fetch(endpoint,{method:"POST",signal:controller.signal,headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","Accept":"application/json"},body:"data="+encodeURIComponent(query)});
+    if(!response.ok)throw new Error("OpenStreetMap returned HTTP "+response.status);
+    payload=await response.json();break;
+   }catch(err){lastError=err;}
+   finally{clearTimeout(timer);}
   }
-  if(!payload)throw lastError||new Error("OpenStreetMap intersection search is unavailable.");
+  if(!payload)throw new Error(lastError?.name==="AbortError"?"The OpenStreetMap search timed out. Please try again in a moment.":(lastError?.message||"OpenStreetMap is temporarily unavailable."));
   const ways=payload.elements.filter(x=>x.type==="way"&&Array.isArray(x.nodes));
   const nodes=new Map(payload.elements.filter(x=>x.type==="node"&&Number.isFinite(x.lat)&&Number.isFinite(x.lon)).map(x=>[x.id,x]));
-  const includes=(name,input)=>{const clean=v=>v.toLowerCase().replace(/\\b(street|road|boulevard|avenue|st|rd|blvd|ave)\\b/g,"").replace(/[^a-z0-9]/g,"");return clean(name||"").includes(clean(input))||clean(input).includes(clean(name||""));};
-  const waysA=ways.filter(w=>includes(w.tags?.name,a)),waysB=ways.filter(w=>includes(w.tags?.name,b));
+  const matches=(name,input)=>{const n=normalize(name||""),q=normalize(input);return n&&q&&(n.includes(q)||q.includes(n));};
+  const waysA=ways.filter(w=>matches(w.tags?.name,a)),waysB=ways.filter(w=>matches(w.tags?.name,b));
+  if(!waysA.length||!waysB.length)throw new Error("OpenStreetMap found "+(!waysA.length?"no mapped way for "+a: "no mapped way for "+b)+". Try a shorter road name or use Locate single road.");
   const byNodeA=new Map();waysA.forEach(w=>w.nodes.forEach(id=>{if(!byNodeA.has(id))byNodeA.set(id,[]);byNodeA.get(id).push(w)}));
   const candidates=[];
   waysB.forEach(w=>w.nodes.forEach(id=>{if(!byNodeA.has(id)||!nodes.has(id))return;const n=nodes.get(id);byNodeA.get(id).forEach(wa=>candidates.push({node:n,wayA:wa,wayB:w}));}));
   const unique=[...new Map(candidates.map(c=>[c.node.id,c])).values()];
-  if(!unique.length)throw new Error("OpenStreetMap did not find a shared road intersection for these names in the Melbourne area. Try the road names as they appear on street signs, or use Locate single road and place the marker manually.");
+  if(!unique.length)throw new Error("Both roads were found, but OpenStreetMap does not show them sharing a mapped node. The intersection may be mapped with a gap or a different road name. Use Locate single road to navigate and place the pin manually.");
   unique.sort((x,y)=>Math.hypot(x.node.lat-28.0836,(x.node.lon+80.6081)*Math.cos(28*Math.PI/180))-Math.hypot(y.node.lat-28.0836,(y.node.lon+80.6081)*Math.cos(28*Math.PI/180)));
   const chosen=unique[0],lat=chosen.node.lat,lng=chosen.node.lon;
   locatedIntersection={lat,lng,label:a+" / "+b,display:chosen.wayA.tags.name+" × "+chosen.wayB.tags.name};
   locatedPreview=L.marker([lat,lng],{draggable:true}).addTo(map).bindPopup("<b>OSM road intersection</b><br>"+esc(locatedIntersection.display)).openPopup();
   locatedPreview.on("dragend",()=>{const p=locatedPreview.getLatLng();locatedIntersection.lat=p.lat;locatedIntersection.lng=p.lng;});
   map.setView([lat,lng],18);$("saveLocatedIntersection").disabled=!selectedIntersection;
-  $("intersectionSearchMessage").textContent="Found "+unique.length+" shared intersection candidate(s). Suggested: "+locatedIntersection.display+". Check the pin carefully; drag it if needed, then place marker.";
- }catch(err){$("intersectionSearchMessage").textContent=err.message;locatedIntersection=null;$("saveLocatedIntersection").disabled=true;}
+  status.textContent="Found "+unique.length+" shared mapped intersection candidate(s): "+locatedIntersection.display+". Review the pin, adjust if needed, then save.";
+ }catch(err){status.textContent=err.message;locatedIntersection=null;$("saveLocatedIntersection").disabled=true;}
  finally{button.disabled=false;}
 });
 $("saveLocatedIntersection").addEventListener("click",async()=>{if(!selectedIntersection||!locatedIntersection){$("intersectionSearchMessage").textContent="Select a queued report and locate its intersection first.";return;}const {data,error}=await db.from("intersection_queue").select("*").eq("id",selectedIntersection).single();if(error||!data){$("intersectionSearchMessage").textContent="Could not load selected report.";return;}const {data:userData}=await db.auth.getUser();const label=data.road_a+" / "+data.road_b;const description="UNVERIFIED: "+data.condition+(data.direction?" · "+data.direction:"")+" · Source: "+(data.source_name||"reported source")+(data.reported_at?" · Reported: "+new Date(data.reported_at).toLocaleString():"");const p=locatedIntersection;const saved=await db.from("map_zones").insert({name:data.condition+" · "+label,description,zone_type:data.condition==="TRAFFIC SIGNAL OUT"?"information":"caution",color:data.condition==="ROAD FLOODED"?"#1677d2":"#d87917",geometry:{type:"Point",coordinates:[p.lng,p.lat]},active:true,created_by:userData.user?.id||null});if(saved.error){$("intersectionSearchMessage").textContent="Could not save marker: "+saved.error.message;return;}const updated=await db.from("intersection_queue").update({status:"placed",latitude:p.lat,longitude:p.lng,updated_at:new Date().toISOString()}).eq("id",data.id);if(updated.error){$("intersectionSearchMessage").textContent="Marker saved but queue update failed: "+updated.error.message;return;}if(locatedPreview)map.removeLayer(locatedPreview);locatedPreview=null;locatedIntersection=null;selectedIntersection=null;$("saveLocatedIntersection").disabled=true;$("intersectionSearchMessage").textContent="Placed "+label+" successfully. You can drag its marker later.";await loadIntersectionQueue();await loadAdminZones();});
