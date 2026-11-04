@@ -146,6 +146,32 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 #adminOriginalSections{display:none!important}
 @media(max-width:1050px){.map-workspace{grid-template-columns:1fr}#mapWorkspaceMain #map{height:62vh;min-height:420px}#mapWorkspaceSide{display:grid;grid-template-columns:1fr 1fr;gap:12px}#mapWorkspaceSide>*{min-width:0}}
 @media(max-width:700px){.admin-tabs{position:relative;top:auto;display:grid;grid-template-columns:1fr 1fr}.admin-tab{justify-content:center;padding:10px 7px;font-size:12px}.map-workspace{grid-template-columns:1fr}#mapWorkspaceSide{display:flex;flex-direction:column}#adminTabReports #reportsPanel,#adminTabClearance #clearanceReviewPanel,#adminTabFlags #flagsPanel{max-height:none;min-height:0}#mapWorkspaceMain #map{height:55vh;min-height:360px}}
+
+/* Refined admin workspace backdrop: quiet, consistent, and low-contrast */
+html{min-height:100%;background:#071722}
+body{
+ min-height:100vh;
+ background-color:#071722!important;
+ background-image:
+  radial-gradient(ellipse 900px 520px at 12% -8%,rgba(20,105,119,.22),transparent 72%),
+  radial-gradient(ellipse 760px 500px at 92% 8%,rgba(18,70,91,.18),transparent 70%),
+  linear-gradient(180deg,#091d29 0%,#071722 48%,#06141e 100%)!important;
+ background-attachment:fixed!important;
+ color:#eaf4f7;
+}
+body:before{
+ content:"";
+ position:fixed;
+ inset:0;
+ z-index:-1;
+ pointer-events:none;
+ opacity:.13;
+ background-image:radial-gradient(rgba(155,205,211,.22) .65px,transparent .65px);
+ background-size:26px 26px;
+ mask-image:linear-gradient(to bottom,black,transparent 78%);
+}
+.wrap{position:relative}
+.admin-tab-panel{background:transparent}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
