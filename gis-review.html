@@ -10,6 +10,12 @@
 </div>
 <div id="locatorStatus" style="color:var(--muted);margin-top:10px;font-size:12px">No search performed.</div>
 <div id="locatorResults" style="margin-top:8px"></div>
+</section><section class="panel" style="margin-bottom:14px;padding:14px">
+<div style="font-weight:800;margin-bottom:6px">Batch intersection correction</div>
+<div style="color:var(--muted);font-size:12px;margin-bottom:10px">Uses the same Brevard County centerline search and geometric intersection calculation as the locator above. It only proposes updates for intersection zones; road-wide closures and corridor closures are left unchanged. Review candidates before applying.</div>
+<div class="controls"><button id="batchFind">Calculate intersection positions for active zones</button><button id="batchApply" disabled>Apply verified positions</button></div>
+<div id="batchStatus" style="color:var(--muted);margin-top:9px;font-size:12px">No batch calculation performed.</div>
+<div id="batchResults" style="margin-top:8px"></div>
 </section><div class="grid"><section class="panel"><div class="head"><span>Map comparison</span><span id="status" style="color:var(--muted);font-size:12px">Loading…</span></div><div id="map"></div><div class="legend">Red = existing active incident geometry · Cyan = Brevard County centerlines · Aerial imagery is a visual cross-check, not proof of a closure.</div></section><aside class="panel"><div class="head"><span>Active incidents</span><span id="count">0</span></div><div id="zoneList"><div class="item">Loading…</div></div></aside></div></main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/esri-leaflet@3.0.15/dist/esri-leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script><script>
 const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO"),map=L.map("map",{preferCanvas:true}).setView([28.0836,-80.6081],11);
@@ -63,6 +69,65 @@ async function locateIntersection(){
  }catch(e){status.textContent="Locator error: "+e.message;}
  finally{btn.disabled=false;}
 }
+
+let batchProposals=[];
+function zoneCenter(z){const b=L.geoJSON(z.geometry).getBounds();return b.isValid()?b.getCenter():null;}
+function compactRoad(s){return cleanRoadName(s).replace(/\\b(US|U S)\\b/g,"").trim();}
+async function batchRoadSearch(label){
+ const key=compactRoad(label);if(key.length<3)throw new Error("Road name too short: "+label);
+ const q=new URLSearchParams({where:"UPPER(ADD_LBL) LIKE '%"+key.replace(/'/g,"''")+"%'",outFields:"OBJECTID,ADD_LBL,LSt_Name,LSt_Type,LSt_PreDir,LSt_PosDir",returnGeometry:"true",outSR:"4326",f:"geojson"});
+ const r=await fetch(countyQuery+"?"+q);if(!r.ok)throw new Error("County GIS HTTP "+r.status);
+ const d=await r.json();if(d.error)throw new Error(d.error.message);return (d.features||[]).filter(x=>x.geometry?.coordinates);
+}
+async function batchFind(){
+ const status=document.getElementById("batchStatus"),out=document.getElementById("batchResults"),find=document.getElementById("batchFind"),apply=document.getElementById("batchApply");
+ find.disabled=true;apply.disabled=true;batchProposals=[];out.innerHTML="";status.textContent="Calculating against official county centerlines…";
+ const skips=[],proposals=[];
+ try{
+  for(const z of records){
+   const label=(z.name||"").split("·").slice(1).join("·").trim();
+   if(!label.includes("/")||/I-95|US 192/i.test(label)){skips.push({name:z.name,why:"Ramp/highway or non-standard report; manual review"});continue;}
+   const parts=label.split("/").map(x=>x.trim());if(parts.length!==2){skips.push({name:z.name,why:"Not a two-road intersection"});continue;}
+   const center=zoneCenter(z);if(!center){skips.push({name:z.name,why:"No existing reference position"});continue;}
+   const [a,b]=await Promise.all(parts.map(batchRoadSearch));
+   if(!a.length||!b.length){skips.push({name:z.name,why:"Could not uniquely retrieve both named roads"});continue;}
+   const aa=a.filter(x=>compactRoad(featureLabel(x))===compactRoad(parts[0]));
+   const bb=b.filter(x=>compactRoad(featureLabel(x))===compactRoad(parts[1]));
+   if(!aa.length||!bb.length){skips.push({name:z.name,why:"County label did not exactly match both road names"});continue;}
+   let hits=[];
+   for(const x of aa)for(const y of bb){try{turf.lineIntersect(x,y).features.forEach(p=>hits.push(p));}catch(e){}}
+   const unique=[];for(const p of hits){const ll=L.latLng(p.geometry.coordinates[1],p.geometry.coordinates[0]);if(!unique.some(q=>ll.distanceTo(q.ll)<15))unique.push({p,ll});}
+   if(!unique.length){skips.push({name:z.name,why:"No geometric centerline intersection"});continue;}
+   unique.sort((x,y)=>x.ll.distanceTo(center)-y.ll.distanceTo(center));
+   const best=unique[0],distance=best.ll.distanceTo(center);
+   if(distance>1500){skips.push({name:z.name,why:"Nearest intersection is "+Math.round(distance)+" m from existing marker; ambiguous"});continue;}
+   const [lng,lat]=best.p.geometry.coordinates,delta=.00012;
+   const geometry={type:"Polygon",coordinates:[[[lng-delta,lat-delta],[lng+delta,lat-delta],[lng+delta,lat+delta],[lng-delta,lat+delta],[lng-delta,lat-delta]]]};
+   proposals.push({id:z.id,name:z.name,geometry,lat,lng,distance,roads:[featureLabel(aa[0]),featureLabel(bb[0])]});
+  }
+  batchProposals=proposals;
+  out.innerHTML=proposals.map((p,i)=>'<div class="item"><strong>'+esc(p.name)+'</strong><small>'+esc(p.roads.join(" × "))+'</small><small>Proposed: '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+' · '+Math.round(p.distance)+' m from current marker</small></div>').join("")+
+   skips.map(s=>'<div class="item"><strong>NOT MOVED · '+esc(s.name)+'</strong><small>'+esc(s.why)+'</small></div>').join("");
+  status.textContent=proposals.length+" intersection candidate(s) calculated; "+skips.length+" left unchanged for manual review. Review the proposed positions before applying.";
+  apply.disabled=!proposals.length;
+ }catch(e){status.textContent="Batch calculation failed: "+e.message;}
+ finally{find.disabled=false;}
+}
+async function batchApply(){
+ if(!batchProposals.length)return;
+ if(!confirm("Move "+batchProposals.length+" existing intersection zone marker(s) to the calculated Brevard County centerline intersections? Descriptions and statuses will remain unchanged."))return;
+ const status=document.getElementById("batchStatus"),apply=document.getElementById("batchApply");apply.disabled=true;
+ let done=0,failed=[];
+ for(const p of batchProposals){
+  const {error}=await db.from("map_zones").update({geometry:p.geometry,updated_at:new Date().toISOString()}).eq("id",p.id).eq("active",true);
+  if(error)failed.push(p.name+": "+error.message);else done++;
+ }
+ status.textContent=done+" zone geometry(ies) updated; "+failed.length+" failed. "+failed.join(" | ");
+ await load();locatorLayers.clearLayers();batchProposals=[];
+}
+document.getElementById("batchFind").addEventListener("click",batchFind);
+document.getElementById("batchApply").addEventListener("click",batchApply);
+
 document.getElementById("locate").addEventListener("click",locateIntersection);
 ["roadA","roadB"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")locateIntersection();}));
 load();
