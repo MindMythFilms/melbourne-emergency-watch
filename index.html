@@ -2044,11 +2044,13 @@ async function loadPublicZones(){
  mewPublicZonesLoading=(async()=>{
   const {data,error}=await db.from("map_zones").select("id,name,description,zone_type,color,geometry").eq("active",true).order("created_at",{ascending:false});
   if(error){console.warn("CoastWatch FL zones unavailable:",error.message);const list=$("publicZoneList");if(list&&!list.children.length)list.innerHTML='<span class="map-zone-empty">Zone information is temporarily unavailable.</span>';return false;}
-  const zones=(data||[]).filter(z=>z.geometry&&["Polygon","MultiPolygon"].includes(z.geometry.type));
+  const zones=(data||[]).filter(z=>z.geometry&&["Point","Polygon","MultiPolygon"].includes(z.geometry.type));
   const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
   zones.forEach(z=>{
-   const casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:.16,lineCap:"round",lineJoin:"round"}});
-   const bounds=casing.getBounds();
+   const isPoint=z.geometry.type==="Point";
+   let casing,bounds;
+   if(isPoint){const c=z.geometry.coordinates;if(!Array.isArray(c)||c.length<2)return;const ll=L.latLng(c[1],c[0]);casing=L.circleMarker(ll,{radius:9,color:"#ffffff",weight:3,fillColor:z.color||"#ef3340",fillOpacity:.98});bounds=L.latLngBounds([ll,ll]).pad(.002);}
+   else{casing=L.geoJSON(z.geometry,{style:{color:"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:.16,lineCap:"round",lineJoin:"round"}});bounds=casing.getBounds();}
    if(!bounds||!bounds.isValid())return;
    const rawDescription=String(z.description||"");
    const isUnverified=rawDescription.startsWith("UNVERIFIED:");
@@ -2061,7 +2063,7 @@ async function loadPublicZones(){
    const detailDescription=rawDescription.replace(/^UNVERIFIED:\s*/,"");
    const sourceLabel=/\bFHP\b|Florida Highway Patrol/i.test(rawDescription)?"Official FHP report · current conditions not independently verified":/City of Melbourne/i.test(rawDescription)?"Official City of Melbourne advisory · not independently verified by CoastWatch FL":/City of West Melbourne|West Melbourne Police/i.test(rawDescription)?"Official West Melbourne update · not independently verified by CoastWatch FL":/Brevard County/i.test(rawDescription)?"Official Brevard County update · not independently verified by CoastWatch FL":"Source-reported information · not independently verified by CoastWatch FL";
    const color=z.color||"#ef3340";
-   const outline=L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
+   const outline=isPoint?L.circleMarker(bounds.getCenter(),{radius:5,color,weight:2,fillColor:color,fillOpacity:.2}):L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label"><b>'+esc(situation)+'</b><small>'+(isUnverified?'UNVERIFIED':'STATUS')+'</small></span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
