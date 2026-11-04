@@ -2020,7 +2020,16 @@ async function loadNwsAlerts(){
    if(feature.geometry){
     L.geoJSON(feature,{interactive:false,style:()=>({color,weight:3,opacity:1,fillColor:color,fillOpacity:.15,dashArray:"6 4"}),pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{interactive:true,radius:13.3,color:"#fff",weight:2,fillColor:color,fillOpacity:1}),onEachFeature:(f,layer)=>{if(["Point","MultiPoint"].includes(f.geometry?.type)){layer.options.interactive=true;layer.bindPopup(popup);}}}).addTo(nwsAlertLayer);
    }else{
-    L.circleMarker(nwsCountyCenter,{interactive:true,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
+    const eventName=String(p.event||"").toLowerCase();
+    if(eventName.includes("rip current")){
+     const coast=[[28.78,-80.43],[28.62,-80.48],[28.46,-80.51],[28.28,-80.49],[28.10,-80.47],[27.92,-80.45],[27.82,-80.43]];
+     L.polyline(coast,{interactive:true,color,weight:7,opacity:.9,dashArray:"8 7"}).bindPopup(popup).addTo(nwsAlertLayer);
+    }else if(eventName.includes("flood")&&String(p.headline||"").toLowerCase().includes("st. johns river")){
+     const river=[[28.54,-80.99],[28.55,-80.90],[28.35,-80.80],[28.05,-80.72]];
+     L.polyline(river,{interactive:true,color,weight:7,opacity:.9,dashArray:"8 6"}).bindPopup(popup).addTo(nwsAlertLayer);
+    }else{
+     L.circleMarker(nwsCountyCenter,{interactive:true,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
+    }
    }
   });
   renderNwsAlertList(features);
