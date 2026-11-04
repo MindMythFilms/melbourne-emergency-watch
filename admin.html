@@ -261,7 +261,7 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
   const bbox="27.90,-80.80,28.25,-80.45";
   const ra=regexFor(a),rb=regexFor(b);
   if(!ra||!rb)throw new Error("Enter recognizable road names.");
-  const query='[out:json][timeout:20];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+'););out geom;';
+  const query='[out:json][timeout:20];(way["highway"]["name"~"'+ra+'",i]('+bbox+');way["highway"]["ref"~"'+ra+'",i]('+bbox+');way["highway"]["name"~"'+rb+'",i]('+bbox+');way["highway"]["ref"~"'+rb+'",i]('+bbox+'););out geom;';
   const endpoints=["https://overpass.kumi.systems/api/interpreter","https://overpass-api.de/api/interpreter"];
   let payload=null,lastError=null;
   for(const endpoint of endpoints){
@@ -272,8 +272,8 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
   if(!payload)throw new Error(lastError?.name==="AbortError"?"The map search timed out. Please try again.":lastError?.message||"OpenStreetMap is temporarily unavailable.");
   const ways=payload.elements.filter(x=>x.type==="way"&&Array.isArray(x.geometry)&&x.geometry.length>1);
   const matches=(name,input)=>{const n=norm(name||""),q=norm(input);return n&&q&&(n.includes(q)||q.includes(n));};
-  const waysA=ways.filter(w=>matches(w.tags?.name,a)),waysB=ways.filter(w=>matches(w.tags?.name,b));
-  if(!waysA.length||!waysB.length)throw new Error("Could not match "+(!waysA.length?a:b)+" to a mapped road. Try removing the directional suffix (NE/NW/SE/SW).");
+  const waysA=ways.filter(w=>matches(w.tags?.name,a)||matches(w.tags?.ref,a)),waysB=ways.filter(w=>matches(w.tags?.name,b)||matches(w.tags?.ref,b));
+  if(!waysA.length||!waysB.length)throw new Error("Could not match "+(!waysA.length?a:b)+" against the road names or route numbers on the map. Try the label exactly as it appears on the map.");
   const intersections=[];
   const add=(lat,lon,wa,wb)=>{if(!Number.isFinite(lat)||!Number.isFinite(lon))return;if(!intersections.some(p=>Math.abs(p.lat-lat)<0.000002&&Math.abs(p.lon-lon)<0.000002))intersections.push({lat,lon,wayA:wa,wayB:wb});};
   // First use shared OSM vertices when the road ways are explicitly connected.
