@@ -1559,8 +1559,7 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 </section>
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
 <section class="panel" id="map-panel">
- <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary active" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div>
- <div class="map-stage"><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ <div class="map-stage"><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary active" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
  <div class="panelhead map-workspace-head">
   <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
   <div class="map-live-state"><i></i> Live updates</div>
@@ -2277,3 +2276,24 @@ setInterval(checkForSiteUpdates,180000);
 
 
 </script></body></html>
+
+/* Map style and shelter controls float over the map canvas on every screen size. */
+#map-panel>.map-stage{position:relative!important}
+#map-panel>.map-stage>#mapBasemapCard{
+ position:absolute!important;top:12px!important;left:12px!important;right:12px!important;
+ z-index:850!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;
+ flex-wrap:wrap!important;gap:8px 12px!important;width:auto!important;margin:0!important;
+ padding:9px 11px!important;border:1px solid #8aa8b8aa!important;border-radius:11px!important;
+ background:rgba(5,25,40,.88)!important;box-shadow:0 3px 14px #00152266!important;
+ backdrop-filter:blur(7px)!important;box-sizing:border-box!important
+}
+#map-panel>.map-stage>#mapBasemapCard>strong{color:#f2fbff!important;font-size:12px!important;white-space:nowrap!important}
+#map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons{display:flex!important;flex:1 1 auto!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:7px!important}
+#map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:120px!important;min-height:36px!important;padding:6px 11px!important;font-size:12px!important}
+#map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons button#shelterToggleBtn{min-width:135px!important}
+@media(max-width:650px){
+ #map-panel>.map-stage>#mapBasemapCard{top:8px!important;left:8px!important;right:8px!important;gap:6px!important;padding:7px!important}
+ #map-panel>.map-stage>#mapBasemapCard>strong{display:none!important}
+ #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons{gap:5px!important}
+ #map-panel>.map-stage>#mapBasemapCard .map-basemap-buttons button{flex:1 1 0!important;min-width:0!important;min-height:34px!important;padding:5px 7px!important;font-size:11px!important}
+}
