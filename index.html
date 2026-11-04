@@ -1885,7 +1885,25 @@ mewPlaceReportPanel();mewPlaceHero();if(mewMobileLayout.addEventListener)mewMobi
 const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(mobileLegendButton&&mobileLegend){mobileLegend.classList.add("mobile-collapsed");mobileLegendButton.addEventListener("click",()=>{const expanded=mobileLegendButton.getAttribute("aria-expanded")==="true";mobileLegend.classList.toggle("mobile-collapsed",expanded);mobileLegendButton.setAttribute("aria-expanded",String(!expanded));mobileLegendButton.textContent=expanded?"＋ Map legend":"－ Hide map legend";});}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
-let map=L.map("map").setView([28.0836,-80.6081],11),markers=[];
+let map=L.map("map",{scrollWheelZoom:false,dragging:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false}).setView([28.0836,-80.6081],11),markers=[];
+/* Keep the map passive while visitors scroll the page. Unlock map gestures only after deliberate interaction. */
+let mewMapUnlocked=false;
+function mewUnlockMap(){
+ if(mewMapUnlocked)return;
+ mewMapUnlocked=true;
+ map.dragging.enable();
+ map.touchZoom.enable();
+ map.doubleClickZoom.enable();
+ map.boxZoom.enable();
+ map.keyboard.enable();
+ map.scrollWheelZoom.enable();
+ const hint=document.getElementById("mapInteractionHint");
+ if(hint)hint.remove();
+}
+const mewMapContainer=map.getContainer();
+mewMapContainer.addEventListener("pointerdown",mewUnlockMap,{capture:true,once:true});
+mewMapContainer.addEventListener("touchstart",mewUnlockMap,{capture:true,once:true,passive:true});
+mewMapContainer.addEventListener("focusin",mewUnlockMap,{once:true});
 requestAnimationFrame(()=>requestAnimationFrame(()=>map.invalidateSize({pan:false})));
 const mewMapStage=document.querySelector(".map-stage");
 map.on("popupopen",()=>mewMapStage?.classList.add("mew-popup-visible"));
