@@ -2044,8 +2044,8 @@ function mewRefreshZoneLabelVisibility(){
   const point=map.latLngToContainerPoint(entry.bounds.getCenter());
   const collision=shown.some(p=>Math.hypot(p.x-point.x,p.y-point.y)<spacing);
   const visible=zoom>=minZoom&&!collision;
-  if(visible){shown.push(point);if(!mewPublicZoneLayer.hasLayer(entry.labelMarker))entry.labelMarker.addTo(mewPublicZoneLayer);}
-  else if(mewPublicZoneLayer.hasLayer(entry.labelMarker))mewPublicZoneLayer.removeLayer(entry.labelMarker);
+  if(visible){shown.push(point);if(!entry.group.hasLayer(entry.labelMarker))entry.group.addLayer(entry.labelMarker);}
+  else if(entry.group.hasLayer(entry.labelMarker))entry.group.removeLayer(entry.labelMarker);
  });
 }
 map.on("zoomend moveend",mewRefreshZoneLabelVisibility);
