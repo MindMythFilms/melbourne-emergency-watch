@@ -211,7 +211,7 @@ async function loadIntersectionQueue(){
 }
 document.getElementById("intersectionQueue").addEventListener("click",e=>{const b=e.target.closest("[data-place-intersection]");if(!b)return;const id=b.dataset.placeIntersection;selectedIntersection=id;if(placementPreview){map.removeLayer(placementPreview);placementPreview=null;}document.querySelectorAll("[data-place-intersection]").forEach(x=>{x.disabled=false;x.textContent="Place on map";x.classList.remove("green")});b.textContent="Selected — locate below";b.classList.add("green");db.from("intersection_queue").select("road_a,road_b").eq("id",id).single().then(({data,error})=>{if(error){intersectionMsg("Could not load road names: "+error.message,"error");return;}$("roadSearchA").value=data.road_a;$("roadSearchB").value=data.road_b;$("saveLocatedIntersection").disabled=true;$("intersectionSearchMessage").textContent="Road names loaded. Press Locate intersection to center the map automatically.";});$("adminMapPanel").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>map.invalidateSize({pan:false}),350);});
 let locatedIntersection=null;let locatedPreview=null;
-let singleRoadLayer=null;
+let singleRoadLayer=null;let intersectionRoadLayer=null;
 $("locateSingleRoadBtn").addEventListener("click",async()=>{
  const road=$("roadSearchA").value.trim()||$("roadSearchB").value.trim();
  if(!road){$("intersectionSearchMessage").textContent="Enter a road name in either road field.";return;}
@@ -299,18 +299,38 @@ $("locateIntersectionBtn").addEventListener("click",async()=>{
   $("intersectionSearchMessage").textContent="Found "+a+". Now searching for "+b+"…";
   await new Promise(resolve=>setTimeout(resolve,1100));
   const roadB=await searchRoadGeometry(b);
+  const styleA={color:"#e67e22",weight:7,opacity:.9,lineCap:"round",lineJoin:"round"};
+  const styleB={color:"#168bd2",weight:7,opacity:.9,lineCap:"round",lineJoin:"round"};
+  const layerA=L.geoJSON(roadA.geometry,{style:styleA});
+  const layerB=L.geoJSON(roadB.geometry,{style:styleB});
+  intersectionRoadLayer=L.featureGroup([layerA,layerB]).addTo(map);
+  const roadBounds=intersectionRoadLayer.getBounds();
+  if(roadBounds.isValid())map.fitBounds(roadBounds.pad(.12),{maxZoom:17});
   const crossings=findRoadCrossings(roadA.geometry,roadB.geometry);
-  if(!crossings.length)throw new Error("Both roads were found, but their mapped lines do not cross. No marker was placed. Check the road names or map coverage.");
-  const center=map.getCenter();
-  const ranked=crossings.map(p=>({p,d:Math.hypot((p[0]-center.lng)*Math.cos(center.lat*Math.PI/180),p[1]-center.lat)})).sort((x,y)=>x.d-y.d);
-  // Prefer the crossing nearest the current map view when roads cross more than once.
-  const p=ranked[0].p;
-  locatedIntersection={lat:p[1],lng:p[0],label:a+" / "+b,display:a+" × "+b};
-  map.setView([p[1],p[0]],17);
-  locatedPreview=L.marker([p[1],p[0]],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" × "+b)).openPopup();
-  locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
-  $("saveLocatedIntersection").disabled=!selectedIntersection;
-  $("intersectionSearchMessage").textContent="Intersection located from OpenStreetMap road geometry. Review the draggable pin, then press Place marker here to save. "+crossings.length+" mapped crossing"+(crossings.length===1?"":"s")+" found.";
+  if(crossings.length){
+   const center=map.getCenter();
+   const ranked=crossings.map(p=>({p,d:Math.hypot((p[0]-center.lng)*Math.cos(center.lat*Math.PI/180),p[1]-center.lat)})).sort((x,y)=>x.d-y.d);
+   const p=ranked[0].p;
+   locatedIntersection={lat:p[1],lng:p[0],label:a+" / "+b,display:a+" × "+b};
+   map.setView([p[1],p[0]],17);
+   locatedPreview=L.marker([p[1],p[0]],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" × "+b)).openPopup();
+   locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
+   $("saveLocatedIntersection").disabled=!selectedIntersection;
+   $("intersectionSearchMessage").textContent="Both roads are shown: "+a+" (orange) and "+b+" (blue). A mapped crossing was found. Review the draggable pin, then press Place marker here to save.";
+  }else{
+   $("intersectionSearchMessage").textContent="Both roads are shown: "+a+" (orange) and "+b+" (blue). Their mapped lines do not meet in the data, but you can zoom in and click the actual crossing. A draggable preview pin will appear; nothing is saved until you press Place marker here.";
+   map.getContainer().style.cursor="crosshair";
+   map.once("click",event=>{
+    map.getContainer().style.cursor="";
+    const point=event.latlng;
+    locatedIntersection={lat:point.lat,lng:point.lng,label:a+" / "+b,display:a+" × "+b};
+    if(locatedPreview)map.removeLayer(locatedPreview);
+    locatedPreview=L.marker([point.lat,point.lng],{draggable:true}).addTo(map).bindPopup("<b>Proposed intersection marker</b><br>"+esc(a+" × "+b)).openPopup();
+    locatedPreview.on("dragend",()=>{const ll=locatedPreview.getLatLng();locatedIntersection.lat=ll.lat;locatedIntersection.lng=ll.lng;});
+    $("saveLocatedIntersection").disabled=!selectedIntersection;
+    $("intersectionSearchMessage").textContent="Manual crossing position selected. Drag the pin if needed, then press Place marker here.";
+   });
+  }
  }catch(err){$("intersectionSearchMessage").textContent=err.message||"Intersection search failed. No marker was saved.";}
  finally{button.disabled=false;}
 });
