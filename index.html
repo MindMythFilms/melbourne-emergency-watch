@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-mobile-horizontal-overflow-fix-v4"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-boil-water-popup-every-visit-v5"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -2650,35 +2650,16 @@ setInterval(checkForSiteUpdates,180000);
 </style>
 
 <script>
-/* Show the advisory once per browser for this specific notice; keep the map accessible after dismissal. */
+/* Show the active boil-water notice on every site visit; dismissal lasts only until navigation/reload. */
 (function(){
- const key='coastwatch-boil-water-west-melbourne-2026-11-04-dismissed';
  const overlay=document.getElementById('mewWaterOverlay');
  if(!overlay)return;
- let dismissed=false;
- try{dismissed=localStorage.getItem(key)==='1'}catch(e){}
- if(dismissed)return;
  let previousFocus=document.activeElement;
  overlay.hidden=false;
  const close=()=>{
   overlay.hidden=true;
-  try{localStorage.setItem(key,'1')}catch(e){}
   if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
- };
- document.getElementById('mewWaterClose').addEventListener('click',close);
- document.getElementById('mewWaterDismiss').addEventListener('click',close);
- overlay.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){e.preventDefault();close();return}
-  if(e.key==='Tab'){
-   const controls=[...overlay.querySelectorAll('a[href],button:not([disabled])')];
-   if(!controls.length)return;
-   const first=controls[0],last=controls[controls.length-1];
-   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
-   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
-  }
- });
- document.getElementById('mewWaterClose').focus();
-})();
+ };;
 </script>
 </body></html>
 
