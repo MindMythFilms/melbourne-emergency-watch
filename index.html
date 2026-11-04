@@ -1487,6 +1487,13 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
  #map-panel .map-stage #mapZonesCard{transform:translateY(-26px)!important}
 }
 
+/* Desktop and laptop: keep the same map-layer controls visible as on mobile. */
+@media(min-width:651px){
+ #map-panel>#mapBasemapCard{display:flex!important;visibility:visible!important;min-height:58px!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:12px 18px!important;padding:12px 16px!important}
+ #map-panel>#mapBasemapCard .map-basemap-buttons{display:flex!important;visibility:visible!important;flex:1 1 auto!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:9px!important}
+ #map-panel>#mapBasemapCard .map-basemap-buttons button{display:inline-flex!important;visibility:visible!important;align-items:center!important;justify-content:center!important;min-width:132px!important}
+ #map-panel>#mapBasemapCard .map-basemap-buttons button#shelterToggleBtn{display:inline-flex!important;min-width:150px!important}
+}
 /* Map style selector sits in its own compact toolbar immediately above the map. */
 #map-panel>#mapBasemapCard{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;width:100%!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #1b536a!important;border-radius:0!important;background:#09263a!important;box-shadow:none!important}
 #map-panel>#mapBasemapCard>strong{display:block;margin:0!important;color:#d9edf4!important;font-size:13px!important;white-space:nowrap}
