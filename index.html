@@ -1489,6 +1489,10 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 #map-panel>#mapBasemapCard .map-basemap-buttons button{min-height:38px!important;min-width:120px!important;padding:7px 13px!important;font-size:12px!important;border:1px solid #47677a!important;border-radius:9px!important;background:#18384d!important;color:#e8f4f8!important;box-shadow:none!important}
 #map-panel>#mapBasemapCard .map-basemap-buttons button.active{background:#087d83!important;border-color:#6de6dc!important;color:#fff!important}
 @media(max-width:650px){#map-panel>#mapBasemapCard{padding:9px 11px!important;gap:9px!important}#map-panel>#mapBasemapCard>strong{font-size:12px!important}#map-panel>#mapBasemapCard .map-basemap-buttons{gap:6px!important}#map-panel>#mapBasemapCard .map-basemap-buttons button{min-width:0!important;flex:1!important;min-height:36px!important;padding:6px 7px!important;font-size:11px!important}}
+
+#map-panel>#mapBasemapCard .map-basemap-buttons button#shelterToggleBtn{border-color:#247f79;background:#0d625f;color:#fff}
+#map-panel>#mapBasemapCard .map-basemap-buttons button#shelterToggleBtn[aria-pressed="false"]{background:#26394a;border-color:#536a7c;color:#d5e0e8}
+@media(max-width:650px){#map-panel>#mapBasemapCard .map-basemap-buttons button#shelterToggleBtn{flex-basis:100%}}
 </style></head>
 <body>
 <header class="site-header">
@@ -1525,7 +1529,7 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 </section>
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
 <section class="panel" id="map-panel">
- <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button></div></div>
+ <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary active" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div>
  <div class="map-stage"><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
  <div class="panelhead map-workspace-head">
   <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
@@ -1656,9 +1660,13 @@ let powerOutageNextAllowedAt=0,powerOutageLastSuccessAt=null;
 let nwsAlertFetchInProgress=false;
 const nwsCountyCenter=[28.2639,-80.7214]; // approximate center of Brevard County; used only when NWS supplies no geometry.
 let sourceMode="both";
+let sheltersVisible=true;
+const shelterToggleButton=$("shelterToggleBtn");
+function syncShelterToggle(){if(!shelterToggleButton)return;shelterToggleButton.textContent="Shelters: "+(sheltersVisible?"On":"Off");shelterToggleButton.setAttribute("aria-pressed",String(sheltersVisible));}
+if(shelterToggleButton)shelterToggleButton.addEventListener("click",()=>{sheltersVisible=!sheltersVisible;syncShelterToggle();applySourceFilter();});
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=mode==="both"||mode==="shelters";
+ const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=sheltersVisible&&(mode==="both"||mode==="shelters");
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
@@ -2103,6 +2111,7 @@ document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-phot
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
 loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
+syncShelterToggle();
 applySourceFilter();
 // Check for newly deployed public-page updates every 3 minutes.
 // Do not reload while a visitor is entering a report or has unsaved form data.
