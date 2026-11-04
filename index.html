@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-west-melbourne-boil-water-popup-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-west-melbourne-boil-water-popup-mobile-fix-v3"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -1633,7 +1633,29 @@ body.dark .mew-water-advisory a{color:#83e4e8}
 .mew-water-dismiss:hover{background:#552e10}
 .mew-water-close:focus-visible,.mew-water-dismiss:focus-visible{outline:3px solid #138caa;outline-offset:3px}
 body.dark .mew-water-close{background:#48341d;color:#ffe1aa;border-color:#a97939}
-@media(max-width:650px){.mew-water-overlay{padding:12px}.mew-water-overlay .mew-water-advisory{max-height:calc(100dvh - 24px);padding:18px 14px}.mew-water-overlay .mew-water-advisory-head{padding-right:35px}.mew-water-close{top:8px;right:8px;width:34px;height:34px}}
+@media(max-width:650px){
+ .mew-water-overlay{
+  align-items:flex-start!important;justify-content:center!important;
+  padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+ }
+ .mew-water-overlay .mew-water-advisory{
+  width:100%!important;max-width:560px!important;
+  max-height:calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px)!important;
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px)!important;
+  margin:0 auto!important;padding:18px 14px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+ }
+ .mew-water-overlay .mew-water-advisory-head{padding-right:38px;align-items:flex-start}
+ .mew-water-overlay .mew-water-advisory-status{margin-left:auto}
+ .mew-water-close{top:8px;right:8px;width:34px;height:34px;z-index:2}
+ .mew-water-boil-step strong{overflow-wrap:anywhere}
+ .mew-water-advisory-meta{display:grid;grid-template-columns:1fr;gap:7px}
+ .mew-water-dismiss{position:sticky;bottom:0;z-index:1;box-shadow:0 -8px 15px #fff9}
+ body.dark .mew-water-dismiss{box-shadow:0 -8px 15px #252b31}
+}
 </style></head>
 <body>
 <header class="site-header">
