@@ -2153,7 +2153,7 @@ document.addEventListener("click",async e=>{
    alert("The community reached the safe-now threshold. This zone has been hidden from the public map, but remains in the admin zone list. This is community feedback, not official clearance.");
   }else{
    button.textContent="Vote recorded";
-   buttons.forEach(b=>{if(b!==button)b.disabled=false;});
+   buttons.forEach(b=>b.disabled=false);
   }
  }catch(error){
   console.warn("Map-zone feedback failed:",error);
