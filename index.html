@@ -1832,15 +1832,26 @@ async function loadShelters(){
    const pet=String(p.pet_accommodations_desc||"").trim();
    const accessible=String(p.wheelchair_accessible||p.ada_compliant||"").toUpperCase();
    const phone=String(p.org_poc_phone||p.org_main_phone||"").trim();
-   const icon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:#64748b;box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">⌂</span>',iconSize:[42,42],iconAnchor:[21,21]});
+   const icon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+color+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">⌂</span>',iconSize:[42,42],iconAnchor:[21,21]});
    const popupHtml='<div style="min-width:220px"><strong>🏠 '+name+'</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+color+';color:#fff;font-weight:800">'+esc(labels[status])+'</div><div>'+address+'</div>'+(accessible?'<div><b>Wheelchair / ADA:</b> '+esc(accessible)+'</div>':'')+(pet?'<div><b>Pet information:</b> '+esc(pet)+'</div>':'')+(phone?'<div><b>Phone:</b> '+esc(phone)+'</div>':'')+'<small style="display:block;margin-top:8px">Source: FEMA National Shelter System. Status and capacity can change. A listed location is not a direction to evacuate. Confirm opening with Brevard County before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Check official Brevard shelter announcements</a></p></div>';
    const marker=L.marker([lat,lng],{icon,pane:"mewShelterPane",title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300});
    items.push({latlng:L.latLng(lat,lng),layer:marker});
   });
+  // Brevard EOC confirmed activation: South Mainland Community Center, Micco.
+  // Manual official-announcement entry supplements FEMA's slower general inventory.
+  const southMainlandLat=27.858477,southMainlandLng=-80.501050;
+  const southMainlandName="South Mainland Community Center";
+  if(!items.some(item=>item.latlng.distanceTo(L.latLng(southMainlandLat,southMainlandLng))<120)){
+   const activeColor="#16834a";
+   const activeIcon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+activeColor+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">🏠</span>',iconSize:[46,46],iconAnchor:[23,23]});
+   const activePopup='<div style="min-width:220px"><strong>🏠 '+southMainlandName+'</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+activeColor+';color:#fff;font-weight:800">OPEN · BREVAR​D EOC ANNOUNCEMENT</div><div>3700 Allen Ave, Micco, FL 32976</div><div><b>Phone:</b> (772) 663-8748</div><small style="display:block;margin-top:8px">Source: Brevard County Emergency Management announcement, Nov. 4, 2026. CoastWatch listing manually added from the official announcement. Confirm current availability and instructions with Brevard County before traveling.</small><p><a href="https://www.facebook.com/BrevardEOC/posts/11426-1030-am-brevard-county-has-opened-a-shelter-for-those-impacted-by-recent-f/1442458614728922/" target="_blank" rel="noopener noreferrer">View Brevard EOC announcement</a></p><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
+   const activeMarker=L.marker([southMainlandLat,southMainlandLng],{icon:activeIcon,pane:"mewShelterPane",title:southMainlandName+" — OPEN"}).bindPopup(activePopup,{maxWidth:300});
+   items.push({latlng:L.latLng(southMainlandLat,southMainlandLng),layer:activeMarker});
+  }
   mewShelterItems=items;
   mewRefreshShelterClusters();
   if(count)count.textContent=items.length?items.length+" shelter locations":"No FEMA shelter records returned for Brevard County";
-  if(updated)updated.textContent="FEMA data · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
+  if(updated)updated.textContent="FEMA + Brevard EOC · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
  }catch(error){
   console.warn("CoastWatch shelter locations unavailable:",error);
   if(count)count.textContent="Shelter data unavailable";
