@@ -1691,7 +1691,8 @@ body.dark .mew-recovery-card a{color:#70e3d7}
 body.dark .mew-utility-card{background:#302713;border-color:#745b29}
 body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 @media(max-width:900px){.mew-recovery-updates{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.mew-recovery-updates{grid-template-columns:1fr;gap:9px;margin-bottom:14px}.mew-recovery-card{padding:14px 15px}.mew-recovery-card h2{font-size:15px}}
+.mew-recovery-details>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:5px}.mew-recovery-details>summary::-webkit-details-marker{display:none}.mew-recovery-details>summary strong{font:800 16px/1.25 Manrope,sans-serif;color:#15354a}.mew-recovery-expand{display:none}.mew-recovery-body{display:block}body.dark .mew-recovery-details>summary strong{color:#edf7fb}
+@media(max-width:600px){.mew-recovery-updates{grid-template-columns:1fr;gap:7px;margin-bottom:14px}.mew-recovery-card{padding:11px 13px}.mew-recovery-details>summary{position:relative;padding-right:72px;gap:3px}.mew-recovery-details>summary strong{font-size:13px}.mew-recovery-kicker{font-size:9px;letter-spacing:.08em}.mew-recovery-expand{display:block;position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;color:#087f83}.mew-recovery-details[open] .mew-recovery-expand{font-size:0}.mew-recovery-details[open] .mew-recovery-expand:after{content:'Close −';font-size:11px}.mew-recovery-body{display:none}.mew-recovery-details[open] .mew-recovery-body{display:block}.mew-recovery-card p{font-size:12px;line-height:1.45}body.dark .mew-recovery-expand{color:#70e3d7}}
 </style>
 </head>
 <body>
@@ -1731,24 +1732,33 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 <section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
 <section class="mew-recovery-updates" aria-label="Additional recovery advisories">
  <article class="mew-recovery-card mew-utility-card">
-  <div class="mew-recovery-kicker">UTILITY PRECAUTION · NOV. 4</div>
-  <h2>SEWER LIFT-STATION CONCERNS</h2>
-  <p>The Town of Indialantic reports that Brevard County is experiencing problems with sewer lift stations and possible failures following heavy rain. No specific failed station or confirmed failure location was identified in the notice.</p>
-  <p><strong>Conserve water. Avoid laundry and running dishwashers.</strong> This is a regional precautionary advisory, not a confirmed outage at a particular facility.</p>
-  <a href="https://nextdoor.com/agency-post/fl/indialantic/town-of-indialantic/the-city-of-melbourne-has-issued-a-boil-water-notice-522900344/" target="_blank" rel="noopener noreferrer">Town of Indialantic agency notice ↗</a>
+  <details class="mew-recovery-details">
+   <summary><span class="mew-recovery-kicker">UTILITY PRECAUTION · NOV. 4</span><strong>SEWER LIFT-STATION CONCERNS</strong><span class="mew-recovery-expand">Details +</span></summary>
+   <div class="mew-recovery-body">
+    <p>The Town of Indialantic reports that Brevard County is experiencing problems with sewer lift stations and possible failures following heavy rain. No specific failed station or confirmed failure location was identified in the notice.</p>
+    <p><strong>Conserve water. Avoid laundry and running dishwashers.</strong> This is a regional precautionary advisory, not a confirmed outage at a particular facility.</p>
+    <a href="https://nextdoor.com/agency-post/fl/indialantic/town-of-indialantic/the-city-of-melbourne-has-issued-a-boil-water-notice-522900344/" target="_blank" rel="noopener noreferrer">Town of Indialantic agency notice ↗</a>
+   </div>
+  </details>
  </article>
  <article class="mew-recovery-card">
-  <div class="mew-recovery-kicker">SCHOOL OPERATIONS · NOV. 4</div>
-  <h2>BREVARD PUBLIC SCHOOLS CLOSED</h2>
-  <p>All Brevard Public Schools campuses and district offices are closed Wednesday, November 4. The district cited water-service disruptions, flooded or closed roads, campus damage and staffing challenges. A Thursday schedule update was expected.</p>
-  <a href="https://roosevelt.brevardschools.org/o/bps/page/breaking-news" target="_blank" rel="noopener noreferrer">District breaking-news updates ↗</a>
+  <details class="mew-recovery-details">
+   <summary><span class="mew-recovery-kicker">SCHOOL OPERATIONS · NOV. 4</span><strong>BREVARD PUBLIC SCHOOLS CLOSED</strong><span class="mew-recovery-expand">Details +</span></summary>
+   <div class="mew-recovery-body">
+    <p>All Brevard Public Schools campuses and district offices are closed Wednesday, November 4. The district cited water-service disruptions, flooded or closed roads, campus damage and staffing challenges. A Thursday schedule update was expected.</p>
+    <a href="https://roosevelt.brevardschools.org/o/bps/page/breaking-news" target="_blank" rel="noopener noreferrer">District breaking-news updates ↗</a>
+   </div>
+  </details>
  </article>
  <article class="mew-recovery-card">
-  <div class="mew-recovery-kicker">CITY FACILITY CLOSURES · NOV. 3 UPDATE</div>
-  <h2>MELBOURNE RECREATION FACILITIES</h2>
-  <p><strong>Closed:</strong> City ballfields, golf courses, Crane / Pieloch Dog Park, and the boat ramps at Front Street Park and Ballard Park due to high water.</p>
-  <p>These notices do not mean every park or recreation facility is closed. Pickleball and tennis courts were listed open, but water was unavailable due to the boil-water notice. Confirm before traveling.</p>
-  <a href="https://www.melbourneflorida.org/Government/City-News" target="_blank" rel="noopener noreferrer">City of Melbourne updates ↗</a>
+  <details class="mew-recovery-details">
+   <summary><span class="mew-recovery-kicker">CITY FACILITY CLOSURES · NOV. 3 UPDATE</span><strong>MELBOURNE RECREATION FACILITIES</strong><span class="mew-recovery-expand">Details +</span></summary>
+   <div class="mew-recovery-body">
+    <p><strong>Closed:</strong> City ballfields, golf courses, Crane / Pieloch Dog Park, and the boat ramps at Front Street Park and Ballard Park due to high water.</p>
+    <p>These notices do not mean every park or recreation facility is closed. Pickleball and tennis courts were listed open, but water was unavailable due to the boil-water notice. Confirm before traveling.</p>
+    <a href="https://www.melbourneflorida.org/Government/City-News" target="_blank" rel="noopener noreferrer">City of Melbourne updates ↗</a>
+   </div>
+  </details>
  </article>
 </section>
 <section class="hero hero-visual">
