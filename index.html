@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-road-status-reconciliation-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-south-mainland-official-map-pin-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1864,8 +1864,9 @@ async function loadShelters(){
    items.push({latlng:L.latLng(lat,lng),layer:marker});
   });
   // Brevard EOC confirmed activation: South Mainland Community Center, Micco.
+  // Official Brevard County park-directory location link resolves to this Google Maps pin.
   // Manual official-announcement entry supplements FEMA's slower general inventory.
-  const southMainlandLat=27.858477,southMainlandLng=-80.501050;
+  const southMainlandLat=27.8589916,southMainlandLng=-80.5012966;
   const southMainlandName="South Mainland Community Center";
   if(!items.some(item=>item.latlng.distanceTo(L.latLng(southMainlandLat,southMainlandLng))<120)){
    const activeColor="#16834a";
@@ -1881,12 +1882,12 @@ async function loadShelters(){
  }catch(error){
   console.warn("CoastWatch shelter locations unavailable:",error);
   // Keep the Brevard EOC-confirmed active shelter visible even if FEMA's feed fails.
-  if(!mewShelterItems.some(item=>item.latlng.distanceTo(L.latLng(27.858477,-80.501050))<120)){
+  if(!mewShelterItems.some(item=>item.latlng.distanceTo(L.latLng(27.8589916,-80.5012966))<120)){
    const activeColor="#16834a";
    const activeIcon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+activeColor+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">🏠</span>',iconSize:[46,46],iconAnchor:[23,23]});
    const activePopup='<div style="min-width:220px"><strong>🏠 South Mainland Community Center</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+activeColor+';color:#fff;font-weight:800">FLOOD SHELTER · ANNOUNCED OPEN 10:30 AM</div><div>3700 Allen Ave, Micco, FL 32976</div><div><b>Facility phone:</b> <a href="tel:+17726638748">(772) 663-8748</a></div><div><b>Emergency information:</b> <a href="tel:211">211</a></div><div style="margin-top:7px"><b>Pet-friendly</b> · Available for special-needs and general populations</div><div>Food will be provided. Bring bedding, medications, clothing, sturdy shoes, hygiene items, and personal supplies.</div><small style="display:block;margin-top:8px">Source: Brevard County Emergency Management, Nov. 4, 2026, 10:30 AM. This records the county announcement, not a live occupancy check. Shelter status and capacity can change; confirm current operation and instructions before traveling.</small><p><a href="https://www.brevardfl.gov/eahome" target="_blank" rel="noopener noreferrer">View official Brevard EOC announcement</a></p><p><a href="https://www.brevardfl.gov/ParksAndRecreation/ParkDirectory/SouthMainland" target="_blank" rel="noopener noreferrer">Facility details and contact information</a></p><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
-   const activeMarker=L.marker([27.858477,-80.501050],{icon:activeIcon,pane:"mewShelterPane",title:"South Mainland Community Center — FLOOD SHELTER · ANNOUNCED OPEN"}).bindPopup(activePopup,{maxWidth:300});
-   mewShelterItems.push({latlng:L.latLng(27.858477,-80.501050),layer:activeMarker});
+   const activeMarker=L.marker([27.8589916,-80.5012966],{icon:activeIcon,pane:"mewShelterPane",title:"South Mainland Community Center — FLOOD SHELTER · ANNOUNCED OPEN"}).bindPopup(activePopup,{maxWidth:300});
+   mewShelterItems.push({latlng:L.latLng(27.8589916,-80.5012966),layer:activeMarker});
    mewRefreshShelterClusters();
   }
 
