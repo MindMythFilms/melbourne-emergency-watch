@@ -1517,10 +1517,6 @@ body.dark #evacuationStatus a:hover{color:#b5fff8!important}
 .mew-point-cluster{display:flex!important;align-items:center;justify-content:center;width:42px!important;height:42px!important;border:3px solid #fff!important;border-radius:50%!important;background:#234b63!important;color:#fff!important;font:900 14px/1 system-ui,sans-serif!important;box-shadow:0 2px 9px #0008!important}
 .mew-point-cluster span{display:block}
 .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:transparent!important}
-
-/* Numbered zone clusters for dense areas at county and regional zoom levels. */
-.mew-zone-cluster-icon{background:transparent!important;border:0!important}
-.mew-zone-cluster{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border:3px solid #fff;border-radius:50%;background:#9f263e;color:#fff;font:900 15px/1 system-ui,sans-serif;box-shadow:0 2px 10px #0009,0 0 0 2px #9f263e88}
 </style></head>
 <body>
 <header class="site-header">
@@ -2007,8 +2003,6 @@ function popup(r){const photo=approvedPhotos[r.id];const observed=String(r.descr
 
 /* Public read-only CoastWatch FL zone overlay. RLS exposes active zones only. */
 let mewPublicZoneLayer=L.featureGroup().addTo(map);
-const mewZoneClusterLayer=L.featureGroup();
-mewPublicZoneLayer.addLayer(mewZoneClusterLayer);
 const mewPublicZoneBounds=new Map();
 const mewPublicZoneEntries=new Map();
 let mewPublicZonesLoading=null;
@@ -2057,30 +2051,8 @@ async function loadPublicZones(){
 }
 function mewRefreshZoneLabelVisibility(){
  const zoom=map.getZoom(),mobile=window.matchMedia("(max-width: 700px)").matches;
- const minZoom=mobile?13:12,spacing=mobile?92:118;
+ const minZoom=mobile?13:12,spacing=mobile?92:118,shown=[];
  const entries=[...mewPublicZoneEntries.values()];
- mewZoneClusterLayer.clearLayers();
- if(zoom<minZoom){
-  // Group nearby zone locations into numbered pins while keeping every road polygon visible.
-  const radius=mobile?68:82,clusters=[];
-  entries.forEach(entry=>{
-   const point=map.latLngToContainerPoint(entry.bounds.getCenter());
-   let cluster=clusters.find(c=>c.points.some(p=>Math.hypot(p.x-point.x,p.y-point.y)<radius));
-   if(!cluster){cluster={points:[],entries:[],bounds:L.latLngBounds([]),lat:0,lng:0};clusters.push(cluster);}
-   cluster.points.push(point);cluster.entries.push(entry);cluster.bounds.extend(entry.bounds);
-  });
-  clusters.forEach(cluster=>{
-   const latlngs=cluster.entries.map(e=>e.bounds.getCenter());
-   const center=L.latLng(latlngs.reduce((sum,p)=>sum+p.lat,0)/latlngs.length,latlngs.reduce((sum,p)=>sum+p.lng,0)/latlngs.length);
-   const count=cluster.entries.length;
-   const icon=L.divIcon({className:"mew-zone-cluster-icon",html:'<span class="mew-zone-cluster">'+count+'</span>',iconSize:[42,42],iconAnchor:[21,21]});
-   const marker=L.marker(center,{icon,keyboard:true,title:count+" nearby road zones",zIndexOffset:1600});
-   marker.bindTooltip(count+" road zone"+(count===1?"":"s")+" · zoom in to inspect",{direction:"top",offset:[0,-18]});
-   marker.on("click",()=>map.fitBounds(cluster.bounds,{padding:[48,48],maxZoom:minZoom,animate:true,duration:.55}));
-   marker.addTo(mewZoneClusterLayer);
-  });
- }
- const shown=[];
  entries.forEach(entry=>{
   if(!entry.labelMarker)return;
   const point=map.latLngToContainerPoint(entry.bounds.getCenter());
