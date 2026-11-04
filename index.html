@@ -104,6 +104,11 @@ body.dark button.secondary{background:#20394d;color:#eaf2f8;border-color:#385168
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 
+/* Numbered, dependency-free map clusters for shelters and road closures */
+.mew-count-cluster{background:transparent;border:0}
+.mew-count-cluster span{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border:3px solid #fff;border-radius:50%;background:#174f78;color:#fff;font:900 16px/1 system-ui,sans-serif;box-shadow:0 3px 12px #071a2c66;outline:2px solid #174f78}
+.mew-road-cluster span{background:#b4232d;outline-color:#b4232d}
+.mew-shelter-cluster span{background:#14784d;outline-color:#14784d}
 /* Map placement cursor: red location pin instead of the drag hand */
 #map .leaflet-container,#map.leaflet-container{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'%3E%3Cpath d='M15 1C7.3 1 1 7.2 1 14.8c0 10.1 14 26 14 26s14-15.9 14-26C29 7.2 22.7 1 15 1Z' fill='%23e52b3b' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='15' cy='14' r='5' fill='white'/%3E%3C/svg%3E") 15 40,crosshair!important}
 #map .leaflet-grab,#map .leaflet-dragging .leaflet-grab{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'%3E%3Cpath d='M15 1C7.3 1 1 7.2 1 14.8c0 10.1 14 26 14 26s14-15.9 14-26C29 7.2 22.7 1 15 1Z' fill='%23e52b3b' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='15' cy='14' r='5' fill='white'/%3E%3C/svg%3E") 15 40,crosshair!important}
@@ -1669,6 +1674,35 @@ const evacuationZoneLayer=L.featureGroup();
 map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450";
 const shelterLayer=L.featureGroup();
 let shelterFetchInProgress=false;
+let mewShelterItems=[];
+function mewMakeCountCluster(count,latlng,bounds,kind){
+ const icon=L.divIcon({className:"mew-count-cluster mew-"+kind+"-cluster",html:'<span>'+count+'</span>',iconSize:[48,48],iconAnchor:[24,24]});
+ const marker=L.marker(latlng,{icon,keyboard:true,title:count+" "+kind+" locations"});
+ marker.on("click",()=>{if(bounds&&bounds.isValid())map.fitBounds(bounds,{padding:[55,55],maxZoom:Math.min(16,map.getZoom()+3),animate:true});});
+ return marker;
+}
+function mewGroupNearby(items,radius){
+ const groups=[];
+ items.forEach(item=>{
+  const point=map.latLngToContainerPoint(item.latlng);
+  let group=groups.find(g=>g.points.some(p=>Math.hypot(p.x-point.x,p.y-point.y)<=radius));
+  if(!group){group={items:[],points:[],bounds:L.latLngBounds()};groups.push(group);}
+  group.items.push(item);group.points.push(point);group.bounds.extend(item.latlng);
+ });
+ return groups;
+}
+function mewRefreshShelterClusters(){
+ if(!shelterLayer)return;
+ shelterLayer.clearLayers();
+ const clusterZoom=window.matchMedia("(max-width:700px)").matches?12:11;
+ if(map.getZoom()>=clusterZoom){mewShelterItems.forEach(item=>item.layer.addTo(shelterLayer));return;}
+ mewGroupNearby(mewShelterItems,62).forEach(group=>{
+  if(group.items.length===1)group.items[0].layer.addTo(shelterLayer);
+  else mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,"shelter").addTo(shelterLayer);
+ });
+}
+map.on("zoomend moveend",mewRefreshShelterClusters);
+
 const rainRadarLayer=L.tileLayer.wms("https://nowcoast.noaa.gov/geoserver/observations/weather_radar/ows",{layers:"conus_base_reflectivity_mosaic",styles:"",format:"image/png",transparent:true,version:"1.1.1",opacity:.72,attribution:"Radar: NOAA/NWS MRMS via nowCOAST"});
 rainRadarLayer.on("loading",()=>{const e=$("rainRadarUpdated");if(e)e.textContent="Connecting to NOAA radar…";});
 rainRadarLayer.on("load",()=>{const e=$("rainRadarUpdated");if(e)e.textContent="NOAA MRMS radar · Latest image loaded";});
@@ -1737,7 +1771,7 @@ async function loadShelters(){
   const payload=await response.json();
   if(payload.error)throw new Error(payload.error.message||"FEMA shelter service error");
   const features=(payload.features||[]).filter(f=>f.geometry&&(Array.isArray(f.geometry.coordinates)||(Number.isFinite(Number(f.geometry.x))&&Number.isFinite(Number(f.geometry.y)))));
-  shelterLayer.clearLayers();
+  const items=[];
   const palette={OPEN:"#16834a",STANDBY:"#d69e18",ALERT:"#dc6b20",FULL:"#c2413b",CLOSED:"#64748b"};
   const labels={OPEN:"OPEN · FEMA status",STANDBY:"STANDBY · not confirmed open",ALERT:"ALERT · check official instructions",FULL:"FULL · do not assume space is available",CLOSED:"CLOSED",UNKNOWN:"STATUS UNAVAILABLE"};
   features.forEach(feature=>{
@@ -1753,10 +1787,13 @@ async function loadShelters(){
    const phone=String(p.org_poc_phone||p.org_main_phone||"").trim();
    const icon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+color+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">⌂</span>',iconSize:[42,42],iconAnchor:[21,21]});
    const popupHtml='<div style="min-width:220px"><strong>🏠 '+name+'</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+color+';color:#fff;font-weight:800">'+esc(labels[status])+'</div><div>'+address+'</div>'+(accessible?'<div><b>Wheelchair / ADA:</b> '+esc(accessible)+'</div>':'')+(pet?'<div><b>Pet information:</b> '+esc(pet)+'</div>':'')+(phone?'<div><b>Phone:</b> '+esc(phone)+'</div>':'')+'<small style="display:block;margin-top:8px">Source: FEMA National Shelter System. Status and capacity can change. A listed location is not a direction to evacuate. Confirm opening with Brevard County before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Check official Brevard shelter announcements</a></p></div>';
-   L.marker([lat,lng],{icon,pane:"mewShelterPane",title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300}).addTo(shelterLayer);
+   const marker=L.marker([lat,lng],{icon,pane:"mewShelterPane",title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300});
+   items.push({latlng:L.latLng(lat,lng),layer:marker});
   });
-  if(count)count.textContent=features.length?features.length+" shelter locations":"No FEMA shelter records returned for Brevard County";
-  if(updated)updated.textContent="FEMA data · refreshed "+new Date().toLocaleTimeString();
+  mewShelterItems=items;
+  mewRefreshShelterClusters();
+  if(count)count.textContent=items.length?items.length+" shelter locations":"No FEMA shelter records returned for Brevard County";
+  if(updated)updated.textContent="FEMA data · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
  }catch(error){
   console.warn("CoastWatch shelter locations unavailable:",error);
   if(count)count.textContent="Shelter data unavailable";
@@ -2022,9 +2059,9 @@ async function loadPublicZones(){
   });
   // Swap the map layer and lookup data only after the replacement data is fully prepared.
   mewPublicZoneLayer.clearLayers();
-  nextLayers.forEach(group=>group.addTo(mewPublicZoneLayer));
   mewPublicZoneEntries.clear();nextEntries.forEach((value,key)=>mewPublicZoneEntries.set(key,value));
   mewPublicZoneBounds.clear();nextBounds.forEach((value,key)=>mewPublicZoneBounds.set(key,value));
+  mewRefreshPublicZoneClusters();
   mewRefreshZoneLabelVisibility();
   const list=$("publicZoneList"),count=$("mapZonesCount");
   if(count)count.textContent=nextEntries.size+(nextEntries.size===1?" zone":" zones");
@@ -2036,6 +2073,19 @@ async function loadPublicZones(){
  })().finally(()=>{mewPublicZonesLoading=null;});
  return mewPublicZonesLoading;
 }
+function mewRefreshPublicZoneClusters(){
+ if(!mewPublicZoneLayer)return;
+ mewPublicZoneLayer.clearLayers();
+ const entries=[...mewPublicZoneEntries.values()];
+ const clusterZoom=window.matchMedia("(max-width:700px)").matches?11:10;
+ if(map.getZoom()>=clusterZoom){entries.forEach(entry=>entry.group.addTo(mewPublicZoneLayer));return;}
+ const items=entries.map(entry=>({latlng:entry.bounds.getCenter(),layer:entry.group,bounds:entry.bounds}));
+ mewGroupNearby(items,68).forEach(group=>{
+  if(group.items.length===1)group.items[0].layer.addTo(mewPublicZoneLayer);
+  else mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,"road").addTo(mewPublicZoneLayer);
+ });
+}
+map.on("zoomend moveend",mewRefreshPublicZoneClusters);
 function mewRefreshZoneLabelVisibility(){
  const zoom=map.getZoom(),mobile=window.matchMedia("(max-width: 700px)").matches;
  const minZoom=mobile?13:12,spacing=mobile?92:118,shown=[];
