@@ -1752,7 +1752,7 @@ function mewRefreshShelterClusters(){
 }
 map.on("zoomend",mewRefreshShelterClusters);
 map.on("moveend",()=>{if(!map._popup)mewRefreshShelterClusters();});
-map.on("popupclose",()=>mewRefreshShelterClusters());
+map.on("popupclose",()=>requestAnimationFrame(()=>{if(!map._popup)mewRefreshShelterClusters();}));
 
 const rainRadarLayer=L.tileLayer.wms("https://nowcoast.noaa.gov/geoserver/observations/weather_radar/ows",{layers:"conus_base_reflectivity_mosaic",styles:"",format:"image/png",transparent:true,version:"1.1.1",opacity:.72,attribution:"Radar: NOAA/NWS MRMS via nowCOAST"});
 rainRadarLayer.on("loading",()=>{const e=$("rainRadarUpdated");if(e)e.textContent="Connecting to NOAA radar…";});
@@ -2188,7 +2188,7 @@ function mewRefreshPublicZoneClusters(){
 // changes until no popup is open, then refresh once the visitor closes it.
 map.on("zoomend",mewRefreshPublicZoneClusters);
 map.on("moveend",()=>{if(!map._popup)mewRefreshPublicZoneClusters();});
-map.on("popupclose",()=>mewRefreshPublicZoneClusters());
+map.on("popupclose",()=>requestAnimationFrame(()=>{if(!map._popup)mewRefreshPublicZoneClusters();}));
 function mewRefreshZoneLabelVisibility(){
  const zoom=map.getZoom(),mobile=window.matchMedia("(max-width:700px)").matches;
  const minZoom=mobile?13:12;
