@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-shelter-grey-clusters-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-satellite-street-labels-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -1965,14 +1965,17 @@ async function loadNwsAlerts(){
 
 const imagery=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community",maxZoom:19});
 const labels=L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{attribution:"",maxZoom:19});
+const roadLabels=L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",{attribution:"Road data © Esri, HERE, Garmin, and OpenStreetMap contributors",maxZoom:19,opacity:1});
 const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19});
 imagery.addTo(map);
 labels.addTo(map);
+roadLabels.addTo(map);
+roadLabels.on("tileerror",()=>{const note=document.querySelector("#map-panel .mapnote");if(note)note.textContent="Street-name overlay is temporarily unavailable. Satellite imagery remains available.";});
 streets.on("tileerror",()=>{const note=document.querySelector("#map-panel .mapnote");if(note)note.textContent="Map tiles are temporarily unavailable. Please refresh or use the official emergency links below.";});
 imagery.on("tileerror",()=>{if(map.hasLayer(imagery)){map.removeLayer(imagery);streets.addTo(map);const note=document.querySelector("#map-panel .mapnote");if(note)note.textContent="Satellite imagery is unavailable; showing the street map instead.";}});
 
-$("satelliteBtn").onclick=()=>{map.removeLayer(streets);if(!map.hasLayer(imagery))imagery.addTo(map);if(!map.hasLayer(labels))labels.addTo(map)};
-$("streetBtn").onclick=()=>{map.removeLayer(imagery);map.removeLayer(labels);streets.addTo(map)};
+$("satelliteBtn").onclick=()=>{map.removeLayer(streets);if(!map.hasLayer(imagery))imagery.addTo(map);if(!map.hasLayer(labels))labels.addTo(map);if(!map.hasLayer(roadLabels))roadLabels.addTo(map)};
+$("streetBtn").onclick=()=>{map.removeLayer(imagery);map.removeLayer(labels);map.removeLayer(roadLabels);streets.addTo(map)};
 $("satelliteBtn").addEventListener("click",()=>{$("satelliteBtn").classList.add("active");$("streetBtn").classList.remove("active")});$("streetBtn").addEventListener("click",()=>{$("streetBtn").classList.add("active");$("satelliteBtn").classList.remove("active")});
 const selectedLocationIcon=L.divIcon({className:"selected-location-pin",html:'<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48" aria-hidden="true"><path d="M18 1C8.6 1 1 8.5 1 17.7 1 30 18 47 18 47s17-17 17-29.3C35 8.5 27.4 1 18 1Z" fill="#e52b3b" stroke="#fff" stroke-width="2.5"/><circle cx="18" cy="17" r="6" fill="#fff"/></svg>',iconSize:[36,48],iconAnchor:[18,47],popupAnchor:[0,-43]});
 let selectedLocationMarker=null;let mapFilter="all";
