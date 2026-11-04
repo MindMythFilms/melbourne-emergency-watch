@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261103-numbered-map-clusters-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261103-numbered-map-clusters-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -2077,7 +2077,7 @@ function mewRefreshPublicZoneClusters(){
  if(!mewPublicZoneLayer)return;
  mewPublicZoneLayer.clearLayers();
  const entries=[...mewPublicZoneEntries.values()];
- const clusterZoom=window.matchMedia("(max-width:700px)").matches?11:10;
+ const clusterZoom=window.matchMedia("(max-width:700px)").matches?13:12;
  if(map.getZoom()>=clusterZoom){entries.forEach(entry=>entry.group.addTo(mewPublicZoneLayer));return;}
  const items=entries.map(entry=>({latlng:entry.bounds.getCenter(),layer:entry.group,bounds:entry.bounds}));
  mewGroupNearby(items,68).forEach(group=>{
@@ -2087,16 +2087,14 @@ function mewRefreshPublicZoneClusters(){
 }
 map.on("zoomend moveend",mewRefreshPublicZoneClusters);
 function mewRefreshZoneLabelVisibility(){
- const zoom=map.getZoom(),mobile=window.matchMedia("(max-width: 700px)").matches;
- const minZoom=mobile?13:12,spacing=mobile?92:118,shown=[];
- const entries=[...mewPublicZoneEntries.values()];
- entries.forEach(entry=>{
-  if(!entry.labelMarker)return;
-  const point=map.latLngToContainerPoint(entry.bounds.getCenter());
-  const collision=shown.some(p=>Math.hypot(p.x-point.x,p.y-point.y)<spacing);
-  const visible=zoom>=minZoom&&!collision;
-  if(visible){shown.push(point);if(!entry.group.hasLayer(entry.labelMarker))entry.group.addLayer(entry.labelMarker);}
-  else if(entry.group.hasLayer(entry.labelMarker))entry.group.removeLayer(entry.labelMarker);
+ const zoom=map.getZoom(),mobile=window.matchMedia("(max-width:700px)").matches;
+ const minZoom=mobile?13:12;
+ const showAll=zoom>=minZoom;
+ mewPublicZoneEntries.forEach(entry=>{
+  if(!entry.labelMarker||!entry.group)return;
+  const hasLabel=entry.group.hasLayer(entry.labelMarker);
+  if(showAll&&!hasLabel)entry.group.addLayer(entry.labelMarker);
+  else if(!showAll&&hasLabel)entry.group.removeLayer(entry.labelMarker);
  });
 }
 map.on("zoomend moveend",mewRefreshZoneLabelVisibility);
