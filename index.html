@@ -1674,7 +1674,26 @@ body.dark .mew-water-close{background:#48341d;color:#ffe1aa;border-color:#a97939
  .mew-water-dismiss{position:sticky;bottom:0;z-index:1;box-shadow:0 -8px 15px #fff9}
  body.dark .mew-water-dismiss{box-shadow:0 -8px 15px #252b31}
 }
-</style></head>
+</style> 
+<style id="coastwatch-recovery-updates">
+.mew-recovery-updates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0 0 20px}
+.mew-recovery-card{min-width:0;padding:17px 18px;border:1px solid #d9e5eb;border-radius:15px;background:#fff;box-shadow:0 8px 24px rgba(11,35,55,.06);color:#24394b}
+.mew-recovery-card h2{margin:4px 0 9px;font:800 16px/1.25 Manrope,sans-serif;color:#15354a}
+.mew-recovery-card p{margin:7px 0;font-size:13px;line-height:1.55;color:#53697b}
+.mew-recovery-card a{display:inline-block;margin-top:7px;color:#087f83;font-size:13px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.mew-recovery-kicker{font-size:11px;letter-spacing:.1em;font-weight:900;color:#647b8d}
+.mew-utility-card{border-color:#e7c98e;background:#fffaf0}
+.mew-utility-card .mew-recovery-kicker{color:#94600b}
+body.dark .mew-recovery-card{background:#102337;border-color:#2b455b;color:#eaf2f8}
+body.dark .mew-recovery-card h2{color:#edf7fb}
+body.dark .mew-recovery-card p{color:#bdcbd6}
+body.dark .mew-recovery-card a{color:#70e3d7}
+body.dark .mew-utility-card{background:#302713;border-color:#745b29}
+body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
+@media(max-width:900px){.mew-recovery-updates{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.mew-recovery-updates{grid-template-columns:1fr;gap:9px;margin-bottom:14px}.mew-recovery-card{padding:14px 15px}.mew-recovery-card h2{font-size:15px}}
+</style>
+</head>
 <body>
 <header class="site-header">
  <div class="site-header-inner">
@@ -1710,6 +1729,28 @@ body.dark .mew-water-close{background:#48341d;color:#ffe1aa;border-color:#a97939
 </div>
 
 <section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
+<section class="mew-recovery-updates" aria-label="Additional recovery advisories">
+ <article class="mew-recovery-card mew-utility-card">
+  <div class="mew-recovery-kicker">UTILITY PRECAUTION · NOV. 4</div>
+  <h2>SEWER LIFT-STATION CONCERNS</h2>
+  <p>The Town of Indialantic reports that Brevard County is experiencing problems with sewer lift stations and possible failures following heavy rain. No specific failed station or confirmed failure location was identified in the notice.</p>
+  <p><strong>Conserve water. Avoid laundry and running dishwashers.</strong> This is a regional precautionary advisory, not a confirmed outage at a particular facility.</p>
+  <a href="https://nextdoor.com/agency-post/fl/indialantic/town-of-indialantic/the-city-of-melbourne-has-issued-a-boil-water-notice-522900344/" target="_blank" rel="noopener noreferrer">Town of Indialantic agency notice ↗</a>
+ </article>
+ <article class="mew-recovery-card">
+  <div class="mew-recovery-kicker">SCHOOL OPERATIONS · NOV. 4</div>
+  <h2>BREVARD PUBLIC SCHOOLS CLOSED</h2>
+  <p>All Brevard Public Schools campuses and district offices are closed Wednesday, November 4. The district cited water-service disruptions, flooded or closed roads, campus damage and staffing challenges. A Thursday schedule update was expected.</p>
+  <a href="https://roosevelt.brevardschools.org/o/bps/page/breaking-news" target="_blank" rel="noopener noreferrer">District breaking-news updates ↗</a>
+ </article>
+ <article class="mew-recovery-card">
+  <div class="mew-recovery-kicker">CITY FACILITY CLOSURES · NOV. 3 UPDATE</div>
+  <h2>MELBOURNE RECREATION FACILITIES</h2>
+  <p><strong>Closed:</strong> City ballfields, golf courses, Crane / Pieloch Dog Park, and the boat ramps at Front Street Park and Ballard Park due to high water.</p>
+  <p>These notices do not mean every park or recreation facility is closed. Pickleball and tennis courts were listed open, but water was unavailable due to the boil-water notice. Confirm before traveling.</p>
+  <a href="https://www.melbourneflorida.org/Government/City-News" target="_blank" rel="noopener noreferrer">City of Melbourne updates ↗</a>
+ </article>
+</section>
 <section class="hero hero-visual">
  <div class="hero-atmosphere" aria-hidden="true"><span class="hero-palm">🌴</span><span class="hero-horizon"></span><span class="hero-sun"></span></div>
  <div class="hero-copy">
@@ -2308,7 +2349,7 @@ async function loadPublicZones(){
    const isSignalOut=/traffic signal|traffic light/i.test(String(z.name||"")+" "+rawDescription);
    const isWashout=String(z.name||"").toLowerCase().includes("washout")||/washed out|washout/i.test(rawDescription);
    const isFlooded=/roadway flooded|outside lanes flooded|lanes flooded|flooded at|travel lanes underwater|standing water|water over (the )?roadway/i.test(rawDescription);
-   const facilityStatus=/^PARK CLOSED/i.test(String(z.name||""))?"PARK CLOSED":(/^TRAIL CLOSED/i.test(String(z.name||""))?"TRAIL CLOSED":(/^DOCK \/ RAMP DAMAGE/i.test(String(z.name||""))?"DOCK / RAMP DAMAGE":(/^ENTRANCE ROAD DAMAGED/i.test(String(z.name||""))?"ENTRANCE ROAD DAMAGED":"")));
+   const facilityStatus=/^PARK CLOSED/i.test(String(z.name||""))?"PARK CLOSED":(/^DOG PARK CLOSED/i.test(String(z.name||""))?"DOG PARK CLOSED":(/^BOAT RAMP CLOSED/i.test(String(z.name||""))?"BOAT RAMP CLOSED":(/^TRAIL CLOSED/i.test(String(z.name||""))?"TRAIL CLOSED":(/^DOCK \/ RAMP DAMAGE/i.test(String(z.name||""))?"DOCK / RAMP DAMAGE":(/^ENTRANCE ROAD DAMAGED/i.test(String(z.name||""))?"ENTRANCE ROAD DAMAGED":"")))));
    const situation=facilityStatus||(isStatusUnknown?(isSignalOut?"SIGNAL STATUS UNVERIFIED":"ROAD STATUS UNVERIFIED"):(isSignalOut?"TRAFFIC SIGNAL OUT":(isOpen?"ROAD OPEN":(isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED"))))));
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
    const openRoadCaution=isOpen?'<div class="mew-road-open-caution" role="note"><strong>⚠️ USE CAUTION</strong><br>This road is reported open, but standing water, debris, or changing conditions may still be present. Slow down and proceed carefully. Never drive through floodwater.</div>':"";
