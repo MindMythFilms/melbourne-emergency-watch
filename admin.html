@@ -120,7 +120,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 <section class="panel pad" id="login"><h2>Administrator sign in</h2><div id="loginMsg" class="msg hidden"></div><form id="loginForm"><div class="field"><label>Email</label><input id="email" type="email" required autocomplete="username"></div><div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password"></div><button type="submit">Sign in</button></form></section>
 <section id="dashboard" class="hidden">
 <div id="pageMsg" class="msg hidden"></div>
-<div class="stats"><div class="stat"><b id="total">0</b><span>Loaded reports</span></div><div class="stat"><b id="pending">0</b><span>Unverified reports · public</span></div><div class="stat"><b id="published">0</b><span>Admin-reviewed legacy</span></div><div class="stat"><b id="resolved">0</b><span>Resolved</span></div></div>
+<div class="stats"><div class="stat"><b id="total">0</b><span>Total map zones</span></div><div class="stat"><b id="pending">0</b><span>Publicly visible zones</span></div><div class="stat"><b id="published">0</b><span>Hidden zones</span></div><div class="stat"><b id="resolved">0</b><span>Intersection markers</span></div></div>
 
 <section class="panel" id="zoneManager">
  <div class="pad">
@@ -376,6 +376,10 @@ async function loadAdminZones(){
  if(!zoneEditControl){zoneEditControl=new L.Control.Draw({position:"topleft",draw:false,edit:{featureGroup:zoneLayers,edit:true,remove:true}});map.addControl(zoneEditControl);}
 }
 function renderZoneList(){
+ $("total").textContent=zones.length;
+ $("pending").textContent=zones.filter(z=>z.active===true).length;
+ $("published").textContent=zones.filter(z=>z.active!==true).length;
+ $("resolved").textContent=zones.filter(z=>z.geometry&&z.geometry.type==="Point").length;
  const host=$("zoneList");
  host.innerHTML=zones.length?zones.map(z=>'<article class="report"><h3><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+esc(z.color)+';margin-right:7px"></span>'+esc(z.name)+'</h3><div class="meta">'+esc(z.zone_type)+' · '+(z.active?"Publicly visible":"Hidden")+'</div>'+(z.description?'<p>'+esc(z.description)+'</p>':'')+'<div class="actions"><button class="gray" data-zone-edit="'+z.id+'">Edit details</button><button class="gray" data-zone-toggle="'+z.id+'" data-active="'+(!z.active)+'">'+(z.active?"Hide zone":"Show zone")+'</button><button class="red" data-zone-delete="'+z.id+'">Delete zone</button></div></article>').join(""):'<div class="empty">No zones created yet. Place an intersection marker or draw an affected area on the map.</div>';
 }
