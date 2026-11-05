@@ -1731,7 +1731,60 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 .mew-recovery-details>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;position:relative;padding-right:72px}.mew-recovery-details>summary::-webkit-details-marker{display:none}.mew-recovery-details>summary strong{font:800 16px/1.25 Manrope,sans-serif;color:#15354a}.mew-recovery-expand{display:block;position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;color:#087f83}.mew-recovery-details[open] .mew-recovery-expand{font-size:0}.mew-recovery-details[open] .mew-recovery-expand:after{content:'Close −';font-size:11px}.mew-recovery-body{display:none}.mew-recovery-details[open] .mew-recovery-body{display:block}body.dark .mew-recovery-details>summary strong{color:#edf7fb}body.dark .mew-recovery-expand{color:#70e3d7}
 @media(max-width:600px){.mew-recovery-updates{grid-template-columns:1fr;gap:7px;margin-bottom:14px}.mew-recovery-card{padding:11px 13px}.mew-recovery-details>summary{position:relative;padding-right:72px;gap:3px}.mew-recovery-details>summary strong{font-size:13px}.mew-recovery-kicker{font-size:9px;letter-spacing:.08em}.mew-recovery-card p{font-size:12px;line-height:1.45}}
 </style>
-<style id="coastwatch-zone-photo-links">.mew-zone-photo-link{margin:10px 0 8px;padding:9px 11px;background:#e8f6f4;border:1px solid #b8e2dc;border-radius:9px}.mew-zone-photo-link a{display:inline-block;color:#087f83!important;font-weight:800;text-decoration:underline;text-underline-offset:3px}.mew-zone-photo-link a:focus-visible{outline:2px solid #087f83;outline-offset:3px}body.dark .mew-zone-photo-link{background:#15363b;border-color:#28615f}body.dark .mew-zone-photo-link a{color:#83e8dc!important}</style></head>
+<style id="coastwatch-zone-photo-links">.mew-zone-photo-link{margin:10px 0 8px;padding:9px 11px;background:#e8f6f4;border:1px solid #b8e2dc;border-radius:9px}.mew-zone-photo-link a{display:inline-block;color:#087f83!important;font-weight:800;text-decoration:underline;text-underline-offset:3px}.mew-zone-photo-link a:focus-visible{outline:2px solid #087f83;outline-offset:3px}body.dark .mew-zone-photo-link{background:#15363b;border-color:#28615f}body.dark .mew-zone-photo-link a{color:#83e8dc!important}</style>
+<style id="mew-two-finger-tutorial">
+.mew-gesture-help{margin-left:auto;min-height:39px;padding:9px 13px;border:1px solid #70d8d2;background:linear-gradient(135deg,#0b3348,#0d5960);color:#eaffff;border-radius:11px;font-size:12px;letter-spacing:.01em;box-shadow:0 5px 16px #087f7c25;white-space:nowrap}
+.mew-gesture-help:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.mew-gesture-overlay{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:18px;background:rgba(2,12,23,.82);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
+.mew-gesture-overlay[hidden]{display:none!important}
+.mew-gesture-dialog{position:relative;width:min(980px,100%);max-height:min(92vh,900px);overflow:auto;padding:30px;border:1px solid #65dcd34d;border-radius:25px;background:radial-gradient(ellipse at 50% -15%,#1c778455,transparent 48%),linear-gradient(145deg,#071b2d,#0b2b40 58%,#071a2b);color:#f3fbff;box-shadow:0 30px 100px #0009,0 0 55px #1bbab51c}
+.mew-gesture-close{position:absolute;top:15px;right:16px;width:39px;height:39px;padding:0;border:1px solid #b5e7ed44;border-radius:50%;background:#ffffff12;color:#eaffff;font-size:25px;line-height:1;box-shadow:none}
+.mew-gesture-kicker{color:#72e3dc;font-size:10px;font-weight:900;letter-spacing:.22em}
+.mew-gesture-dialog>h2{margin:8px 45px 4px 0;color:#fff;font:800 clamp(25px,4vw,36px)/1.1 Manrope,system-ui,sans-serif;letter-spacing:-1px}
+.mew-gesture-intro{margin:0 0 21px;color:#bdd4df;font-size:14px}
+.mew-gesture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.mew-gesture-card{min-width:0;padding:12px;border:1px solid #a5dce51f;border-radius:17px;background:linear-gradient(155deg,#ffffff0d,#ffffff05);box-shadow:inset 0 1px #ffffff0c}
+.mew-gesture-art{height:158px;position:relative;overflow:hidden;border:1px solid #6ad5d52b;border-radius:12px;background:radial-gradient(ellipse at 50% 100%,#137a8050,transparent 65%),#061827}
+.mew-map-mini{position:absolute;inset:17px 22px;border:1px solid #8cc9cf33;border-radius:10px;background:linear-gradient(35deg,transparent 43%,#e3c87935 44%,#e3c87935 47%,transparent 48%),linear-gradient(130deg,transparent 35%,#e3c87925 36%,#e3c87925 39%,transparent 40%),repeating-linear-gradient(0deg,#173e50 0 17px,#1a4655 18px 19px);transition:transform .6s ease}
+.mew-map-road{position:absolute;width:150%;height:7px;left:-20%;top:48%;background:#c4b98c;border:1px solid #e5d9aa;border-radius:10px;transform:rotate(-24deg);box-shadow:0 0 0 3px #c4b98c20}
+.mew-map-water{position:absolute;width:48px;height:140%;right:22%;top:-20%;background:#168b9a66;transform:rotate(26deg);filter:blur(2px)}
+.mew-map-pin{position:absolute;left:51%;top:40%;color:#ff6d68;font-size:24px;text-shadow:0 2px 8px #000}
+.mew-gesture-art.zoomed .mew-map-mini{transform:scale(1.25)}
+.mew-hand{position:absolute;z-index:2;left:50%;top:50%;width:100px;height:116px;transform:translate(-50%,-50%);filter:drop-shadow(0 5px 5px #0008)}
+.mew-finger{position:absolute;top:0;width:24px;height:76px;border:1px solid #e7b18d;border-radius:14px 14px 10px 10px;background:linear-gradient(90deg,#d99570,#f4c09b 38%,#eab18c 78%,#c98261);box-shadow:inset 2px 0 3px #fff5}
+.mew-finger b{position:absolute;top:7px;left:6px;width:11px;height:16px;border-radius:8px;background:linear-gradient(180deg,#f6d2bd,#d99a7b);border:1px solid #d49a7b}
+.mew-finger.finger-one{left:24px}.mew-finger.finger-two{left:53px;height:68px;top:8px}
+.mew-palm{position:absolute;left:15px;top:53px;width:72px;height:61px;border:1px solid #d99c78;border-radius:24px 25px 30px 30px;background:linear-gradient(120deg,#d99470,#f1b993 48%,#d68f6c);box-shadow:inset 3px 2px 5px #fff4}
+.mew-touch-dot{position:absolute;z-index:3;top:28px;width:12px;height:12px;border:2px solid #fff;border-radius:50%;background:#2ce4d1;box-shadow:0 0 0 5px #2ce4d128,0 0 16px #2ce4d1}
+.mew-touch-dot.dot-one{left:calc(50% - 28px)}.mew-touch-dot.dot-two{left:calc(50% + 1px)}
+.mew-pan-art .mew-hand-pan{animation:mewHandPan 2.8s ease-in-out infinite}
+.mew-pan-art .mew-map-mini{animation:mewMapPan 2.8s ease-in-out infinite}
+.mew-zoom-art .finger-one{animation:mewSpreadOne 2.6s ease-in-out infinite}
+.mew-zoom-art .finger-two{animation:mewSpreadTwo 2.6s ease-in-out infinite}
+.mew-zoom-art .mew-map-mini{animation:mewMapZoomIn 2.6s ease-in-out infinite}
+.mew-pinch-art .finger-one{animation:mewPinchOne 2.6s ease-in-out infinite}
+.mew-pinch-art .finger-two{animation:mewPinchTwo 2.6s ease-in-out infinite}
+.mew-pinch-art .mew-map-mini{animation:mewMapZoomOut 2.6s ease-in-out infinite}
+.mew-gesture-card h3{margin:12px 0 4px;color:#f4ffff;font:800 16px Manrope,system-ui,sans-serif}
+.mew-gesture-card p{min-height:62px;margin:0 0 12px;color:#bdd2dd;font-size:12px;line-height:1.55}
+.mew-gesture-tag{display:block;padding:8px 7px;border:1px solid #43c9c34d;border-radius:8px;background:#0d4149;color:#8df1e6;text-align:center;font-size:9px;font-weight:900;letter-spacing:.07em}
+.mew-gesture-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:17px;padding-top:16px;border-top:1px solid #b8e6e51f;color:#c3d8e1;font-size:13px}
+.mew-gesture-footer strong{color:#fff}
+.mew-gesture-footer button{flex:0 0 auto;background:linear-gradient(135deg,#1ab7a8,#117e91);color:#fff;padding:11px 18px}
+@keyframes mewHandPan{0%,100%{translate:-50% -50%}50%{translate:calc(-50% - 17px) calc(-50% + 4px)}}
+@keyframes mewMapPan{0%,100%{translate:0 0}50%{translate:14px -4px}}
+@keyframes mewSpreadOne{0%,100%{translate:0 0}50%{translate:-14px -5px}}
+@keyframes mewSpreadTwo{0%,100%{translate:0 0}50%{translate:14px -5px}}
+@keyframes mewPinchOne{0%,100%{translate:0 0}50%{translate:9px 0}}
+@keyframes mewPinchTwo{0%,100%{translate:0 0}50%{translate:-9px 0}}
+@keyframes mewMapZoomIn{0%,100%{scale:1}50%{scale:1.28}}
+@keyframes mewMapZoomOut{0%,100%{scale:1.2}50%{scale:.88}}
+@media(max-width:700px){.mew-gesture-overlay{padding:9px}.mew-gesture-dialog{padding:23px 14px 16px;border-radius:19px;max-height:94vh}.mew-gesture-grid{grid-template-columns:1fr;gap:9px}.mew-gesture-card{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:12px;align-items:center;padding:9px}.mew-gesture-art{grid-column:1;grid-row:1/4;height:112px}.mew-gesture-card h3{grid-column:2;margin:0 0 3px;font-size:14px}.mew-gesture-card p{grid-column:2;min-height:0;margin:0 0 5px;font-size:11px}.mew-gesture-tag{grid-column:2;font-size:8px;padding:6px 4px}.mew-gesture-footer{align-items:stretch;flex-direction:column;font-size:12px}.mew-gesture-footer button{width:100%}.mew-gesture-help{margin-left:0}}
+@media(max-width:390px){.mew-gesture-card{grid-template-columns:94px minmax(0,1fr);column-gap:9px}.mew-gesture-art{height:102px}.mew-gesture-tag{letter-spacing:.02em;font-size:7px}}
+@media(prefers-reduced-motion:reduce){.mew-gesture-overlay *, .mew-gesture-overlay *:before{animation:none!important;transition:none!important}}
+</style>
+
+</head>
 <body>
 <header class="site-header">
  <div class="site-header-inner">
@@ -1782,7 +1835,36 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  <div class="panelhead map-workspace-head">
   <div class="map-heading-copy"><span class="map-heading-icon" aria-hidden="true">⌖</span><div><h2>Live Hazard Map</h2><span>Community observations and official NWS alerts</span></div></div>
   <div class="map-live-state"><i></i> Live updates</div>
+  <button class="mew-gesture-help" id="mewGestureHelp" type="button" aria-haspopup="dialog" aria-controls="mewGestureTutorial">☝ How to use the map</button>
  </div>
+
+ <section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
+  <div class="mew-gesture-dialog">
+   <button class="mew-gesture-close" id="mewGestureClose" type="button" aria-label="Close map tutorial">×</button>
+   <div class="mew-gesture-kicker">COASTWATCH FL · QUICK GUIDE</div>
+   <h2 id="mewGestureTitle">Your map. Your control.</h2>
+   <p class="mew-gesture-intro" id="mewGestureIntro">Use two fingers on the map to move around and zoom in or out.</p>
+   <div class="mew-gesture-grid">
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-pan-art" aria-hidden="true"><div class="mew-map-mini"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-pan"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Move the map</h3><p>Place two fingers down and slide them together to explore another area.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · MOVE TOGETHER</span>
+    </article>
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-zoom-art" aria-hidden="true"><div class="mew-map-mini zoomed"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-zoom"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Zoom in</h3><p>Touch with two fingers, then spread them apart to see more detail.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · SPREAD APART</span>
+    </article>
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-pinch-art" aria-hidden="true"><div class="mew-map-mini"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-pinch"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Zoom out</h3><p>Bring your two fingers closer together to zoom back out.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · PINCH TOGETHER</span>
+    </article>
+   </div>
+   <div class="mew-gesture-footer"><span><strong>One finger?</strong> Scroll the webpage normally.</span><button id="mewGestureGotIt" type="button">Got it — show me the map</button></div>
+  </div>
+ </section>
+
  <div class="map-stage"><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
 
  <div class="map-dashboard">
@@ -2876,4 +2958,52 @@ setInterval(checkForSiteUpdates,180000);
 })();</script>
 
 <script>(function(){var d=document.getElementById("mapAdvancedControls");if(d&&window.matchMedia&&window.matchMedia("(max-width: 700px)").matches)d.open=false;})();</script>
+
+<script id="mew-two-finger-tutorial-script">
+(()=>{
+ const dialog=document.getElementById("mewGestureTutorial");
+ const openButton=document.getElementById("mewGestureHelp");
+ const closeButton=document.getElementById("mewGestureClose");
+ const doneButton=document.getElementById("mewGestureGotIt");
+ if(!dialog||!openButton||!closeButton||!doneButton)return;
+ let lastFocus=null;
+ const open=()=>{
+  lastFocus=document.activeElement;
+  dialog.hidden=false;
+  document.body.style.overflow="hidden";
+  closeButton.focus();
+ };
+ const close=()=>{
+  dialog.hidden=true;
+  document.body.style.overflow="";
+  try{localStorage.setItem("coastwatch-map-gesture-guide-seen","1")}catch(e){}
+  if(lastFocus&&lastFocus.isConnected)lastFocus.focus();
+ };
+ openButton.addEventListener("click",open);
+ closeButton.addEventListener("click",close);
+ doneButton.addEventListener("click",close);
+ dialog.addEventListener("click",e=>{if(e.target===dialog)close()});
+ document.addEventListener("keydown",e=>{
+  if(dialog.hidden)return;
+  if(e.key==="Escape"){e.preventDefault();close();return}
+  if(e.key==="Tab"){
+   const items=[...dialog.querySelectorAll('button:not([disabled])')];
+   if(!items.length)return;
+   if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items[items.length-1].focus()}
+   else if(!e.shiftKey&&document.activeElement===items[items.length-1]){e.preventDefault();items[0].focus()}
+  }
+ });
+ let shown=false;
+ const showFirstTime=()=>{
+  if(shown)return;
+  shown=true;
+  let seen=false;
+  try{seen=localStorage.getItem("coastwatch-map-gesture-guide-seen")==="1"}catch(e){seen=false}
+  if(!seen)open();
+ };
+ if(document.readyState==="complete")setTimeout(showFirstTime,1200);
+ else window.addEventListener("load",()=>setTimeout(showFirstTime,1200),{once:true});
+})();
+</script>
+
 </body></html>
