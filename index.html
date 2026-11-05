@@ -3269,4 +3269,21 @@ setInterval(checkForSiteUpdates,180000);
 }
 </style>
 
+
+<script id="mew-safety-link-behavior">
+(()=>{
+ const link=document.querySelector('.mew-safety-main a[href="#safety-details"]');
+ const details=document.getElementById("safety-details");
+ if(!link||!details)return;
+ link.addEventListener("click",event=>{
+  event.preventDefault();
+  details.open=!details.open;
+  link.setAttribute("aria-expanded",String(details.open));
+  // Keep the visitor at the safety notice; expanding content must not jump the page.
+ });
+ link.setAttribute("aria-controls","safety-details");
+ link.setAttribute("aria-expanded",String(details.open));
+})();
+</script>
+
 </body></html>
