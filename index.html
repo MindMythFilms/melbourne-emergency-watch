@@ -1708,6 +1708,9 @@ body.dark .mew-water-close{background:#48341d;color:#ffe1aa;border-color:#a97939
  .map-heading-copy h2{font-size:17px!important}
 }
 
+
+/* Keep vertical page scrolling available over the map on touch screens. */
+@media (max-width:700px),(pointer:coarse){#map,.leaflet-container{touch-action:pan-y!important}}
 </style> 
 <style id="coastwatch-recovery-updates">
 .mew-recovery-updates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0 0 20px}
@@ -1890,24 +1893,43 @@ const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map",{scrollWheelZoom:false,dragging:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false}).setView([28.0836,-80.6081],11),markers=[];
-/* Keep the map passive while visitors scroll the page. Unlock map gestures only after deliberate interaction. */
+/* Mobile map gestures: one finger scrolls the page; two fingers pan/zoom the map. */
+const mewMapContainer=map.getContainer();
+const mewMobileMapGestures=window.matchMedia("(max-width: 700px), (pointer: coarse)").matches;
 let mewMapUnlocked=false;
-function mewUnlockMap(){
- if(mewMapUnlocked)return;
- mewMapUnlocked=true;
- map.dragging.enable();
- map.touchZoom.enable();
- map.doubleClickZoom.enable();
- map.boxZoom.enable();
- map.keyboard.enable();
- map.scrollWheelZoom.enable();
+function mewUnlockMap(event){
+ if(mewMobileMapGestures){
+  // Never enable one-finger dragging on touch devices. Leaflet's touchZoom
+  // handler takes over when a second finger is placed on the map.
+  map.dragging.disable();
+  map.touchZoom.enable();
+  map.doubleClickZoom.enable();
+  map.boxZoom.disable();
+  map.keyboard.enable();
+  map.scrollWheelZoom.disable();
+  mewMapUnlocked=true;
+ }else{
+  if(mewMapUnlocked)return;
+  mewMapUnlocked=true;
+  map.dragging.enable();
+  map.touchZoom.enable();
+  map.doubleClickZoom.enable();
+  map.boxZoom.enable();
+  map.keyboard.enable();
+  map.scrollWheelZoom.enable();
+ }
  const hint=document.getElementById("mapInteractionHint");
  if(hint)hint.remove();
 }
-const mewMapContainer=map.getContainer();
-mewMapContainer.addEventListener("pointerdown",mewUnlockMap,{capture:true,once:true});
-mewMapContainer.addEventListener("touchstart",mewUnlockMap,{capture:true,once:true,passive:true});
-mewMapContainer.addEventListener("focusin",mewUnlockMap,{once:true});
+if(mewMobileMapGestures){
+ map.dragging.disable();
+ map.touchZoom.enable();
+ map.scrollWheelZoom.disable();
+ mewMapContainer.style.touchAction="pan-y";
+}else{
+ mewMapContainer.addEventListener("pointerdown",event=>{if(event.pointerType!=="touch")mewUnlockMap(event);},{capture:true,once:true});
+ mewMapContainer.addEventListener("focusin",mewUnlockMap,{once:true});
+}
 requestAnimationFrame(()=>requestAnimationFrame(()=>map.invalidateSize({pan:false})));
 const mewMapStage=document.querySelector(".map-stage");
 map.on("popupopen",()=>mewMapStage?.classList.add("mew-popup-visible"));
