@@ -1823,7 +1823,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
    <a class="nav-link active" href="#map-panel">Map</a>
    <a class="nav-link" href="#official-alerts-panel">Alerts</a>
    <a class="nav-link" href="#about">About</a>
-   <a class="nav-link" href="#safety-details">Safety</a>
+   <a class="nav-link" href="#safety-announcement">Safety</a>
    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">☼ Theme</button>
    <a class="nav-report" href="#report-panel">＋ Report Hazard</a>
   </nav>
@@ -1854,7 +1854,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 </section>
 </div>
 
-<section class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
+<section id="safety-announcement" class="mew-safety-announcement mew-safety-compact" role="region" aria-labelledby="mew-safety-title"><div class="mew-safety-main"><span class="mew-alert-icon" aria-hidden="true">!</span><p><strong id="mew-safety-title">Community reports are unverified.</strong> CoastWatch FL is not an emergency service. For emergencies or immediate danger, call <strong>911</strong>.</p><a href="#safety-details">Safety information</a></div><details id="safety-details" class="mew-safety-details"><summary>Read important safety information</summary><p><strong>Every report is submitted by a community member.</strong> CoastWatch FL does not independently investigate, verify, or guarantee the accuracy, completeness, or current status of reports. Conditions may change quickly.</p><div class="mew-announcement-grid"><div><strong>Reports may be inaccurate or outdated</strong><span>A reported hazard may have moved, cleared, worsened, or never been present as described.</span></div><div><strong>Use extra caution when driving</strong><span>Watch for standing water, flooded roads, debris, fallen trees, damaged pavement, and blocked lanes. Never drive through floodwater.</span></div><div><strong>Do not put yourself at risk</strong><span>Never approach a hazard, enter a flooded area, or trespass to photograph or confirm a report.</span></div><div><strong>Check official sources</strong><span>Confirm weather alerts, road closures, and emergency instructions with appropriate authorities.</span></div></div><p class="mew-announcement-disclaimer">CoastWatch FL is not affiliated with government, law enforcement, fire-rescue, or emergency management agencies and does not dispatch responders. Photo screening is limited to content and privacy suitability; photo approval does not verify an event.</p></details></section>
 
 
 <div class="layout"><span id="mewMobileReportPlacement" hidden></span>
@@ -3285,5 +3285,11 @@ setInterval(checkForSiteUpdates,180000);
  link.setAttribute("aria-expanded",String(details.open));
 })();
 </script>
+
+
+<style id="mew-safety-nav-target">
+#safety-announcement{scroll-margin-top:90px}
+@media(max-width:700px){#safety-announcement{scroll-margin-top:76px}}
+</style>
 
 </body></html>
