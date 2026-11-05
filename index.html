@@ -2806,6 +2806,10 @@ setInterval(checkForSiteUpdates,180000);
    if(strip.parentElement)strip.remove();
    resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==sidebar)sidebar.appendChild(card);});
    if(zones.parentElement!==stage)stage.appendChild(zones);
+   const legendToggle=document.getElementById("mobileLegendToggle");
+   const legend=document.getElementById("nwsLegend");
+   if(legendToggle&&legendToggle.parentElement!==panel)panel.insertBefore(legendToggle,dashboard);
+   if(legend&&legend.parentElement!==panel)panel.insertBefore(legend,dashboard);
   }
   requestAnimationFrame(()=>map.invalidateSize({pan:false}));
  };
@@ -3254,6 +3258,14 @@ setInterval(checkForSiteUpdates,180000);
 }
 @media(max-width:360px){
  #map-panel .mew-gesture-help{font-size:18px!important;min-height:55px!important;padding:11px 15px!important}
+}
+</style>
+
+
+<style id="mew-legend-directly-under-map">
+@media(max-width:900px){
+ #map-panel>.mobile-legend-toggle{display:block!important;position:relative!important;width:100%!important;margin:0!important;clear:both!important}
+ #map-panel>.nws-legend{position:relative!important;width:100%!important;margin:0!important;clear:both!important}
 }
 </style>
 
