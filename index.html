@@ -3998,4 +3998,39 @@ body.dark #map-panel .map-report-tools .map-report-button{
  #community-partner-ads .cw-ad-slide.is-active{animation:none!important}
 }
 </style>
+
+<style id="cw-ad-active-shine">
+/* More visible, continuous glossy light streak across the whole ad banner. */
+#community-partner-ads:before{
+ background:
+  linear-gradient(108deg,transparent 0%,rgba(255,255,255,.015) 34%,rgba(198,250,255,.34) 46%,rgba(255,255,255,.72) 49%,rgba(130,235,248,.28) 52%,rgba(255,255,255,.04) 59%,transparent 72%)!important;
+ background-size:260% 100%!important;
+ animation:cwAdBrilliantShine 4.2s cubic-bezier(.45,0,.35,1) infinite!important;
+ opacity:.9!important;
+}
+#community-partner-ads .cw-ad-slide:before{
+ inset:-55% -18%!important;
+ background:linear-gradient(108deg,transparent 39%,rgba(148,245,255,.08) 45%,rgba(255,255,255,.30) 49%,rgba(139,235,249,.13) 53%,transparent 61%)!important;
+ background-size:220% 100%!important;
+ animation:cwAdInnerGleam 5.5s ease-in-out infinite!important;
+}
+#community-partner-ads .cw-ad-slide:after{
+ border-color:rgba(154,244,250,.72)!important;
+ box-shadow:0 0 18px rgba(71,222,239,.16),0 0 0 18px rgba(100,229,238,.10),0 0 0 38px rgba(100,229,238,.06)!important;
+}
+#community-partner-ads{
+ box-shadow:0 22px 55px rgba(0,8,20,.48),inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 42px rgba(67,218,235,.12),0 0 24px rgba(91,225,240,.12)!important;
+}
+@keyframes cwAdBrilliantShine{
+ 0%,8%{background-position:160% 0}
+ 72%,100%{background-position:-85% 0}
+}
+@keyframes cwAdInnerGleam{
+ 0%,15%{transform:translateX(-42%)}
+ 75%,100%{transform:translateX(42%)}
+}
+@media(prefers-reduced-motion:reduce){
+ #community-partner-ads:before,#community-partner-ads .cw-ad-slide:before{animation:none!important}
+}
+</style>
 </body></html>
