@@ -1811,6 +1811,16 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 
 </style>
 
+
+<style id="cw-ad-animated-sponsor-art">
+/* Animated sponsor artwork: preserve the compact, horizontal carousel footprint. */
+#community-partner-ads .cw-ad-slides{height:clamp(108px,12vw,164px)!important;min-height:0!important;overflow:hidden!important}
+#community-partner-ads .cw-ad-slide{padding:0!important;inset:0!important;background:transparent!important}
+#community-partner-ads .cw-ad-slide img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important}
+#community-partner-ads .cw-ad-slide:after{display:none!important}
+@media(max-width:620px){#community-partner-ads .cw-ad-slides{height:108px!important;min-height:108px!important}}
+@media(prefers-reduced-motion:reduce){#community-partner-ads .cw-ad-slide img{animation:none!important}}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -1830,9 +1840,9 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  </div>
  <section class="cw-ad-carousel" id="community-partner-ads" aria-label="CoastWatch FL business advertising">
   <div class="cw-ad-slides">
-    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><span class="cw-ad-kicker">COASTWATCH FL · COMMUNITY PARTNERS</span><h2>YOUR <em>BUSINESS HERE</em></h2><p>Put your brand in the local spotlight.</p><span class="cw-ad-foot">ADVERTISE WITH COASTWATCH FL</span></article>
-    <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><span class="cw-ad-kicker">REACH BREVARD COUNTY</span><h2>CONNECT WITH YOUR <em>COMMUNITY</em></h2><p>Help support a more informed local community.</p><span class="cw-ad-foot">YOUR BUSINESS COULD BE FEATURED HERE</span></article>
-    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><span class="cw-ad-kicker">LOCAL BUSINESSES · LOCAL IMPACT</span><h2>FEATURE YOUR <em>BUSINESS</em></h2><p>Make your business part of the CoastWatch FL story.</p><span class="cw-ad-foot">SPONSORSHIP OPPORTUNITIES</span></article>
+    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></article>
+    <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><img src="/assets/sponsors/coastwatch-become-a-sponsor.svg" alt="Become a CoastWatch FL sponsor — put your business in front of a prepared community" loading="lazy"></article>
+    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></article>
   </div>
   <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Advertising space available <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
 </section>
