@@ -3252,7 +3252,7 @@ setInterval(checkForSiteUpdates,180000);
 /* Recover vertical space above the map: compact title, status and help controls. */
 #map-panel>.map-workspace-head{
  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
- grid-template-areas:"title title" "status status" "help help"!important;
+ grid-template-areas:"title status" "title help"!important;
  align-items:center!important;column-gap:14px!important;row-gap:7px!important;
  padding:13px 18px!important;min-height:0!important;
 }
@@ -3262,15 +3262,15 @@ setInterval(checkForSiteUpdates,180000);
 #map-panel .map-heading-copy h2{margin:0!important;font-size:clamp(19px,2vw,25px)!important;line-height:1.15!important}
 #map-panel .map-heading-copy>div>span{display:block!important;margin-top:3px!important;font-size:12px!important;line-height:1.35!important}
 #map-panel .map-live-state{grid-area:status!important;justify-self:end!important;align-self:end!important;width:max-content!important;min-height:0!important;padding:6px 10px!important;font-size:11px!important;line-height:1!important;border-radius:999px!important;white-space:nowrap!important}
-#map-panel .mew-gesture-help{grid-area:help!important;justify-self:start!important;align-self:start!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;max-width:100%!important;min-height:38px!important;margin:0!important;padding:8px 13px!important;border:1px solid #70d8d2!important;border-radius:10px!important;background:linear-gradient(135deg,#0b3348,#0d5960)!important;color:#eaffff!important;font-size:12px!important;line-height:1.2!important;white-space:nowrap!important;visibility:visible!important;opacity:1!important}
+#map-panel .mew-gesture-help{grid-area:help!important;justify-self:end!important;align-self:start!important;width:auto!important;min-height:32px!important;margin:0!important;padding:6px 10px!important;border-radius:9px!important;font-size:11px!important;line-height:1.1!important;white-space:nowrap!important}
 @media(max-width:600px){
- #map-panel>.map-workspace-head{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title title" "status status" "help help"!important;column-gap:8px!important;row-gap:9px!important;padding:11px 13px!important}
+ #map-panel>.map-workspace-head{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title title" "status help"!important;column-gap:8px!important;row-gap:9px!important;padding:11px 13px!important}
  #map-panel .map-heading-icon{flex-basis:32px!important;width:32px!important;height:32px!important;min-height:32px!important;font-size:19px!important;border-radius:10px!important}
  #map-panel .map-heading-copy{gap:8px!important}
  #map-panel .map-heading-copy h2{font-size:19px!important}
  #map-panel .map-heading-copy>div>span{font-size:11px!important}
  #map-panel .map-live-state{justify-self:start!important;padding:6px 9px!important;font-size:10px!important}
- #map-panel .mew-gesture-help{justify-self:start!important;min-height:38px!important;padding:8px 12px!important;font-size:12px!important}
+ #map-panel .mew-gesture-help{justify-self:end!important;min-height:30px!important;padding:6px 9px!important;font-size:10px!important}
 }
 @media(max-width:360px){
  #map-panel .map-heading-copy h2{font-size:17px!important}
