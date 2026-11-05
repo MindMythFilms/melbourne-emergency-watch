@@ -3637,4 +3637,38 @@ body.dark #map-panel .map-report-tools .map-report-button{
 })();
 </script>
 
+
+<style id="coastwatch-pc-map-always-visible">
+@media(min-width:901px){
+ /* The live map is a permanent primary workspace, never a disclosure/collapsible panel. */
+ #map-panel>.map-dashboard>.map-stage,
+ #map-panel>.map-dashboard>.map-stage>#map{display:block!important;visibility:visible!important;opacity:1!important}
+ #map-panel>.map-dashboard>.map-stage{height:clamp(650px,78vh,900px)!important;min-height:650px!important}
+ #map-panel>.map-dashboard>.map-stage>#map{height:100%!important;min-height:0!important}
+ #map-panel .map-sidebar>#mapAdvancedControls{display:block!important}
+ #map-panel .map-sidebar>#mapAdvancedControls>summary{display:none!important;pointer-events:none!important}
+ #map-panel .map-sidebar>#mapAdvancedControls>.map-sidebar-details-body{display:flex!important}
+}
+</style>
+<script id="coastwatch-pc-map-never-collapse">
+(()=>{
+ const mq=window.matchMedia("(min-width:901px)");
+ const panel=document.getElementById("map-panel");
+ const details=document.getElementById("mapAdvancedControls");
+ const stage=panel?.querySelector(".map-stage");
+ const map=stage?.querySelector("#map");
+ if(!panel||!details||!stage||!map)return;
+ const enforce=()=>{
+  if(!mq.matches)return;
+  details.open=true;
+  if(stage.closest("details"))panel.appendChild(stage);
+  if(map.closest("details"))stage.appendChild(map);
+  stage.hidden=false;map.hidden=false;
+  if(window.L&&window.mewMap&&typeof window.mewMap.invalidateSize==="function")requestAnimationFrame(()=>window.mewMap.invalidateSize());
+ };
+ enforce();
+ mq.addEventListener?mq.addEventListener("change",enforce):window.addEventListener("resize",enforce);
+})();
+</script>
+
 </body></html>
