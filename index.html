@@ -1926,8 +1926,18 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 </div><button id="submitBtn" type="submit">Submit community report</button><div id="formMessage" class="status hidden" role="status"></div></form></div></section>
 </div>
 
-<section class="panel" id="community-reports-panel"><div class="panelhead"><div><h2>Latest community reports</h2><span class="section-subtitle">Recent observations submitted by the community · Not independently verified</span></div></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
-<section class="panel" id="official-alerts-panel"><div class="panelhead"><div><h2>Official National Weather Service alerts</h2><span class="section-subtitle">Government-issued alerts for Brevard County</span></div></div><div id="nwsAlertStatus" role="status" style="margin:12px 18px;font-weight:700">Connecting to National Weather Service…</div><div id="nwsAlertList" class="reportlist" aria-live="polite"><div class="hint">Loading official weather alerts…</div></div></section>
+<section class="panel" id="latest-news-panel">
+ <div class="panelhead"><div><h2>Latest News</h2><span class="section-subtitle">Community reports and official National Weather Service alerts for Brevard County</span></div></div>
+ <div id="community-reports-panel" class="latest-news-group">
+  <div class="latest-news-subhead"><h3>Community reports</h3><span>Recent observations · Not independently verified</span></div>
+  <div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div>
+ </div>
+ <div id="official-alerts-panel" class="latest-news-group">
+  <div class="latest-news-subhead"><h3>Official weather alerts</h3><span>Government-issued National Weather Service alerts</span></div>
+  <div id="nwsAlertStatus" role="status" style="margin:12px 18px;font-weight:700">Connecting to National Weather Service…</div>
+  <div id="nwsAlertList" class="reportlist" aria-live="polite"><div class="hint">Loading official weather alerts…</div></div>
+ </div>
+</section>
 <section class="panel mew-official-resources" id="official-resources"><details class="mew-resources-details"><summary><span><strong>Official emergency information</strong><small>Government resources, road conditions and public health links</small></span><span class="mew-details-count">5 links</span></summary><div class="resource-grid"><a href="https://www.brevardfl.gov/EmergencyManagement" target="_blank" rel="noopener">Brevard County Emergency Management <span>Preparedness, alerts and emergency information ↗</span></a><a href="https://www.weather.gov/mlb/" target="_blank" rel="noopener">National Weather Service — Melbourne <span>Official weather watches and warnings ↗</span></a><a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management <span>Statewide emergency information ↗</span></a><a href="https://www.fl511.com/" target="_blank" rel="noopener">FL511 Traffic Information <span>Road conditions and traffic alerts ↗</span></a><a href="https://www.floridahealth.gov/" target="_blank" rel="noopener">Florida Department of Health <span>Public health advisories ↗</span></a></div><div class="mapnote">These links lead to external official sources. CoastWatch FL does not control their content or guarantee that every alert is shown here. For emergencies, call 911.</div></details></section>
 
 
@@ -3100,6 +3110,27 @@ setInterval(checkForSiteUpdates,180000);
 @media(max-width:650px){
  .mew-map-resource-details>summary{padding:13px 12px}
  .mew-map-resource-details>summary span{font-size:10px}
+}
+</style>
+
+
+<style id="mew-latest-news-combined">
+#latest-news-panel{margin-top:18px!important;overflow:hidden}
+#latest-news-panel>.panelhead{padding:20px 22px!important}
+#latest-news-panel .latest-news-group{border-top:1px solid var(--line,#25485d)}
+#latest-news-panel .latest-news-subhead{padding:15px 20px 8px}
+#latest-news-panel .latest-news-subhead h3{margin:0 0 4px;color:var(--ink,#eff8ff);font-size:17px;font-weight:850}
+#latest-news-panel .latest-news-subhead span{display:block;color:var(--muted,#a9c1d0);font-size:12px;line-height:1.5}
+#latest-news-panel .reportlist{max-height:none;overflow:visible;padding:4px 20px 16px}
+#latest-news-panel .report{padding:15px 0;border-bottom:1px solid #294458}
+#latest-news-panel #nwsAlertStatus{margin:8px 20px 12px!important;padding:10px 12px;border-radius:10px;background:#12364a;color:var(--ink,#eff8ff)}
+@media(max-width:650px){
+ #latest-news-panel>.panelhead{padding:17px 16px!important}
+ #latest-news-panel .latest-news-subhead{padding:13px 16px 7px}
+ #latest-news-panel .latest-news-subhead h3{font-size:15px}
+ #latest-news-panel .latest-news-subhead span{font-size:11px}
+ #latest-news-panel .reportlist{padding:4px 16px 14px}
+ #latest-news-panel #nwsAlertStatus{margin:8px 16px 10px!important}
 }
 </style>
 
