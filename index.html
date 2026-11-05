@@ -2392,10 +2392,12 @@ function nwsPopup(p,approximate){
 }
 function renderNwsAlertList(features){
  const host=$("nwsAlertList");if(!host)return;
- if(!features.length){host.innerHTML='<div class="hint">No active NWS alerts for Brevard County right now.</div>';return;}
- host.innerHTML=features.slice(0,8).map(f=>{
-  const p=f.properties||{},color=nwsSeverityColor(p.severity);
-  return '<div class="report" style="border-left:4px solid '+color+'"><strong>'+esc(p.event||"Weather alert")+'</strong><small>'+esc(p.areaDesc||"Brevard County")+' · '+esc(String(p.severity||"Unknown severity"))+'</small>'+(p.headline?'<p class="report-description">'+esc(p.headline)+'</p>':"")+'<small>Expires: '+esc(nwsSafeDate(p.expires))+'</small>'+(p.web?'<p><a href="'+esc(p.web)+'" target="_blank" rel="noopener noreferrer">View official NWS alert</a></p>':"")+'</div>';
+ if(!features.length){host.innerHTML='<div class="mew-news-empty"><span>✓</span><div><strong>No active NWS alerts</strong><small>No active National Weather Service alerts are currently listed for Brevard County.</small></div></div>';return;}
+ const rank={extreme:0,severe:1,moderate:2,minor:3,unknown:4};
+ const ordered=[...features].sort((a,b)=>(rank[String(a.properties?.severity||"unknown").toLowerCase()]??4)-(rank[String(b.properties?.severity||"unknown").toLowerCase()]??4));
+ host.innerHTML=ordered.slice(0,8).map(f=>{
+  const p=f.properties||{},severity=String(p.severity||"Unknown"),level=severity.toLowerCase(),color=nwsSeverityColor(p.severity);
+  return '<article class="report mew-official-alert-card mew-severity-'+esc(level)+'" style="--mew-alert-color:'+color+'"><div class="mew-alert-card-top"><strong>'+esc(p.event||"Weather alert")+'</strong><span class="mew-alert-severity">'+esc(severity)+'</span></div><small class="mew-alert-area">'+esc(p.areaDesc||"Brevard County")+'</small>'+(p.headline?'<p class="report-description">'+esc(p.headline)+'</p>':"")+'<div class="mew-alert-card-bottom"><small>Expires '+esc(nwsSafeDate(p.expires))+'</small>'+(p.web?'<a href="'+esc(p.web)+'" target="_blank" rel="noopener noreferrer">Official NWS details ↗</a>':"")+'</div><small class="mew-source-label">OFFICIAL · NATIONAL WEATHER SERVICE</small></article>';
  }).join("");
 }
 async function loadNwsAlerts(){
@@ -3415,4 +3417,46 @@ setInterval(checkForSiteUpdates,180000);
 @media(min-width:701px){.mew-emergency-status-strip{grid-template-columns:repeat(5,minmax(0,1fr))!important}}
 @media(max-width:700px){.mew-emergency-status-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
+
+<style id="mew-latest-news-visual-hierarchy">
+#latest-news-panel{border-radius:18px;overflow:hidden}
+#latest-news-panel>.panelhead{padding:19px 22px;background:linear-gradient(110deg,#0b3044,#0a2639)}
+#latest-news-panel>.panelhead h2{font-size:21px;letter-spacing:-.3px}
+#latest-news-panel .latest-news-group{padding-bottom:7px}
+#latest-news-panel .latest-news-subhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px 9px}
+#latest-news-panel .latest-news-subhead h3{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:.01em}
+#community-reports-panel .latest-news-subhead h3:before{content:"◎";display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#0c777733;color:#55ddd2}
+#official-alerts-panel .latest-news-subhead h3:before{content:"⚠";display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#b7791f2b;color:#f5c66a}
+#latest-news-panel .latest-news-subhead span{font-size:10px;text-align:right}
+#latest-news-panel .reportlist{display:grid;gap:8px;padding:4px 20px 14px}
+#latest-news-panel #latestReports .report{margin:0;padding:12px 14px;border:1px solid #31566a;border-left:3px solid #1ba99c;border-radius:11px;background:linear-gradient(110deg,#0b2c40,#0a2537)}
+#latest-news-panel #latestReports .report>strong{display:block;font-size:14px;line-height:1.35}
+#latest-news-panel #latestReports .report>small{display:block;margin-top:4px;color:#a9c2ce;font-size:10px}
+#latest-news-panel #latestReports .report-description{margin:7px 0;color:#d5e6ed;font-size:12px;line-height:1.45}
+#latest-news-panel .mew-official-alert-card{margin:0;padding:13px 14px;border:1px solid #3a5668;border-left:4px solid var(--mew-alert-color,#e5a83c)!important;border-radius:11px;background:linear-gradient(110deg,#102c3e,#0a2435)}
+#latest-news-panel .mew-alert-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#latest-news-panel .mew-alert-card-top>strong{font-size:14px;line-height:1.35;color:#f5fbff}
+#latest-news-panel .mew-alert-severity{flex:0 0 auto;padding:4px 7px;border-radius:6px;background:#ffffff12;color:#ffe1a0;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+#latest-news-panel .mew-alert-area{display:block;margin-top:5px;color:#b6cbd5;font-size:10px}
+#latest-news-panel .mew-official-alert-card .report-description{margin:8px 0;color:#e1edf2;font-size:12px;line-height:1.5}
+#latest-news-panel .mew-alert-card-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid #ffffff18}
+#latest-news-panel .mew-alert-card-bottom small{color:#b7cbd4;font-size:10px}
+#latest-news-panel .mew-alert-card-bottom a{font-size:11px;font-weight:800;color:#75e4dc;text-decoration:none}
+#latest-news-panel .mew-source-label{display:block;margin-top:9px;color:#79b9c1;font-size:8px;font-weight:900;letter-spacing:.13em}
+#latest-news-panel .mew-news-empty{display:flex;align-items:center;gap:12px;margin:4px 20px 14px;padding:14px;border:1px solid #236c57;border-radius:11px;background:#0c392f}
+#latest-news-panel .mew-news-empty>span{font-size:22px;color:#69e0a5}
+#latest-news-panel .mew-news-empty strong,#latest-news-panel .mew-news-empty small{display:block}
+#latest-news-panel .mew-news-empty small{margin-top:3px;color:#b5d6ca;font-size:11px}
+@media(max-width:650px){
+ #latest-news-panel>.panelhead{padding:15px 14px}
+ #latest-news-panel>.panelhead h2{font-size:18px}
+ #latest-news-panel .latest-news-subhead{align-items:flex-start;padding:12px 14px 8px}
+ #latest-news-panel .latest-news-subhead h3{font-size:13px}
+ #latest-news-panel .latest-news-subhead span{max-width:48%;font-size:9px}
+ #latest-news-panel .reportlist{padding:4px 12px 12px;gap:7px}
+ #latest-news-panel #latestReports .report,#latest-news-panel .mew-official-alert-card{padding:11px}
+ #latest-news-panel .mew-alert-card-top>strong{font-size:13px}
+}
+</style>
+
 </body></html>
