@@ -3855,4 +3855,37 @@ body.dark #map-panel .map-report-tools .map-report-button{
   }
 }
 </style>
+
+<style id="mew-desktop-map-dominant-layout">
+/* Desktop: make the live map the primary, near full-screen feature. */
+@media (min-width: 901px) {
+  main {
+    width: calc(100% - 32px) !important;
+    max-width: 2200px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  #map-panel {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  #map-panel > .map-stage {
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+  #map-panel > .map-stage #map {
+    width: 100% !important;
+    height: clamp(760px, 88vh, 1250px) !important;
+    min-height: 760px !important;
+    max-height: none !important;
+  }
+  #map-panel > .map-workspace-head,
+  #map-panel > #mapAdvancedControls {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+</style>
 </body></html>
