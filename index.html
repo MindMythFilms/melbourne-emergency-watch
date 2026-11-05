@@ -3018,26 +3018,51 @@ setInterval(checkForSiteUpdates,180000);
  };;
 </script>
 
-<script>
-/* Automatic CoastWatch FL placeholder-ad rotation; no nonfunctional controls. */
+<script id="cw-ad-carousel-controller">
+/* Reliable CoastWatch FL partner-ad rotation with working slide indicators. */
 (function(){
- const root=document.getElementById('community-partner-ads');
- if(!root)return;
- const slides=[...root.querySelectorAll('.cw-ad-slide')];
- const dots=[...root.querySelectorAll('.cw-ad-progress i')];
- if(slides.length<2)return;
- const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- let current=0,timer=null;
- function show(index){
-  current=(index+slides.length)%slides.length;
-  slides.forEach((slide,i)=>{const active=i===current;slide.classList.toggle('is-active',active);slide.setAttribute('aria-hidden',String(!active));});
-  dots.forEach((dot,i)=>dot.classList.toggle('is-active',i===current));
- }
- function stop(){if(timer){clearInterval(timer);timer=null;}}
- function start(){stop();if(!reduced)timer=setInterval(()=>show(current+1),4800);}
- root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
- show(0);start();
+ const init=()=>{
+  const root=document.getElementById('community-partner-ads');
+  if(!root||root.dataset.carouselReady==='true')return;
+  const slides=Array.from(root.querySelectorAll('.cw-ad-slide'));
+  const dots=Array.from(root.querySelectorAll('.cw-ad-progress i'));
+  if(slides.length<2)return;
+  root.dataset.carouselReady='true';
+  let current=Math.max(0,slides.findIndex(s=>s.classList.contains('is-active')));
+  let timer=null;
+  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(index){
+   current=(index+slides.length)%slides.length;
+   slides.forEach((slide,i)=>{
+    const active=i===current;
+    slide.classList.toggle('is-active',active);
+    slide.setAttribute('aria-hidden',String(!active));
+   });
+   dots.forEach((dot,i)=>{
+    const active=i===current;
+    dot.classList.toggle('is-active',active);
+    dot.setAttribute('role','button');
+    dot.setAttribute('tabindex','0');
+    dot.setAttribute('aria-label','Show advertisement '+(i+1));
+    dot.setAttribute('aria-current',String(active));
+   });
+  }
+  function stop(){if(timer!==null){window.clearInterval(timer);timer=null;}}
+  function start(){stop();if(!document.hidden)timer=window.setInterval(()=>show(current+1),5000);}
+  dots.forEach((dot,i)=>{
+   dot.style.cursor='pointer';
+   dot.addEventListener('click',()=>{show(i);start();});
+   dot.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);start();}
+   });
+  });
+  /* Do not pause on hover: the desktop banner must keep rotating. */
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
+  show(current);
+  start();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+ else init();
 })();</script>
 
 <script>(function(){var d=document.getElementById("mapAdvancedControls");if(d&&window.matchMedia&&window.matchMedia("(max-width: 700px)").matches)d.open=false;})();</script>
