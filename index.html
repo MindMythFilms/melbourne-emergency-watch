@@ -1822,13 +1822,14 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 @media(prefers-reduced-motion:reduce){#community-partner-ads .cw-ad-slide img{animation:none!important}}
 </style>
 <style id="cw-ad-exact-artwork-fit">
-/* Exact artwork ratios: 1600×164 desktop and 640×108 mobile. No cropping. */
-#community-partner-ads .cw-ad-slides{height:auto!important;min-height:0!important;aspect-ratio:1600/164!important;overflow:hidden!important}
+/* Let each SVG keep its natural artwork ratio; never stretch it to the slide height. */
+#community-partner-ads .cw-ad-slides{height:auto!important;min-height:0!important;aspect-ratio:auto!important;overflow:hidden!important}
 #community-partner-ads .cw-ad-slide{inset:0!important;padding:0!important;background:transparent!important}
-#community-partner-ads .cw-ad-slide picture{display:block!important;width:100%!important;height:100%!important}
-#community-partner-ads .cw-ad-slide picture img{display:block!important;width:100%!important;height:100%!important;object-fit:fill!important;object-position:center!important}
+#community-partner-ads .cw-ad-slide.is-active{position:relative!important}
+#community-partner-ads .cw-ad-slide picture{display:block!important;width:100%!important;height:auto!important;flex:0 0 auto!important}
+#community-partner-ads .cw-ad-slide picture img{display:block!important;width:100%!important;height:auto!important;max-width:100%!important;object-fit:contain!important;object-position:center!important}
 #community-partner-ads .cw-ad-slide:after{display:none!important}
-@media(max-width:620px){#community-partner-ads .cw-ad-slides{aspect-ratio:640/148!important}}
+@media(max-width:760px){#community-partner-ads .cw-ad-slides{aspect-ratio:auto!important}}
 </style>
 </head>
 <body>
@@ -1849,9 +1850,9 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  </div>
  <section class="cw-ad-carousel" id="community-partner-ads" aria-label="CoastWatch FL business advertising">
   <div class="cw-ad-slides">
-    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><picture><source media="(max-width:620px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></picture></article>
-    <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><picture><source media="(max-width:620px)" srcset="/assets/sponsors/coastwatch-become-a-sponsor-mobile.svg"><img src="/assets/sponsors/coastwatch-become-a-sponsor.svg" alt="Become a CoastWatch FL sponsor — put your business in front of a prepared community" loading="lazy"></picture></article>
-    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><picture><source media="(max-width:620px)" srcset="/assets/sponsors/coastwatch-stronger-communities-mobile.svg"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></picture></article>
+    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></picture></article>
+    <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-become-a-sponsor-mobile.svg"><img src="/assets/sponsors/coastwatch-become-a-sponsor.svg" alt="Become a CoastWatch FL sponsor — put your business in front of a prepared community" loading="lazy"></picture></article>
+    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-stronger-communities-mobile.svg"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></picture></article>
   </div>
   <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Advertising space available <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
 </section>
