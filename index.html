@@ -3573,4 +3573,54 @@ body.dark #map-panel .map-report-tools .map-report-button{
 }
 </style>
 
+
+<style id="coastwatch-desktop-map-layout-recovery">
+/* Desktop-only layout recovery: place the controls column on the left and map on the right.
+   The mobile layout below 901px is deliberately untouched. */
+@media(min-width:901px){
+ #map-panel{
+  display:grid!important;
+  grid-template-columns:minmax(290px,340px) minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto auto!important;
+  align-items:stretch!important;
+ }
+ #map-panel>.panelhead,
+ #map-panel>#mapBasemapCard,
+ #map-panel>#mapAdvancedControls{
+  grid-column:1/-1!important;
+ }
+ #map-panel>.map-dashboard{
+  grid-column:1!important;grid-row:4!important;
+  display:block!important;width:100%!important;min-width:0!important;
+  height:clamp(620px,78vh,1000px)!important;min-height:560px!important;
+  align-self:stretch!important;overflow:auto!important;
+ }
+ #map-panel>.map-dashboard>.map-sidebar{
+  display:flex!important;width:100%!important;min-width:0!important;
+  min-height:100%!important;height:100%!important;
+  border-right:1px solid rgba(120,180,200,.24)!important;
+  border-bottom:0!important;
+ }
+ #map-panel>.map-stage{
+  grid-column:2!important;grid-row:4!important;
+  display:block!important;position:relative!important;
+  width:100%!important;min-width:0!important;
+  height:clamp(620px,78vh,1000px)!important;
+  min-height:560px!important;max-height:1000px!important;
+  align-self:stretch!important;overflow:hidden!important;
+  border-left:1px solid rgba(120,180,200,.18)!important;
+ }
+ #map-panel>.map-stage>#map{
+  display:block!important;width:100%!important;height:100%!important;
+  min-height:560px!important;max-height:none!important;
+ }
+ #map-panel>.mobile-legend-toggle,
+ #map-panel>.nws-legend,
+ #map-panel>.mapnote,
+ #map-panel>#report-panel{
+  grid-column:1/-1!important;
+ }
+}
+</style>
+
 </body></html>
