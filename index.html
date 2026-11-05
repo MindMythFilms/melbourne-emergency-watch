@@ -1809,9 +1809,13 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 <div class="full"><label style="display:flex;gap:8px;align-items:start;font-weight:500"><input id="anonymous" type="checkbox" checked style="width:auto;margin-top:4px"> Submit without displaying my name.</label></div>
 </div><button id="submitBtn" type="submit">Submit community report</button><div id="formMessage" class="status hidden" role="status"></div></form></div></section>
 </div>
-<section class="cw-partner-strip" aria-label="CoastWatch FL community partnerships">
-  <div class="cw-partner-strip-copy"><span class="cw-partner-kicker">COMMUNITY PARTNERSHIPS</span><strong>Keeping our community informed, together.</strong><span>Local businesses help support accessible community information.</span></div>
-  <button class="cw-partner-open" type="button" data-cw-partner-open>Become a Partner <span aria-hidden="true">↗</span></button>
+<section class="cw-ad-carousel" id="community-partner-ads" aria-label="CoastWatch FL business advertising">
+  <div class="cw-ad-slides">
+    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><span class="cw-ad-kicker">COASTWATCH FL · COMMUNITY PARTNERS</span><h2>YOUR <em>BUSINESS HERE</em></h2><p>Put your brand in the local spotlight.</p><span class="cw-ad-foot">ADVERTISE WITH COASTWATCH FL</span></article>
+    <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><span class="cw-ad-kicker">REACH BREVARD COUNTY</span><h2>CONNECT WITH YOUR <em>COMMUNITY</em></h2><p>Help support a more informed local community.</p><span class="cw-ad-foot">YOUR BUSINESS COULD BE FEATURED HERE</span></article>
+    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><span class="cw-ad-kicker">LOCAL BUSINESSES · LOCAL IMPACT</span><h2>FEATURE YOUR <em>BUSINESS</em></h2><p>Make your business part of the CoastWatch FL story.</p><span class="cw-ad-foot">SPONSORSHIP OPPORTUNITIES</span></article>
+  </div>
+  <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Advertising space available <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
 </section>
 <section class="panel" id="community-reports-panel"><div class="panelhead"><div><h2>Latest community reports</h2><span class="section-subtitle">Recent observations submitted by the community · Not independently verified</span></div></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
 <section class="panel" id="official-alerts-panel"><div class="panelhead"><div><h2>Official National Weather Service alerts</h2><span class="section-subtitle">Government-issued alerts for Brevard County</span></div></div><div id="nwsAlertStatus" role="status" style="margin:12px 18px;font-weight:700">Connecting to National Weather Service…</div><div id="nwsAlertList" class="reportlist" aria-live="polite"><div class="hint">Loading official weather alerts…</div></div></section>
@@ -1822,25 +1826,6 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 </main>
 <div class="mew-photo-viewer" id="photoViewer" role="dialog" aria-modal="true" aria-label="Enlarged community report photo"><button class="mew-photo-viewer-close" id="photoViewerClose" type="button" aria-label="Close enlarged photo">×</button><img id="photoViewerImage" alt="Enlarged administrator-approved community report photo"><div class="mew-photo-viewer-hint">Click outside the photo or press Escape to close</div></div>
 <footer>© CoastWatch FL · Community information only · Not an emergency response service.</footer>
-<button class="cw-partner-float" type="button" data-cw-partner-open aria-haspopup="dialog" aria-controls="cwPartnerDialog"><span class="cw-partner-float-icon" aria-hidden="true">✦</span><span>Support CoastWatch</span></button>
-<div class="cw-partner-modal" id="cwPartnerDialog" role="dialog" aria-modal="true" aria-labelledby="cwPartnerTitle" aria-describedby="cwPartnerIntro" hidden>
-  <div class="cw-partner-backdrop" data-cw-partner-close></div>
-  <section class="cw-partner-dialog">
-    <button class="cw-partner-close" type="button" data-cw-partner-close aria-label="Close sponsorship information">×</button>
-    <span class="cw-partner-kicker">LOCAL IMPACT. STRONGER COMMUNITY.</span>
-    <h2 id="cwPartnerTitle">Become a CoastWatch FL Partner</h2>
-    <p id="cwPartnerIntro">Your business can help keep useful local hazard and emergency information accessible to Brevard County residents.</p>
-    <div class="cw-partner-monthly"><span class="cw-partner-monthly-dot"></span> Monthly partnership opportunities</div>
-    <div class="cw-partner-tiers">
-      <article class="cw-partner-tier cw-partner-gold"><span>GOLD PARTNER</span><h3>Lead the way</h3><p>Premium recognition for businesses making a meaningful local impact.</p></article>
-      <article class="cw-partner-tier cw-partner-silver"><span>SILVER PARTNER</span><h3>Stand together</h3><p>Show your support while helping residents find useful information.</p></article>
-      <article class="cw-partner-tier cw-partner-community"><span>COMMUNITY PARTNER</span><h3>Support local</h3><p>Help strengthen a growing community resource close to home.</p></article>
-    </div>
-    <p class="cw-partner-note">Monthly pricing and enrollment details are being finalized. No payment is collected through this page.</p>
-    <button class="cw-partner-done" type="button" data-cw-partner-close>Got it</button>
-  </section>
-</div>
-
 <div class="mew-flag-overlay" id="flagOverlay" role="dialog" aria-modal="true" aria-labelledby="flagTitle">
  <div class="mew-flag-dialog">
   <h2 id="flagTitle">Report this listing</h2>
@@ -2818,19 +2803,23 @@ setInterval(checkForSiteUpdates,180000);
  .site-nav .theme-toggle,.site-nav .nav-report{padding:10px 12px;font-size:12px;min-height:42px}
 }
 
-/* CoastWatch FL compact partner strip, persistent entry point and accessible dialog */
-.cw-partner-strip{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0 22px;padding:15px 18px;border:1px solid #7dd9e64d;border-radius:17px;background:radial-gradient(ellipse at 8% 0%,#38b8c32b,transparent 55%),linear-gradient(115deg,#0a2235f5,#10354af2);box-shadow:0 10px 28px #00101e24;color:#f3fbff;overflow:hidden}
-.cw-partner-strip:before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 15%,#ffffff0a 50%,transparent 85%);pointer-events:none}
-.cw-partner-strip-copy{display:flex;flex-direction:column;gap:2px;position:relative;z-index:1}.cw-partner-kicker{font-size:9px;letter-spacing:.18em;font-weight:900;color:#82deea}.cw-partner-strip-copy strong{font-size:16px;line-height:1.25;color:#fff}.cw-partner-strip-copy>span:last-child{font-size:12px;color:#bed3df}
-.cw-partner-open{position:relative;z-index:1;flex:0 0 auto;display:inline-flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid #8de8f2a6;border-radius:999px;background:linear-gradient(135deg,#ffffff20,#ffffff09);color:#e9fcff;font:700 12px system-ui,sans-serif;cursor:pointer;box-shadow:inset 0 1px #ffffff3d,0 5px 16px #0003;transition:transform .2s,background .2s}.cw-partner-open:hover{transform:translateY(-1px);background:#ffffff25}.cw-partner-open:focus-visible,.cw-partner-float:focus-visible,.cw-partner-close:focus-visible,.cw-partner-done:focus-visible{outline:3px solid #76e5f0;outline-offset:3px}
-.cw-partner-float{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:900;display:flex;align-items:center;gap:9px;padding:11px 16px 11px 12px;border:1px solid #8de8f2a6;border-radius:999px;background:linear-gradient(135deg,#0d344bfa,#071d30fa);color:#f2fcff;font:750 12px system-ui,sans-serif;box-shadow:0 9px 28px #00101e70,inset 0 1px #ffffff2b;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .2s,box-shadow .2s}.cw-partner-float:hover{transform:translateY(-2px);box-shadow:0 13px 32px #00101e85,inset 0 1px #ffffff35}.cw-partner-float-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#d6b66b24;color:#f1d68f;font-size:15px}
-.cw-partner-modal[hidden]{display:none}.cw-partner-modal{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:18px}.cw-partner-backdrop{position:absolute;inset:0;background:#03111dcc;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.cw-partner-dialog{position:relative;width:min(720px,100%);max-height:min(88vh,820px);overflow:auto;padding:clamp(22px,4vw,34px);border:1px solid #8bd9eb66;border-radius:24px;background:radial-gradient(ellipse at 8% 0%,#1d788b45,transparent 45%),linear-gradient(145deg,#0b2639fa,#071a2afa);color:#edfaff;box-shadow:0 24px 90px #0009,inset 0 1px #ffffff25}
-.cw-partner-close{position:absolute;right:16px;top:14px;width:36px;height:36px;border:1px solid #ffffff32;border-radius:50%;background:#ffffff10;color:#e9faff;font-size:24px;line-height:1;cursor:pointer}.cw-partner-dialog h2{margin:8px 42px 8px 0;font-size:clamp(23px,4vw,31px);line-height:1.15;color:#fff}.cw-partner-dialog>p{color:#bed3df;font-size:14px;line-height:1.55}.cw-partner-monthly{display:inline-flex;align-items:center;gap:8px;margin:8px 0 16px;padding:7px 11px;border:1px solid #75dce65c;border-radius:999px;background:#4cc8d412;color:#9ceaf0;font-size:11px;font-weight:800}.cw-partner-monthly-dot{width:7px;height:7px;border-radius:50%;background:#78e3d0;box-shadow:0 0 10px #78e3d0}
-.cw-partner-tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cw-partner-tier{min-width:0;padding:15px 13px;border:1px solid #ffffff27;border-radius:16px;background:linear-gradient(145deg,#ffffff16,#ffffff06);box-shadow:inset 0 1px #ffffff20}.cw-partner-tier>span{font-size:9px;letter-spacing:.13em;font-weight:900}.cw-partner-tier h3{margin:8px 0 5px;font-size:17px;color:#fff}.cw-partner-tier p{margin:0;color:#c2d6e1;font-size:12px;line-height:1.5}.cw-partner-gold{border-color:#e9c66c70}.cw-partner-gold>span{color:#f0d38d}.cw-partner-silver{border-color:#c4d6e570}.cw-partner-silver>span{color:#dceaf5}.cw-partner-community{border-color:#65d7d170}.cw-partner-community>span{color:#8de7df}
-.cw-partner-dialog .cw-partner-note{margin:16px 0 12px;padding:11px 13px;border-left:3px solid #79dbe5;border-radius:0 9px 9px 0;background:#ffffff0b;font-size:12px}.cw-partner-done{width:100%;padding:12px 16px;border:1px solid #8de8f2a6;border-radius:12px;background:linear-gradient(135deg,#16758b,#0b526d);color:white;font:800 13px system-ui,sans-serif;cursor:pointer}
-@media(max-width:620px){.cw-partner-strip{align-items:flex-start;flex-direction:column;padding:15px}.cw-partner-open{align-self:stretch;justify-content:center}.cw-partner-float{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));padding:10px 13px}.cw-partner-tiers{grid-template-columns:1fr}.cw-partner-tier{padding:13px}.cw-partner-dialog{border-radius:19px}.cw-partner-modal{padding:10px}}
-@media(prefers-reduced-motion:reduce){.cw-partner-open,.cw-partner-float{transition:none}}
+/* CoastWatch FL animated business-ad showcase */
+.cw-ad-carousel{position:relative;margin:18px 0 22px;padding:0;border:1px solid #54d5e766;border-radius:20px;overflow:hidden;background:#061a2a;box-shadow:0 14px 38px #00101e35;color:#f3fbff}
+.cw-ad-slides{position:relative;min-height:205px;isolation:isolate;background:radial-gradient(ellipse at 12% 100%,#0e899b55,transparent 45%),linear-gradient(120deg,#061626,#0a3047 55%,#071b2c)}
+.cw-ad-slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 22px 30px;opacity:0;visibility:hidden;transform:scale(1.025);transition:opacity .8s ease,transform 1.2s ease,visibility .8s;overflow:hidden}
+.cw-ad-slide:before,.cw-ad-slide:after{content:"";position:absolute;pointer-events:none;z-index:-1}
+.cw-ad-slide:before{inset:-40% -10%;background:linear-gradient(112deg,transparent 35%,#55e8f21a 49%,transparent 62%);transform:translateX(-35%);animation:cwAdShimmer 6s ease-in-out infinite}
+.cw-ad-slide:after{width:260px;height:260px;right:-70px;bottom:-180px;border:1px solid #64e5ee55;border-radius:50%;box-shadow:0 0 0 18px #64e5ee0c,0 0 0 38px #64e5ee08}
+.cw-ad-slide.is-active{position:relative;opacity:1;visibility:visible;transform:scale(1)}
+.cw-ad-one{background:radial-gradient(ellipse at 15% 5%,#087e9a44,transparent 45%),linear-gradient(120deg,#071827,#0c3448 60%,#071827)}
+.cw-ad-two{background:radial-gradient(ellipse at 85% 0%,#d49a3930,transparent 42%),linear-gradient(115deg,#081c2c,#10405a 58%,#092438)}
+.cw-ad-three{background:radial-gradient(ellipse at 20% 100%,#16a5a055,transparent 48%),linear-gradient(120deg,#061a2b,#0a3044 60%,#0c2636)}
+.cw-ad-kicker{font-size:10px;letter-spacing:.22em;font-weight:900;color:#80e7ef;text-transform:uppercase}.cw-ad-slide h2{margin:9px 0 5px;font-size:clamp(27px,5vw,48px);line-height:1.05;letter-spacing:.025em;color:#f7fbff;text-shadow:0 3px 20px #0008}.cw-ad-slide h2 em{font-style:normal;color:#f0cc77;text-shadow:0 0 22px #e6b94c55}.cw-ad-two h2 em{color:#83e7ed}.cw-ad-three h2 em{color:#f2cf82}.cw-ad-slide p{margin:5px 0 14px;color:#d3e6ee;font-size:clamp(13px,2vw,16px)}.cw-ad-foot{font-size:9px;letter-spacing:.2em;font-weight:900;color:#9adce7}
+.cw-ad-caption{display:flex;align-items:center;gap:9px;padding:10px 16px;border-top:1px solid #8de8f222;background:#041522;color:#a9c7d4;font-size:10px;letter-spacing:.04em}.cw-ad-pulse{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#75e1c2;box-shadow:0 0 10px #75e1c2;animation:cwAdPulse 1.8s ease-in-out infinite}.cw-ad-progress{display:flex;gap:5px;margin-left:auto}.cw-ad-progress i{display:block;width:5px;height:5px;border-radius:50%;background:#577c8e;transition:background .3s,transform .3s}.cw-ad-progress i.is-active{background:#81e6ee;transform:scale(1.35)}
+@keyframes cwAdShimmer{0%,25%{transform:translateX(-35%)}75%,100%{transform:translateX(35%)}}@keyframes cwAdPulse{0%,100%{opacity:.55;box-shadow:0 0 4px #75e1c2}50%{opacity:1;box-shadow:0 0 13px #75e1c2}}
+@media(max-width:620px){.cw-ad-slides{min-height:190px}.cw-ad-slide{padding:22px 14px 24px}.cw-ad-slide h2{font-size:clamp(25px,8vw,36px)}.cw-ad-kicker{font-size:8px;letter-spacing:.16em}.cw-ad-caption{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.cw-ad-slide{transition:none}.cw-ad-slide:before,.cw-ad-pulse{animation:none!important}.cw-ad-slide:not(.is-active){display:none}}
+
 
 </style>
 
@@ -2848,38 +2837,25 @@ setInterval(checkForSiteUpdates,180000);
 </script>
 
 <script>
-/* CoastWatch FL partnership entry points and accessible information dialog. */
+/* Automatic CoastWatch FL placeholder-ad rotation; no nonfunctional controls. */
 (function(){
- const dialog=document.getElementById('cwPartnerDialog');
- if(!dialog)return;
- const openers=[...document.querySelectorAll('[data-cw-partner-open]')];
- const closers=[...dialog.querySelectorAll('[data-cw-partner-close]')];
- let returnFocus=null;
- function openDialog(){
-  returnFocus=document.activeElement;
-  dialog.hidden=false;
-  document.body.style.overflow='hidden';
-  const closeButton=dialog.querySelector('.cw-partner-close');
-  if(closeButton)closeButton.focus();
+ const root=document.getElementById('community-partner-ads');
+ if(!root)return;
+ const slides=[...root.querySelectorAll('.cw-ad-slide')];
+ const dots=[...root.querySelectorAll('.cw-ad-progress i')];
+ if(slides.length<2)return;
+ const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let current=0,timer=null;
+ function show(index){
+  current=(index+slides.length)%slides.length;
+  slides.forEach((slide,i)=>{const active=i===current;slide.classList.toggle('is-active',active);slide.setAttribute('aria-hidden',String(!active));});
+  dots.forEach((dot,i)=>dot.classList.toggle('is-active',i===current));
  }
- function closeDialog(){
-  dialog.hidden=true;
-  document.body.style.overflow='';
-  if(returnFocus&&typeof returnFocus.focus==='function')returnFocus.focus();
- }
- openers.forEach(button=>button.addEventListener('click',openDialog));
- closers.forEach(button=>button.addEventListener('click',closeDialog));
- document.addEventListener('keydown',event=>{
-  if(dialog.hidden)return;
-  if(event.key==='Escape'){event.preventDefault();closeDialog();return;}
-  if(event.key==='Tab'){
-   const focusable=[...dialog.querySelectorAll('button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
-   if(!focusable.length)return;
-   const first=focusable[0],last=focusable[focusable.length-1];
-   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-  }
- });
-})();
+ function stop(){if(timer){clearInterval(timer);timer=null;}}
+ function start(){stop();if(!reduced)timer=setInterval(()=>show(current+1),4800);}
+ root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
+ show(0);start();
+})();</script>
 
 </body></html>
