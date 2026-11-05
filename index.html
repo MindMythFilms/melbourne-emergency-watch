@@ -1867,6 +1867,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 
  
 
+ <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div>
  <div class="map-stage">
 <section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
   <div class="mew-gesture-dialog">
@@ -1893,7 +1894,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
    </div>
    <div class="mew-gesture-footer"><span><strong>One finger?</strong> Scroll the webpage normally.</span><button id="mewGestureGotIt" type="button">Got it — show me the map</button></div>
   </div>
- </section><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ </section><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
 
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
@@ -3055,6 +3056,29 @@ setInterval(checkForSiteUpdates,180000);
  #map-panel .mew-gesture-card p{font-size:10px!important}
  #map-panel .mew-gesture-card .mew-gesture-tag{font-size:7px!important}
  #map-panel .mew-gesture-footer{margin-top:7px!important;padding-top:7px!important}
+}
+</style>
+
+
+<style id="mew-map-controls-above-canvas">
+/* Basemap and shelter controls occupy their own row above the map canvas. */
+#map-panel>#mapBasemapCard{
+ position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:5!important;
+ display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;
+ gap:8px 12px!important;width:auto!important;margin:0!important;padding:11px 14px!important;
+ border:0!important;border-bottom:1px solid #8aa8b866!important;border-radius:0!important;
+ background:linear-gradient(120deg,#08283d,#0b354a)!important;box-shadow:none!important;
+ backdrop-filter:none!important;box-sizing:border-box!important
+}
+#map-panel>#mapBasemapCard>strong{display:block!important;color:#d8f0f4!important;font-size:12px!important;white-space:nowrap!important;margin:0!important}
+#map-panel>#mapBasemapCard .map-basemap-buttons{display:flex!important;flex:1 1 auto!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:8px!important}
+#map-panel>#mapBasemapCard .map-basemap-buttons button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:120px!important;min-height:40px!important;padding:7px 13px!important;font-size:13px!important}
+#map-panel>.map-stage{position:relative!important}
+@media(max-width:650px){
+ #map-panel>#mapBasemapCard{gap:6px!important;padding:9px 10px!important}
+ #map-panel>#mapBasemapCard>strong{display:none!important}
+ #map-panel>#mapBasemapCard .map-basemap-buttons{gap:6px!important}
+ #map-panel>#mapBasemapCard .map-basemap-buttons button{flex:1 1 0!important;min-width:0!important;min-height:42px!important;padding:6px 7px!important;font-size:12px!important}
 }
 </style>
 
