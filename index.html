@@ -3783,4 +3783,76 @@ body.dark #map-panel .map-report-tools .map-report-button{
   }
 }
 </style>
+
+<style id="mew-desktop-compact-map-filters">
+/* Compact desktop map controls: keep filters in one shallow toolbar row. */
+@media (min-width: 701px) {
+  #map-panel>#mapAdvancedControls .map-filter-card {
+    display: grid !important;
+    grid-template-columns: max-content minmax(0,1fr) !important;
+    align-items: center !important;
+    column-gap: 22px !important;
+    row-gap: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 9px 12px !important;
+  }
+  #map-panel>#mapAdvancedControls .map-filter-card h3 {
+    grid-column: 1 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+  #map-panel>#mapAdvancedControls .map-filter-card .map-filters {
+    grid-column: 2 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #map-panel>#mapAdvancedControls .map-filter-card .map-filters>label {
+    display: flex !important;
+    flex: 0 1 225px !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 135px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+  }
+  #map-panel>#mapAdvancedControls .map-filter-card .map-filters>label:nth-child(2) {
+    flex-basis: 165px !important;
+  }
+  #map-panel>#mapAdvancedControls .map-filter-card .map-filters>label select {
+    width: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 5px 28px 5px 9px !important;
+    font-size: 11px !important;
+    box-sizing: border-box !important;
+  }
+  #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card {
+    min-height: 62px !important;
+    height: auto !important;
+    padding: 9px 12px !important;
+    gap: 9px !important;
+  }
+  #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card .map-count-icon {
+    font-size: 21px !important;
+  }
+  #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card strong {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+  #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card small {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+}
+</style>
 </body></html>
