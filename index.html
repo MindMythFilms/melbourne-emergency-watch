@@ -1809,30 +1809,9 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 <div class="full"><label style="display:flex;gap:8px;align-items:start;font-weight:500"><input id="anonymous" type="checkbox" checked style="width:auto;margin-top:4px"> Submit without displaying my name.</label></div>
 </div><button id="submitBtn" type="submit">Submit community report</button><div id="formMessage" class="status hidden" role="status"></div></form></div></section>
 </div>
-<section class="cw-sponsor-section" id="sponsors" aria-labelledby="cw-sponsor-title">
-  <div class="cw-sponsor-heading">
-    <div><span class="cw-sponsor-eyebrow">COMMUNITY PARTNERSHIPS</span><h2 id="cw-sponsor-title">Proudly supporting CoastWatch FL</h2><p>Local businesses can help keep essential community information accessible.</p></div>
-    <span class="cw-sponsor-live">SPONSORSHIP OPPORTUNITIES</span>
-  </div>
-  <div class="cw-sponsor-shell" aria-roledescription="carousel" aria-label="CoastWatch FL sponsorship opportunities">
-    <button class="cw-sponsor-arrow cw-sponsor-prev" type="button" aria-label="Previous sponsorship tier">‹</button>
-    <div class="cw-sponsor-viewport">
-      <div class="cw-sponsor-track">
-        <article class="cw-sponsor-slide cw-tier-gold" aria-label="Gold sponsor opportunity">
-          <div class="cw-tier-mark">✦</div><div class="cw-tier-copy"><span class="cw-tier-label">GOLD PARTNER</span><h3>Lead the way for community safety.</h3><p>Premium visibility for businesses that want to make a meaningful local impact.</p><span class="cw-tier-note">FOUNDING PARTNER OPPORTUNITY</span></div><div class="cw-tier-medal">GOLD</div>
-        </article>
-        <article class="cw-sponsor-slide cw-tier-silver" aria-label="Silver sponsor opportunity">
-          <div class="cw-tier-mark">◆</div><div class="cw-tier-copy"><span class="cw-tier-label">SILVER PARTNER</span><h3>Stand alongside your community.</h3><p>Show your support while helping residents find useful local information.</p><span class="cw-tier-note">COMMUNITY SUPPORTER OPPORTUNITY</span></div><div class="cw-tier-medal">SILVER</div>
-        </article>
-        <article class="cw-sponsor-slide cw-tier-community" aria-label="Community sponsor opportunity">
-          <div class="cw-tier-mark">✧</div><div class="cw-tier-copy"><span class="cw-tier-label">COMMUNITY PARTNER</span><h3>Make a difference, right here at home.</h3><p>Support a growing community resource and help strengthen local connections.</p><span class="cw-tier-note">LOCAL BUSINESS OPPORTUNITY</span></div><div class="cw-tier-medal">LOCAL</div>
-        </article>
-      </div>
-    </div>
-    <button class="cw-sponsor-arrow cw-sponsor-next" type="button" aria-label="Next sponsorship tier">›</button>
-  </div>
-  <div class="cw-sponsor-controls"><div class="cw-sponsor-dots" role="group" aria-label="Choose sponsorship tier"><button type="button" aria-label="Show Gold Partner" aria-current="true"></button><button type="button" aria-label="Show Silver Partner"></button><button type="button" aria-label="Show Community Partner"></button></div><span class="cw-sponsor-auto">Rotates automatically · swipe to explore</span></div>
-  <div class="cw-sponsor-cta"><span>Want your business featured here?</span><a href="#about">Explore CoastWatch FL</a></div>
+<section class="cw-partner-strip" aria-label="CoastWatch FL community partnerships">
+  <div class="cw-partner-strip-copy"><span class="cw-partner-kicker">COMMUNITY PARTNERSHIPS</span><strong>Keeping our community informed, together.</strong><span>Local businesses help support accessible community information.</span></div>
+  <button class="cw-partner-open" type="button" data-cw-partner-open>Become a Partner <span aria-hidden="true">↗</span></button>
 </section>
 <section class="panel" id="community-reports-panel"><div class="panelhead"><div><h2>Latest community reports</h2><span class="section-subtitle">Recent observations submitted by the community · Not independently verified</span></div></div><div class="reportlist" id="latestReports"><div class="hint">Loading reports…</div></div></section>
 <section class="panel" id="official-alerts-panel"><div class="panelhead"><div><h2>Official National Weather Service alerts</h2><span class="section-subtitle">Government-issued alerts for Brevard County</span></div></div><div id="nwsAlertStatus" role="status" style="margin:12px 18px;font-weight:700">Connecting to National Weather Service…</div><div id="nwsAlertList" class="reportlist" aria-live="polite"><div class="hint">Loading official weather alerts…</div></div></section>
@@ -1843,6 +1822,24 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 </main>
 <div class="mew-photo-viewer" id="photoViewer" role="dialog" aria-modal="true" aria-label="Enlarged community report photo"><button class="mew-photo-viewer-close" id="photoViewerClose" type="button" aria-label="Close enlarged photo">×</button><img id="photoViewerImage" alt="Enlarged administrator-approved community report photo"><div class="mew-photo-viewer-hint">Click outside the photo or press Escape to close</div></div>
 <footer>© CoastWatch FL · Community information only · Not an emergency response service.</footer>
+<button class="cw-partner-float" type="button" data-cw-partner-open aria-haspopup="dialog" aria-controls="cwPartnerDialog"><span class="cw-partner-float-icon" aria-hidden="true">✦</span><span>Support CoastWatch</span></button>
+<div class="cw-partner-modal" id="cwPartnerDialog" role="dialog" aria-modal="true" aria-labelledby="cwPartnerTitle" aria-describedby="cwPartnerIntro" hidden>
+  <div class="cw-partner-backdrop" data-cw-partner-close></div>
+  <section class="cw-partner-dialog">
+    <button class="cw-partner-close" type="button" data-cw-partner-close aria-label="Close sponsorship information">×</button>
+    <span class="cw-partner-kicker">LOCAL IMPACT. STRONGER COMMUNITY.</span>
+    <h2 id="cwPartnerTitle">Become a CoastWatch FL Partner</h2>
+    <p id="cwPartnerIntro">Your business can help keep useful local hazard and emergency information accessible to Brevard County residents.</p>
+    <div class="cw-partner-monthly"><span class="cw-partner-monthly-dot"></span> Monthly partnership opportunities</div>
+    <div class="cw-partner-tiers">
+      <article class="cw-partner-tier cw-partner-gold"><span>GOLD PARTNER</span><h3>Lead the way</h3><p>Premium recognition for businesses making a meaningful local impact.</p></article>
+      <article class="cw-partner-tier cw-partner-silver"><span>SILVER PARTNER</span><h3>Stand together</h3><p>Show your support while helping residents find useful information.</p></article>
+      <article class="cw-partner-tier cw-partner-community"><span>COMMUNITY PARTNER</span><h3>Support local</h3><p>Help strengthen a growing community resource close to home.</p></article>
+    </div>
+    <p class="cw-partner-note">Monthly pricing and enrollment details are being finalized. No payment is collected through this page.</p>
+    <button class="cw-partner-done" type="button" data-cw-partner-close>Got it</button>
+  </section>
+</div>
 
 <div class="mew-flag-overlay" id="flagOverlay" role="dialog" aria-modal="true" aria-labelledby="flagTitle">
  <div class="mew-flag-dialog">
@@ -2821,19 +2818,19 @@ setInterval(checkForSiteUpdates,180000);
  .site-nav .theme-toggle,.site-nav .nav-report{padding:10px 12px;font-size:12px;min-height:42px}
 }
 
-/* CoastWatch FL premium sponsor carousel */
-.cw-sponsor-section{margin:22px 0;padding:clamp(18px,3vw,30px);border:1px solid #5cc8e044;border-radius:22px;background:radial-gradient(ellipse at 12% 0%,#0d6d8540,transparent 46%),linear-gradient(135deg,#071b2bfa,#0b2c43f2 55%,#071827fa);box-shadow:0 18px 48px #00101e45;color:#effaff;overflow:hidden}
-.cw-sponsor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}.cw-sponsor-eyebrow{font-size:10px;letter-spacing:.2em;font-weight:800;color:#70d9ed}.cw-sponsor-heading h2{margin:6px 0;font-size:clamp(20px,3vw,27px);color:#f5fbff}.cw-sponsor-heading p{margin:0;color:#b7cfdd;font-size:14px}.cw-sponsor-live{font-size:9px;letter-spacing:.12em;font-weight:800;color:#8de6f1;border:1px solid #70d9ed55;border-radius:99px;padding:8px 11px;white-space:nowrap;background:#42bcd012}
-.cw-sponsor-shell{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:10px}.cw-sponsor-viewport{overflow:hidden;border-radius:18px;touch-action:pan-y}.cw-sponsor-track{display:flex;transform:translateX(0);transition:transform .65s cubic-bezier(.22,.75,.25,1);will-change:transform}.cw-sponsor-slide{flex:0 0 100%;min-height:210px;box-sizing:border-box;position:relative;display:flex;align-items:center;gap:clamp(16px,3vw,30px);padding:clamp(22px,4vw,38px);border:1px solid #b9edff55;border-radius:18px;overflow:hidden;background:linear-gradient(115deg,#ffffff19,#ffffff08 45%,#ffffff12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px #ffffff35,0 12px 35px #0004}
-.cw-sponsor-slide:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 15%,#ffffff0b 48%,transparent 75%);pointer-events:none}.cw-tier-gold{border-color:#e9c66c88;background:radial-gradient(ellipse at 90% 0%,#d9a93b30,transparent 50%),linear-gradient(115deg,#ffffff19,#ffffff08 50%,#d9a93b10)}.cw-tier-silver{border-color:#c4d6e588;background:radial-gradient(ellipse at 90% 0%,#c5d8e52c,transparent 50%),linear-gradient(115deg,#ffffff19,#ffffff08 50%,#c5d8e510)}.cw-tier-community{border-color:#65d7d188;background:radial-gradient(ellipse at 90% 0%,#42c8c52b,transparent 50%),linear-gradient(115deg,#ffffff19,#ffffff08 50%,#42c8c510)}
-.cw-tier-mark{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;border-radius:16px;font-size:30px;color:#f4d98e;background:linear-gradient(145deg,#ffffff20,#ffffff05);border:1px solid #ffffff35;box-shadow:inset 0 1px #ffffff45,0 0 25px #f0c65b20}.cw-tier-silver .cw-tier-mark{color:#e2edf6}.cw-tier-community .cw-tier-mark{color:#85e7df}
-.cw-tier-copy{position:relative;z-index:1;max-width:650px}.cw-tier-label{font-size:10px;font-weight:900;letter-spacing:.2em;color:#f2d58b}.cw-tier-silver .cw-tier-label{color:#d8e8f5}.cw-tier-community .cw-tier-label{color:#8de7df}.cw-tier-copy h3{margin:8px 0;font-size:clamp(20px,3vw,30px);line-height:1.12;color:#fff}.cw-tier-copy p{margin:0 0 14px;color:#c5d8e5;font-size:14px;line-height:1.55}.cw-tier-note{font-size:9px;letter-spacing:.14em;font-weight:800;color:#f4d98e}.cw-tier-silver .cw-tier-note{color:#d8e8f5}.cw-tier-community .cw-tier-note{color:#8de7df}
-.cw-tier-medal{margin-left:auto;flex:0 0 auto;width:78px;height:78px;border-radius:50%;display:grid;place-items:center;border:1px solid #f0d18b99;color:#f4d98e;font-size:11px;font-weight:900;letter-spacing:.12em;background:radial-gradient(circle at 35% 25%,#ffffff2b,#d6a63b18 58%,#0000);box-shadow:inset 0 1px #ffffff55,0 0 30px #d8a83a20}.cw-tier-silver .cw-tier-medal{border-color:#d9e7f599;color:#e1edf6;background:radial-gradient(circle at 35% 25%,#ffffff2b,#c5d8e518 58%,#0000)}.cw-tier-community .cw-tier-medal{border-color:#75ddd599;color:#9cece5;background:radial-gradient(circle at 35% 25%,#ffffff2b,#42c8c518 58%,#0000)}
-.cw-sponsor-arrow{width:40px;height:40px;border-radius:50%;border:1px solid #8bd9eb66;background:#0b3449;color:#e7faff;font-size:28px;line-height:1;cursor:pointer;transition:background .2s,transform .2s}.cw-sponsor-arrow:hover{background:#14536b;transform:scale(1.06)}.cw-sponsor-arrow:focus-visible,.cw-sponsor-dots button:focus-visible,.cw-sponsor-cta a:focus-visible{outline:3px solid #7ce8f3;outline-offset:3px}
-.cw-sponsor-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:13px 54px 0}.cw-sponsor-dots{display:flex;gap:8px}.cw-sponsor-dots button{width:8px;height:8px;padding:0;border:0;border-radius:20px;background:#7895a7;cursor:pointer;transition:width .25s,background .25s}.cw-sponsor-dots button[aria-current=true]{width:25px;background:#75dcec}.cw-sponsor-auto{font-size:10px;color:#94b4c5}.cw-sponsor-cta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 54px 0;padding-top:15px;border-top:1px solid #9bd9e522;color:#d6e8f1;font-size:13px}.cw-sponsor-cta a{color:#8de8f2;font-weight:800;text-decoration:none}.cw-sponsor-cta a:hover{text-decoration:underline}
-@media(hover:hover){.cw-sponsor-slide{transition:box-shadow .25s,transform .25s}.cw-sponsor-shell:hover .cw-sponsor-slide{box-shadow:inset 0 1px #ffffff45,0 16px 42px #0006}}
-@media(max-width:620px){.cw-sponsor-heading{display:block}.cw-sponsor-live{display:inline-block;margin-top:12px}.cw-sponsor-shell{grid-template-columns:30px minmax(0,1fr) 30px;gap:5px}.cw-sponsor-arrow{width:30px;height:34px;font-size:23px}.cw-sponsor-slide{min-height:235px;padding:20px 16px;gap:12px;align-items:flex-start}.cw-tier-mark{width:42px;height:42px;flex-basis:42px;font-size:23px;border-radius:12px}.cw-tier-medal{width:54px;height:54px;font-size:8px;position:absolute;right:14px;top:14px}.cw-tier-copy{padding-right:4px}.cw-tier-copy h3{font-size:20px;padding-right:30px}.cw-tier-copy p{font-size:13px}.cw-sponsor-controls{margin-left:35px;margin-right:35px}.cw-sponsor-auto{font-size:9px;text-align:right}.cw-sponsor-cta{margin-left:35px;margin-right:35px;align-items:flex-start;flex-direction:column}}
-@media(prefers-reduced-motion:reduce){.cw-sponsor-track{transition:none}.cw-sponsor-arrow,.cw-sponsor-dots button{transition:none}}
+/* CoastWatch FL compact partner strip, persistent entry point and accessible dialog */
+.cw-partner-strip{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0 22px;padding:15px 18px;border:1px solid #7dd9e64d;border-radius:17px;background:radial-gradient(ellipse at 8% 0%,#38b8c32b,transparent 55%),linear-gradient(115deg,#0a2235f5,#10354af2);box-shadow:0 10px 28px #00101e24;color:#f3fbff;overflow:hidden}
+.cw-partner-strip:before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 15%,#ffffff0a 50%,transparent 85%);pointer-events:none}
+.cw-partner-strip-copy{display:flex;flex-direction:column;gap:2px;position:relative;z-index:1}.cw-partner-kicker{font-size:9px;letter-spacing:.18em;font-weight:900;color:#82deea}.cw-partner-strip-copy strong{font-size:16px;line-height:1.25;color:#fff}.cw-partner-strip-copy>span:last-child{font-size:12px;color:#bed3df}
+.cw-partner-open{position:relative;z-index:1;flex:0 0 auto;display:inline-flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid #8de8f2a6;border-radius:999px;background:linear-gradient(135deg,#ffffff20,#ffffff09);color:#e9fcff;font:700 12px system-ui,sans-serif;cursor:pointer;box-shadow:inset 0 1px #ffffff3d,0 5px 16px #0003;transition:transform .2s,background .2s}.cw-partner-open:hover{transform:translateY(-1px);background:#ffffff25}.cw-partner-open:focus-visible,.cw-partner-float:focus-visible,.cw-partner-close:focus-visible,.cw-partner-done:focus-visible{outline:3px solid #76e5f0;outline-offset:3px}
+.cw-partner-float{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:900;display:flex;align-items:center;gap:9px;padding:11px 16px 11px 12px;border:1px solid #8de8f2a6;border-radius:999px;background:linear-gradient(135deg,#0d344bfa,#071d30fa);color:#f2fcff;font:750 12px system-ui,sans-serif;box-shadow:0 9px 28px #00101e70,inset 0 1px #ffffff2b;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .2s,box-shadow .2s}.cw-partner-float:hover{transform:translateY(-2px);box-shadow:0 13px 32px #00101e85,inset 0 1px #ffffff35}.cw-partner-float-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#d6b66b24;color:#f1d68f;font-size:15px}
+.cw-partner-modal[hidden]{display:none}.cw-partner-modal{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:18px}.cw-partner-backdrop{position:absolute;inset:0;background:#03111dcc;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.cw-partner-dialog{position:relative;width:min(720px,100%);max-height:min(88vh,820px);overflow:auto;padding:clamp(22px,4vw,34px);border:1px solid #8bd9eb66;border-radius:24px;background:radial-gradient(ellipse at 8% 0%,#1d788b45,transparent 45%),linear-gradient(145deg,#0b2639fa,#071a2afa);color:#edfaff;box-shadow:0 24px 90px #0009,inset 0 1px #ffffff25}
+.cw-partner-close{position:absolute;right:16px;top:14px;width:36px;height:36px;border:1px solid #ffffff32;border-radius:50%;background:#ffffff10;color:#e9faff;font-size:24px;line-height:1;cursor:pointer}.cw-partner-dialog h2{margin:8px 42px 8px 0;font-size:clamp(23px,4vw,31px);line-height:1.15;color:#fff}.cw-partner-dialog>p{color:#bed3df;font-size:14px;line-height:1.55}.cw-partner-monthly{display:inline-flex;align-items:center;gap:8px;margin:8px 0 16px;padding:7px 11px;border:1px solid #75dce65c;border-radius:999px;background:#4cc8d412;color:#9ceaf0;font-size:11px;font-weight:800}.cw-partner-monthly-dot{width:7px;height:7px;border-radius:50%;background:#78e3d0;box-shadow:0 0 10px #78e3d0}
+.cw-partner-tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cw-partner-tier{min-width:0;padding:15px 13px;border:1px solid #ffffff27;border-radius:16px;background:linear-gradient(145deg,#ffffff16,#ffffff06);box-shadow:inset 0 1px #ffffff20}.cw-partner-tier>span{font-size:9px;letter-spacing:.13em;font-weight:900}.cw-partner-tier h3{margin:8px 0 5px;font-size:17px;color:#fff}.cw-partner-tier p{margin:0;color:#c2d6e1;font-size:12px;line-height:1.5}.cw-partner-gold{border-color:#e9c66c70}.cw-partner-gold>span{color:#f0d38d}.cw-partner-silver{border-color:#c4d6e570}.cw-partner-silver>span{color:#dceaf5}.cw-partner-community{border-color:#65d7d170}.cw-partner-community>span{color:#8de7df}
+.cw-partner-dialog .cw-partner-note{margin:16px 0 12px;padding:11px 13px;border-left:3px solid #79dbe5;border-radius:0 9px 9px 0;background:#ffffff0b;font-size:12px}.cw-partner-done{width:100%;padding:12px 16px;border:1px solid #8de8f2a6;border-radius:12px;background:linear-gradient(135deg,#16758b,#0b526d);color:white;font:800 13px system-ui,sans-serif;cursor:pointer}
+@media(max-width:620px){.cw-partner-strip{align-items:flex-start;flex-direction:column;padding:15px}.cw-partner-open{align-self:stretch;justify-content:center}.cw-partner-float{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));padding:10px 13px}.cw-partner-tiers{grid-template-columns:1fr}.cw-partner-tier{padding:13px}.cw-partner-dialog{border-radius:19px}.cw-partner-modal{padding:10px}}
+@media(prefers-reduced-motion:reduce){.cw-partner-open,.cw-partner-float{transition:none}}
 
 </style>
 
@@ -2851,26 +2848,38 @@ setInterval(checkForSiteUpdates,180000);
 </script>
 
 <script>
-/* Accessible, touch-friendly CoastWatch FL sponsor carousel. */
+/* CoastWatch FL partnership entry points and accessible information dialog. */
 (function(){
- const root=document.querySelector('#sponsors .cw-sponsor-shell'); if(!root)return;
- const track=root.querySelector('.cw-sponsor-track'), slides=[...track.children], dots=[...document.querySelectorAll('.cw-sponsor-dots button')];
- const prev=root.querySelector('.cw-sponsor-prev'), next=root.querySelector('.cw-sponsor-next');
- const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- let index=0,timer=null,startX=0,deltaX=0;
- function show(n){index=(n+slides.length)%slides.length;track.style.transform='translateX(-'+(index*100)+'%)';dots.forEach((d,i)=>{if(i===index)d.setAttribute('aria-current','true');else d.removeAttribute('aria-current')});}
- function stop(){if(timer){clearInterval(timer);timer=null}}
- function start(){stop();if(!reduced)timer=setInterval(()=>show(index+1),6500)}
- prev.addEventListener('click',()=>{show(index-1);start()});next.addEventListener('click',()=>{show(index+1);start()});
- dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);start()}));
- root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
- root.addEventListener('focusin',stop);root.addEventListener('focusout',start);
- root.addEventListener('touchstart',e=>{startX=e.changedTouches[0].clientX;deltaX=0;stop()},{passive:true});
- root.addEventListener('touchmove',e=>{deltaX=e.changedTouches[0].clientX-startX},{passive:true});
- root.addEventListener('touchend',()=>{if(Math.abs(deltaX)>45)show(index+(deltaX<0?1:-1));start()},{passive:true});
- document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start()});
- show(0);start();
+ const dialog=document.getElementById('cwPartnerDialog');
+ if(!dialog)return;
+ const openers=[...document.querySelectorAll('[data-cw-partner-open]')];
+ const closers=[...dialog.querySelectorAll('[data-cw-partner-close]')];
+ let returnFocus=null;
+ function openDialog(){
+  returnFocus=document.activeElement;
+  dialog.hidden=false;
+  document.body.style.overflow='hidden';
+  const closeButton=dialog.querySelector('.cw-partner-close');
+  if(closeButton)closeButton.focus();
+ }
+ function closeDialog(){
+  dialog.hidden=true;
+  document.body.style.overflow='';
+  if(returnFocus&&typeof returnFocus.focus==='function')returnFocus.focus();
+ }
+ openers.forEach(button=>button.addEventListener('click',openDialog));
+ closers.forEach(button=>button.addEventListener('click',closeDialog));
+ document.addEventListener('keydown',event=>{
+  if(dialog.hidden)return;
+  if(event.key==='Escape'){event.preventDefault();closeDialog();return;}
+  if(event.key==='Tab'){
+   const focusable=[...dialog.querySelectorAll('button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
+   if(!focusable.length)return;
+   const first=focusable[0],last=focusable[focusable.length-1];
+   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  }
+ });
 })();
-</script>
 
 </body></html>
