@@ -2494,8 +2494,12 @@ map.on("click",e=>{
  // Coordinates stay in this page's memory; they are not sent to Supabase or saved.
  let myLocationMarker=null,myLocationAccuracy=null;
  $("locateBtn").onclick=()=>{const b=$("locateBtn");b.disabled=true;b.textContent="Locating…";map.locate({setView:true,maxZoom:15,enableHighAccuracy:true,timeout:12000,maximumAge:0});};
- map.on("locationfound",e=>{mewNearbyLocation=e.latlng;mewUpdateNearbyStatus();if(myLocationMarker)map.removeLayer(myLocationMarker);if(myLocationAccuracy)map.removeLayer(myLocationAccuracy);myLocationAccuracy=L.circle(e.latlng,{radius:e.accuracy,color:"#1769aa",weight:1,fillOpacity:.08,interactive:false}).addTo(map);myLocationMarker=L.circleMarker(e.latlng,{radius:9,color:"#fff",weight:3,fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your current device location. This location is not saved by CoastWatch FL.");myLocationMarker.openPopup();const b=$("locateBtn");b.disabled=false;b.textContent="My location";});
- map.on("locationerror",()=>{const b=$("locateBtn");b.disabled=false;b.textContent="My location";alert("Unable to access your location. Please allow location access in your browser and try again.");});
+ let mewLocationMessage=document.getElementById("mewLocationMessage");
+ if(!mewLocationMessage){mewLocationMessage=document.createElement("div");mewLocationMessage.id="mewLocationMessage";mewLocationMessage.setAttribute("role","status");mewLocationMessage.setAttribute("aria-live","polite");mewLocationMessage.style.cssText="display:none;margin:7px 0 0;padding:9px 11px;border:1px solid rgba(80,190,190,.3);border-radius:10px;background:rgba(8,42,58,.88);color:#dceff5;font-size:12px;line-height:1.45";$("locateBtn").insertAdjacentElement("afterend",mewLocationMessage);}
+ function mewShowLocationMessage(message){mewLocationMessage.textContent=message;mewLocationMessage.style.display="block";}
+ function mewClearLocationMessage(){mewLocationMessage.textContent="";mewLocationMessage.style.display="none";}
+ map.on("locationfound",e=>{mewClearLocationMessage();mewNearbyLocation=e.latlng;mewUpdateNearbyStatus();if(myLocationMarker)map.removeLayer(myLocationMarker);if(myLocationAccuracy)map.removeLayer(myLocationAccuracy);myLocationAccuracy=L.circle(e.latlng,{radius:e.accuracy,color:"#1769aa",weight:1,fillOpacity:.08,interactive:false}).addTo(map);myLocationMarker=L.circleMarker(e.latlng,{radius:9,color:"#fff",weight:3,fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your current device location. This location is not saved by CoastWatch FL.");myLocationMarker.openPopup();const b=$("locateBtn");b.disabled=false;b.textContent="My location";});
+ map.on("locationerror",e=>{const b=$("locateBtn");b.disabled=false;b.textContent="My location";const denied=e&&e.code===1;const timeout=e&&e.code===3;mewShowLocationMessage(denied?"Location permission is blocked. In your browser, open site settings for coastwatch-fl.pages.dev, set Location to Allow, then tap My Location again.":timeout?"Your device took too long to respond. Check that Location is turned on and try again.":"Your device location is unavailable. Check browser and device location settings, then try again.");});
 const approvedPhotos={};
 function reportStatusLabel(status){return status==="unverified"?"Unverified community report":status==="resolved"?"Marked resolved · not independently verified":"Previously admin-reviewed · not official verification"}
 const mewFeedbackCounts=new Map();
@@ -3758,6 +3762,12 @@ body.dark #map-panel .map-report-tools .map-report-button{
   height:38px!important;min-height:38px!important;padding-top:6px!important;padding-bottom:6px!important;
  }
 }
+</style>
+
+
+<style id="coastwatch-location-error-inline">
+#mewLocationMessage{max-width:100%}
+@media(max-width:700px){#mewLocationMessage{font-size:11px!important;padding:8px 10px!important}}
 </style>
 
 </body></html>
