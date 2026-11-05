@@ -1928,6 +1928,16 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 </div><button id="submitBtn" type="submit">Submit community report</button><div id="formMessage" class="status hidden" role="status"></div></form></div></section>
 </div>
 
+<section class="mew-home-quick-actions" id="mew-home-quick-actions" aria-label="Quick emergency actions">
+ <div class="mew-quick-heading"><strong>Quick access</strong><span>Important tools, one tap away</span></div>
+ <div class="mew-quick-grid">
+  <button type="button" data-mew-action="location"><span aria-hidden="true">◎</span><b>My Location</b><small>Center the map on you</small></button>
+  <button type="button" data-mew-action="shelters"><span aria-hidden="true">⌂</span><b>Open Shelters</b><small>Show shelter locations</small></button>
+  <button type="button" data-mew-action="alerts"><span aria-hidden="true">⚠</span><b>Weather Alerts</b><small>Read official NWS alerts</small></button>
+  <button type="button" data-mew-action="report"><span aria-hidden="true">＋</span><b>Report a Hazard</b><small>Share an observation</small></button>
+ </div>
+</section>
+
 <section class="panel" id="latest-news-panel">
  <div class="panelhead"><div><h2>Latest News</h2><span class="section-subtitle">Community reports and official National Weather Service alerts for Brevard County</span></div></div>
  <div id="community-reports-panel" class="latest-news-group">
@@ -3291,5 +3301,62 @@ setInterval(checkForSiteUpdates,180000);
 #safety-announcement{scroll-margin-top:90px}
 @media(max-width:700px){#safety-announcement{scroll-margin-top:76px}}
 </style>
+
+
+<style id="mew-home-quick-actions-style">
+.mew-home-quick-actions{margin:18px 0;padding:16px;border:1px solid var(--line,#25485d);border-radius:18px;background:linear-gradient(135deg,#0a2b40,#082337);box-shadow:0 10px 30px #00121e22}
+.mew-quick-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 12px}
+.mew-quick-heading strong{font-size:16px;color:var(--ink,#eff8ff)}
+.mew-quick-heading span{font-size:11px;color:var(--muted,#a9c1d0)}
+.mew-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.mew-quick-grid button{display:grid;grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto;align-items:center;column-gap:9px;min-width:0;min-height:68px;padding:10px 12px;border:1px solid #3d7185;border-radius:12px;background:#10364b;color:#eefaff;text-align:left;box-shadow:none}
+.mew-quick-grid button>span{grid-row:1/3;display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#087f8066;color:#63e6dc;font-size:22px;font-weight:900}
+.mew-quick-grid button b{font-size:13px;line-height:1.2}
+.mew-quick-grid button small{margin-top:3px;color:#b3ccd8;font-size:10px;line-height:1.25}
+.mew-quick-grid button:hover,.mew-quick-grid button:focus-visible{border-color:#54d8cf;background:#12465a;outline:2px solid #54d8cf55;outline-offset:2px}
+@media(max-width:700px){
+ .mew-home-quick-actions{margin:10px 0;padding:12px;border-radius:14px}
+ .mew-quick-heading{margin-bottom:9px}
+ .mew-quick-heading strong{font-size:14px}
+ .mew-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .mew-quick-grid button{min-height:62px;padding:8px;grid-template-columns:28px minmax(0,1fr);column-gap:7px}
+ .mew-quick-grid button>span{width:28px;height:28px;font-size:19px}
+ .mew-quick-grid button b{font-size:12px}
+ .mew-quick-grid button small{font-size:9px}
+}
+</style>
+
+
+<script id="mew-home-quick-actions-script">
+(()=>{
+ const root=document.getElementById("mew-home-quick-actions");
+ if(!root)return;
+ const goTo=id=>{
+  const target=document.getElementById(id);
+  if(!target)return;
+  target.scrollIntoView({behavior:"smooth",block:"start"});
+ };
+ root.addEventListener("click",event=>{
+  const button=event.target.closest("button[data-mew-action]");
+  if(!button)return;
+  const action=button.dataset.mewAction;
+  if(action==="location"){
+   document.getElementById("locateBtn")?.click();
+   goTo("map-panel");
+  }else if(action==="shelters"){
+   const toggle=document.getElementById("shelterToggleBtn");
+   if(toggle&&toggle.getAttribute("aria-pressed")!=="true")toggle.click();
+   const source=document.getElementById("sourceFilter");
+   if(source){source.value="shelters";source.dispatchEvent(new Event("change",{bubbles:true}))}
+   goTo("map-panel");
+  }else if(action==="alerts"){
+   goTo("official-alerts-panel");
+  }else if(action==="report"){
+   goTo("report-panel");
+   window.setTimeout(()=>document.getElementById("category")?.focus({preventScroll:true}),450);
+  }
+ });
+})();
+</script>
 
 </body></html>
