@@ -1782,6 +1782,33 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 @media(max-width:700px){.mew-gesture-overlay{padding:9px}.mew-gesture-dialog{padding:23px 14px 16px;border-radius:19px;max-height:94vh}.mew-gesture-grid{grid-template-columns:1fr;gap:9px}.mew-gesture-card{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:12px;align-items:center;padding:9px}.mew-gesture-art{grid-column:1;grid-row:1/4;height:112px}.mew-gesture-card h3{grid-column:2;margin:0 0 3px;font-size:14px}.mew-gesture-card p{grid-column:2;min-height:0;margin:0 0 5px;font-size:11px}.mew-gesture-tag{grid-column:2;font-size:8px;padding:6px 4px}.mew-gesture-footer{align-items:stretch;flex-direction:column;font-size:12px}.mew-gesture-footer button{width:100%}.mew-gesture-help{margin-left:0}}
 @media(max-width:390px){.mew-gesture-card{grid-template-columns:94px minmax(0,1fr);column-gap:9px}.mew-gesture-art{height:102px}.mew-gesture-tag{letter-spacing:.02em;font-size:7px}}
 @media(prefers-reduced-motion:reduce){.mew-gesture-overlay *, .mew-gesture-overlay *:before{animation:none!important;transition:none!important}}
+
+/* Transparent gesture coach rendered directly over the live map. */
+.mew-gesture-overlay{position:absolute!important;inset:0!important;z-index:1200!important;display:grid!important;place-items:center!important;padding:12px!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.mew-gesture-overlay[hidden]{display:none!important}
+#map-panel>.map-stage{position:relative!important}
+.mew-gesture-dialog{width:min(900px,calc(100% - 20px))!important;max-height:calc(100% - 20px)!important;overflow:auto!important;padding:18px!important;border:1px solid #b6f5f055!important;border-radius:20px!important;background:rgba(3,18,30,.13)!important;color:#fff!important;box-shadow:0 8px 35px #00131f22!important;backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important}
+.mew-gesture-dialog>h2{color:#fff!important;text-shadow:0 2px 12px #00131fcc!important}
+.mew-gesture-intro{color:#f0ffff!important;text-shadow:0 1px 7px #00131f!important}
+.mew-gesture-card{background:rgba(4,25,39,.28)!important;border-color:#a9eeea66!important;backdrop-filter:blur(4px)!important;-webkit-backdrop-filter:blur(4px)!important}
+.mew-gesture-card h3,.mew-gesture-card p{color:#fff!important;text-shadow:0 1px 6px #00131fcc!important}
+.mew-gesture-art{background:transparent!important;border-color:#a9eeea44!important}
+.mew-map-mini{background:rgba(4,28,43,.10)!important;border-color:#d1ffff44!important}
+.mew-gesture-footer{color:#fff!important;text-shadow:0 1px 6px #00131f!important}
+.mew-gesture-close{background:rgba(2,20,31,.48)!important}
+@media(max-width:700px){
+ .mew-gesture-overlay{padding:7px!important}
+ .mew-gesture-dialog{width:100%!important;max-height:100%!important;padding:15px 10px!important}
+ .mew-gesture-grid{grid-template-columns:1fr!important;gap:7px!important}
+ .mew-gesture-card{grid-template-columns:100px minmax(0,1fr)!important;padding:7px!important}
+ .mew-gesture-art{height:94px!important}
+ .mew-gesture-dialog>h2{font-size:22px!important}
+ .mew-gesture-intro{font-size:12px!important;margin-bottom:9px!important}
+ .mew-gesture-card h3{font-size:13px!important}
+ .mew-gesture-card p{font-size:10px!important}
+ .mew-gesture-footer{margin-top:9px;padding-top:9px;gap:8px}
+}
+
 </style>
 
 </head>
@@ -1838,7 +1865,10 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
   <button class="mew-gesture-help" id="mewGestureHelp" type="button" aria-haspopup="dialog" aria-controls="mewGestureTutorial">☝ How to use the map</button>
  </div>
 
- <section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
+ 
+
+ <div class="map-stage">
+<section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
   <div class="mew-gesture-dialog">
    <button class="mew-gesture-close" id="mewGestureClose" type="button" aria-label="Close map tutorial">×</button>
    <div class="mew-gesture-kicker">COASTWATCH FL · QUICK GUIDE</div>
@@ -1863,9 +1893,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
    </div>
    <div class="mew-gesture-footer"><span><strong>One finger?</strong> Scroll the webpage normally.</span><button id="mewGestureGotIt" type="button">Got it — show me the map</button></div>
   </div>
- </section>
-
- <div class="map-stage"><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+ </section><div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
 
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
