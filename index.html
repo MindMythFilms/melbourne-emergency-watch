@@ -1902,9 +1902,9 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
    <details class="map-sidebar-details" id="mapAdvancedControls" open><summary>Map layers &amp; live conditions</summary><div class="map-sidebar-details-body">
    <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option><option value="shelters">Shelters & emergency resources</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
    <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
-   <div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
+   <details class="mew-map-resource-details" id="mewMapResourceDetails"><summary>Live conditions &amp; emergency resources <span>Radar · shelters · evacuation</span></summary><div class="mew-map-resource-items"><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
    
-  </div></details>
+  </div></div></details></div></details>
   </aside>
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
@@ -2768,7 +2768,7 @@ setInterval(checkForSiteUpdates,180000);
  const dashboard=panel?.querySelector(".map-dashboard");
  const sidebar=panel?.querySelector(".map-sidebar");
  const zones=document.getElementById("mapZonesCard");
- const resourceIds=["rainRadarStatus","shelterStatus","evacuationStatus"];
+ const resourceIds=["mewMapResourceDetails"];
  if(!panel||!stage||!heading||!dashboard||!sidebar||!zones)return;
  let strip=stage.querySelector("#map-resource-strip");
  if(!strip){
@@ -3079,6 +3079,27 @@ setInterval(checkForSiteUpdates,180000);
  #map-panel>#mapBasemapCard>strong{display:none!important}
  #map-panel>#mapBasemapCard .map-basemap-buttons{gap:6px!important}
  #map-panel>#mapBasemapCard .map-basemap-buttons button{flex:1 1 0!important;min-width:0!important;min-height:42px!important;padding:6px 7px!important;font-size:12px!important}
+}
+</style>
+
+
+<style id="mew-collapsible-live-resources">
+.mew-map-resource-details{border:1px solid #087f83;border-radius:14px;overflow:hidden;background:#06283a}
+.mew-map-resource-details>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;cursor:pointer;list-style:none;color:#eaffff;font-size:14px;font-weight:850}
+.mew-map-resource-details>summary::-webkit-details-marker{display:none}
+.mew-map-resource-details>summary:after{content:"＋";margin-left:auto;color:#43e1d5;font-size:20px;line-height:1}
+.mew-map-resource-details[open]>summary:after{content:"−"}
+.mew-map-resource-details>summary span{color:#a9cbd5;font-size:11px;font-weight:600}
+.mew-map-resource-items{display:grid;grid-template-columns:1fr;gap:9px;padding:0 10px 10px}
+.mew-map-resource-items>.map-count-card{margin:0!important;min-width:0}
+#map-resource-strip>.mew-map-resource-details{grid-column:1/-1}
+@media(min-width:901px){
+ #map-resource-strip>.mew-map-resource-details{width:100%}
+ #map-resource-strip .mew-map-resource-items{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ .mew-map-resource-details>summary{padding:13px 12px}
+ .mew-map-resource-details>summary span{font-size:10px}
 }
 </style>
 
