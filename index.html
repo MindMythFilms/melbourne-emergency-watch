@@ -3577,33 +3577,63 @@ body.dark #map-panel .map-report-tools .map-report-button{
 
 
 
-<style id="coastwatch-pc-map-restore">
+
+
+
+<style id="coastwatch-desktop-reference-layout">
 @media(min-width:901px){
- #map-panel{display:grid!important;grid-template-columns:minmax(270px,320px) minmax(0,1fr)!important;grid-template-rows:auto auto auto auto auto!important;align-items:start!important}
- #map-panel>.map-workspace-head,#map-panel>#mew-emergency-status-strip,
- #map-panel>#mapBasemapCard,#map-panel>#mapAdvancedControls{grid-column:1/-1!important}
- #map-panel>.map-dashboard{grid-column:1!important;grid-row:5!important;display:block!important;width:100%!important;min-width:0!important;height:auto!important;min-height:0!important}
- #map-panel>.map-dashboard>.map-sidebar{display:flex!important;width:100%!important;min-width:0!important;height:auto!important;min-height:0!important}
- #map-panel>.map-stage{grid-column:2!important;grid-row:5!important;display:block!important;width:100%!important;min-width:0!important;height:clamp(650px,78vh,950px)!important;min-height:650px!important;max-height:950px!important;overflow:hidden!important}
- #map-panel>.map-stage>#map{display:block!important;width:100%!important;height:100%!important;min-height:650px!important;max-height:none!important}
- #map-panel>.mobile-legend-toggle,#map-panel>.nws-legend,#map-panel>.mapnote,#map-panel>#report-panel{grid-column:1/-1!important}
+ #map-panel{display:block!important}
+ #map-panel>.map-workspace-head{display:flex!important;align-items:center!important}
+ #map-panel>.mew-emergency-status-strip{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;width:100%!important;gap:8px!important}
+ #map-panel>.map-basemap-card{display:flex!important;align-items:center!important;gap:12px!important;flex-wrap:wrap!important}
+ #map-panel>.map-basemap-card>strong{margin:0!important;white-space:nowrap}
+ #map-panel>.map-dashboard{display:grid!important;grid-template-columns:320px minmax(0,1fr)!important;grid-template-rows:auto!important;gap:0!important;padding:0!important;align-items:stretch!important}
+ #map-panel>.map-dashboard>.map-sidebar{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;gap:12px!important;width:auto!important;min-width:0!important;padding:14px!important}
+ #map-panel>.map-dashboard>.map-stage{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-self:stretch!important;width:100%!important;min-width:0!important;height:clamp(650px,78vh,900px)!important;min-height:650px!important;max-height:900px!important;overflow:hidden!important}
+ #map-panel>.map-dashboard>.map-stage>#map{flex:1 1 auto!important;display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important}
+ #map-panel .map-sidebar>#mapAdvancedControls{display:block!important;width:100%!important;margin:0!important}
+ #map-panel .map-sidebar>#mapAdvancedControls>summary{display:none!important}
+ #map-panel .map-sidebar>#mapAdvancedControls>.map-sidebar-details-body{display:flex!important;flex-direction:column!important;gap:11px!important;padding:0!important}
+ #map-panel .map-sidebar .map-filter-card{width:100%!important;min-width:0!important;padding:13px!important}
+ #map-panel .map-sidebar .map-filter-card .map-filters{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+ #map-panel .map-sidebar .map-count-card{width:100%!important;min-width:0!important;margin:0!important}
+ #map-panel .map-stage>#mewMapResourceDetails{display:block!important;flex:0 0 auto!important;width:100%!important;margin:0!important;border-radius:0!important}
+ #map-panel .map-stage>#mewMapResourceDetails>summary{display:flex!important}
+ #map-panel .map-stage>#mewMapResourceDetails[open]>.mew-map-resource-items{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;padding:10px!important}
+ #map-panel>.nws-legend,#map-panel>.mapnote,#map-panel>.mobile-legend-toggle{width:100%!important}
 }
 </style>
-<script id="coastwatch-pc-map-reparent">
-(()=> {
- const desktop=window.matchMedia("(min-width:901px)");
+<script id="coastwatch-desktop-reference-dom">
+(()=>{
+ const mq=window.matchMedia("(min-width:901px)");
  const panel=document.getElementById("map-panel");
+ const dashboard=panel?.querySelector(":scope > .map-dashboard");
+ const sidebar=dashboard?.querySelector(":scope > .map-sidebar");
  const stage=panel?.querySelector(":scope > .map-stage");
  const advanced=document.getElementById("mapAdvancedControls");
- if(!panel||!stage||!advanced)return;
- const restore=()=>{
-  if(desktop.matches){
-   if(stage.parentElement!==panel) panel.insertBefore(stage,document.getElementById("map-dashboard")||advanced.nextSibling);
-   if(window.L&&window.mewMap&&typeof window.mewMap.invalidateSize==="function") window.mewMap.invalidateSize();
+ const resources=document.getElementById("mewMapResourceDetails");
+ const map=stage?.querySelector("#map");
+ if(!panel||!dashboard||!sidebar||!stage||!advanced||!resources||!map)return;
+ const original={stageParent:stage.parentNode,stageNext:stage.nextSibling,advancedParent:advanced.parentNode,advancedNext:advanced.nextSibling,resourcesParent:resources.parentNode,resourcesNext:resources.nextSibling,resourcesOpen:resources.open,advancedOpen:advanced.open};
+ function layout(){
+  if(mq.matches){
+   sidebar.appendChild(advanced);
+   advanced.open=true;
+   stage.appendChild(resources);
+   resources.open=true;
+   dashboard.appendChild(stage);
+   if(window.L&&window.mewMap&&typeof window.mewMap.invalidateSize==="function")requestAnimationFrame(()=>window.mewMap.invalidateSize());
+  }else{
+   if(original.resourcesParent)original.resourcesParent.insertBefore(resources,original.resourcesNext);
+   resources.open=original.resourcesOpen;
+   if(original.stageParent)original.stageParent.insertBefore(stage,original.stageNext);
+   if(original.advancedParent)original.advancedParent.insertBefore(advanced,original.advancedNext);
+   advanced.open=original.advancedOpen;
+   if(window.L&&window.mewMap&&typeof window.mewMap.invalidateSize==="function")requestAnimationFrame(()=>window.mewMap.invalidateSize());
   }
- };
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",restore,{once:true});else restore();
- desktop.addEventListener?.("change",restore);
+ }
+ layout();
+ mq.addEventListener?mq.addEventListener("change",layout):window.addEventListener("resize",layout);
 })();
 </script>
 
