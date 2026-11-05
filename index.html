@@ -3004,7 +3004,7 @@ setInterval(checkForSiteUpdates,180000);
  const close=()=>{
   dialog.hidden=true;
   document.body.style.overflow="";
-  try{localStorage.setItem("coastwatch-map-gesture-guide-seen","1")}catch(e){}
+  try{localStorage.setItem("coastwatch-map-gesture-guide-seen-v2","1")}catch(e){}
   if(lastFocus&&lastFocus.isConnected)lastFocus.focus();
  };
  openButton.addEventListener("click",open);
@@ -3026,12 +3026,36 @@ setInterval(checkForSiteUpdates,180000);
   if(shown)return;
   shown=true;
   let seen=false;
-  try{seen=localStorage.getItem("coastwatch-map-gesture-guide-seen")==="1"}catch(e){seen=false}
+  try{seen=localStorage.getItem("coastwatch-map-gesture-guide-seen-v2")==="1"}catch(e){seen=false}
   if(!seen)open();
  };
  if(document.readyState==="complete")setTimeout(showFirstTime,1200);
  else window.addEventListener("load",()=>setTimeout(showFirstTime,1200),{once:true});
 })();
 </script>
+
+
+<style id="mew-map-overlay-final-fix">
+/* This coach belongs to the map canvas, not the viewport. */
+#map-panel>.map-stage{position:relative!important;isolation:isolate!important}
+#map-panel>.map-stage>.mew-gesture-overlay{position:absolute!important;inset:0!important;z-index:2000!important;display:grid!important;place-items:center!important;padding:10px!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#map-panel>.map-stage>.mew-gesture-overlay[hidden]{display:none!important}
+#map-panel .mew-gesture-dialog{width:min(900px,calc(100% - 16px))!important;max-height:calc(100% - 16px)!important;background:rgba(3,18,30,.18)!important;border:1px solid #a9eeea66!important;box-shadow:0 6px 28px #00131f33!important;backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important}
+#map-panel .mew-gesture-card{background:rgba(4,25,39,.27)!important;border-color:#a9eeea77!important}
+#map-panel .mew-gesture-art{background:transparent!important}
+@media(max-width:700px){
+ #map-panel>.map-stage>.mew-gesture-overlay{padding:5px!important}
+ #map-panel .mew-gesture-dialog{width:100%!important;max-height:100%!important;padding:13px 9px!important}
+ #map-panel .mew-gesture-grid{grid-template-columns:1fr!important;gap:6px!important}
+ #map-panel .mew-gesture-card{grid-template-columns:88px minmax(0,1fr)!important;padding:6px!important}
+ #map-panel .mew-gesture-art{height:88px!important}
+ #map-panel .mew-gesture-dialog>h2{font-size:21px!important}
+ #map-panel .mew-gesture-intro{font-size:11px!important;margin-bottom:7px!important}
+ #map-panel .mew-gesture-card h3{font-size:12px!important}
+ #map-panel .mew-gesture-card p{font-size:10px!important}
+ #map-panel .mew-gesture-card .mew-gesture-tag{font-size:7px!important}
+ #map-panel .mew-gesture-footer{margin-top:7px!important;padding-top:7px!important}
+}
+</style>
 
 </body></html>
