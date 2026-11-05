@@ -3733,4 +3733,31 @@ body.dark #map-panel .map-report-tools .map-report-button{
 }
 </style>
 
+
+<style id="coastwatch-pc-filter-height-fix">
+@media(min-width:901px){
+ #map-panel .map-sidebar>#mapAdvancedControls>.map-sidebar-details-body{
+  align-content:start!important;align-items:start!important;
+  grid-auto-rows:max-content!important;
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card{
+  align-self:start!important;height:auto!important;min-height:0!important;
+  padding:9px 11px!important;row-gap:5px!important;
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card h3{
+  line-height:1.2!important;margin:0!important;padding:0!important;
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters{
+  align-items:start!important;align-content:start!important;
+  grid-auto-rows:max-content!important;gap:8px!important;
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters>label{
+  line-height:1.15!important;gap:4px!important;
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters>label select{
+  height:38px!important;min-height:38px!important;padding-top:6px!important;padding-bottom:6px!important;
+ }
+}
+</style>
+
 </body></html>
