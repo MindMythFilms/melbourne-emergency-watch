@@ -1870,6 +1870,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
   <div class="mew-status-item" data-status="shelters"><span class="mew-status-icon">⌂</span><span><small>Open shelters</small><strong>Checking…</strong></span></div>
   <div class="mew-status-item" data-status="outages"><span class="mew-status-icon">⚡</span><span><small>Power outages</small><strong>Checking…</strong></span></div>
   <div class="mew-status-item" data-status="reports"><span class="mew-status-icon">◎</span><span><small>Community reports</small><strong>Checking…</strong></span></div>
+  <div class="mew-status-item" data-status="nearby"><span class="mew-status-icon">⌖</span><span><small>Nearby reports · 10 mi</small><strong>Tap My Location</strong></span></div>
  </section>
 
 
@@ -2032,6 +2033,16 @@ const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map",{scrollWheelZoom:false,dragging:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false}).setView([28.0836,-80.6081],11),markers=[];
+let mewNearbyLocation=null;
+function mewUpdateNearbyStatus(){
+ const target=document.querySelector('#mew-emergency-status-strip [data-status="nearby"] strong');
+ if(!target)return;
+ if(!mewNearbyLocation){target.textContent="Tap My Location";return}
+ const reports=Array.isArray(window.mewReports)?window.mewReports:[];
+ const nearby=reports.filter(r=>Number.isFinite(+r.latitude)&&Number.isFinite(+r.longitude)&&mewNearbyLocation.distanceTo(L.latLng(+r.latitude,+r.longitude))<=16093.44);
+ target.textContent=nearby.length+" nearby";
+ target.title=nearby.length+" community reports within 10 miles. Wider county map remains visible.";
+}
 /* Mobile map gestures: one finger scrolls the page; two fingers pan/zoom the map. */
 const mewMapContainer=map.getContainer();
 const mewMobileMapGestures=window.matchMedia("(max-width: 700px), (pointer: coarse)").matches;
@@ -2480,7 +2491,7 @@ map.on("click",e=>{
  // Coordinates stay in this page's memory; they are not sent to Supabase or saved.
  let myLocationMarker=null,myLocationAccuracy=null;
  $("locateBtn").onclick=()=>{const b=$("locateBtn");b.disabled=true;b.textContent="Locating…";map.locate({setView:true,maxZoom:15,enableHighAccuracy:true,timeout:12000,maximumAge:0});};
- map.on("locationfound",e=>{if(myLocationMarker)map.removeLayer(myLocationMarker);if(myLocationAccuracy)map.removeLayer(myLocationAccuracy);myLocationAccuracy=L.circle(e.latlng,{radius:e.accuracy,color:"#1769aa",weight:1,fillOpacity:.08,interactive:false}).addTo(map);myLocationMarker=L.circleMarker(e.latlng,{radius:9,color:"#fff",weight:3,fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your current device location. This location is not saved by CoastWatch FL.");myLocationMarker.openPopup();const b=$("locateBtn");b.disabled=false;b.textContent="My location";});
+ map.on("locationfound",e=>{mewNearbyLocation=e.latlng;mewUpdateNearbyStatus();if(myLocationMarker)map.removeLayer(myLocationMarker);if(myLocationAccuracy)map.removeLayer(myLocationAccuracy);myLocationAccuracy=L.circle(e.latlng,{radius:e.accuracy,color:"#1769aa",weight:1,fillOpacity:.08,interactive:false}).addTo(map);myLocationMarker=L.circleMarker(e.latlng,{radius:9,color:"#fff",weight:3,fillColor:"#1769aa",fillOpacity:1}).addTo(map).bindPopup("Your current device location. This location is not saved by CoastWatch FL.");myLocationMarker.openPopup();const b=$("locateBtn");b.disabled=false;b.textContent="My location";});
  map.on("locationerror",()=>{const b=$("locateBtn");b.disabled=false;b.textContent="My location";alert("Unable to access your location. Please allow location access in your browser and try again.");});
 const approvedPhotos={};
 function reportStatusLabel(status){return status==="unverified"?"Unverified community report":status==="resolved"?"Marked resolved · not independently verified":"Previously admin-reviewed · not official verification"}
@@ -2678,7 +2689,7 @@ function mewBindPublicZoneButtons(){
 }
 
 async function loadReports(){if(map._popup&&map.hasLayer(map._popup))return;const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,created_at,expires_at").in("category",categories).in("status",["unverified","confirmed","resolved"]).order("created_at",{ascending:false}).limit(250);if(error){console.error("CoastWatch FL public report query failed:",{message:error.message,code:error.code,details:error.details,hint:error.hint});$("latestReports").innerHTML='<div class="status error">Reports are temporarily unavailable.<br><small>'+esc(error.message)+' · '+esc(error.code||"no error code")+'</small></div>';$("countLabel").textContent="Unavailable";markers.forEach(m=>map.removeLayer(m));markers=[];return}
-if(map._popup&&map.hasLayer(map._popup))return;window.mewReports=data||[];mewFeedbackCounts.clear();const {data:feedbackRows,error:feedbackError}=await db.rpc("get_public_incident_feedback");if(feedbackError)console.warn("Community feedback counts unavailable:",feedbackError.message);(feedbackRows||[]).forEach(row=>mewFeedbackCounts.set(row.incident_id,{still_there:Number(row.still_there)||0,no_longer_there:Number(row.no_longer_there)||0}));markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+(data.length===1?" report":" reports");
+if(map._popup&&map.hasLayer(map._popup))return;window.mewReports=data||[];mewUpdateNearbyStatus();mewFeedbackCounts.clear();const {data:feedbackRows,error:feedbackError}=await db.rpc("get_public_incident_feedback");if(feedbackError)console.warn("Community feedback counts unavailable:",feedbackError.message);(feedbackRows||[]).forEach(row=>mewFeedbackCounts.set(row.incident_id,{still_there:Number(row.still_there)||0,no_longer_there:Number(row.no_longer_there)||0}));markers.forEach(m=>map.removeLayer(m));markers=[];Object.keys(approvedPhotos).forEach(k=>delete approvedPhotos[k]);if(data.length){const {data:photoRows}=await db.from("incident_photos").select("incident_id,storage_path").eq("status","approved").in("incident_id",data.map(r=>r.id));for(const photo of (photoRows||[])){const {data:signed}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(signed?.signedUrl)approvedPhotos[photo.incident_id]=signed.signedUrl;}}$("countLabel").textContent=data.length+(data.length===1?" report":" reports");
 $("latestReports").innerHTML=data.slice(0,12).map(r=>`<div class="report"><strong>${esc(r.title||r.category.replaceAll("_"," "))}</strong><small>${esc(r.address||"Location on map")} · ${new Date(r.created_at).toLocaleString()}</small>${String(r.description||"").trim()?`<p class="report-description">${esc(r.description)}</p>`:""}<div><span class="pill">${reportStatusLabel(r.status)}</span></div>${approvedPhotos[r.id]?`<img src="${esc(approvedPhotos[r.id])}" alt="Administrator-approved community photo" class="mew-photo-zoom" role="button" tabindex="0" aria-label="Enlarge community report photo" style="width:100%;max-width:220px;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px">`:""}<button class="secondary mew-flag-btn" data-flag="${r.id}" style="margin-top:9px;padding:9px 12px;font-size:14px">Report this listing</button></div>`).join("")||'<p class="hint">No community reports yet.</p>';
 data.forEach(r=>{if((mapFilter==="all"||r.category===mapFilter)&&Number.isFinite(+r.latitude)&&Number.isFinite(+r.longitude)){const color=r.status==="resolved"?"#64748b":r.status==="unverified"?"#0f766e":"#15803d";const m=L.circleMarker([r.latitude,r.longitude],{radius:11,color:"#ffffff",opacity:1,weight:2.5,fillColor:color,fillOpacity:1}).addTo(map).bindPopup(popup(r),{maxWidth:Math.min(340,Math.max(240,window.innerWidth-76)),maxHeight:Math.max(220,Math.floor(window.innerHeight*.52)),offset:L.point(0,0),autoPan:true,autoPanPaddingTopLeft:[18,85],autoPanPaddingBottomRight:[18,85],closeButton:false,keepInView:true,className:"mew-community-leaflet-popup"});markers.push(m)}});applySourceFilter();}
 
@@ -3367,7 +3378,7 @@ setInterval(checkForSiteUpdates,180000);
 
 
 <style id="mew-emergency-status-strip-style">
-.mew-emergency-status-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 10px;padding:0}
+.mew-emergency-status-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 10px;padding:0}
 .mew-status-item{display:flex;align-items:center;gap:9px;min-width:0;padding:10px 11px;border:1px solid #286077;border-radius:12px;background:linear-gradient(135deg,#0b3045,#09283b);box-shadow:inset 0 1px #ffffff09}
 .mew-status-icon{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background:#0c777766;color:#62e4da;font-size:18px}
 .mew-status-item>span:last-child{display:block;min-width:0}
@@ -3400,4 +3411,8 @@ setInterval(checkForSiteUpdates,180000);
 })();
 </script>
 
+<style id="mew-nearby-status-layout">
+@media(min-width:701px){.mew-emergency-status-strip{grid-template-columns:repeat(5,minmax(0,1fr))!important}}
+@media(max-width:700px){.mew-emergency-status-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+</style>
 </body></html>
