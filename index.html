@@ -2514,7 +2514,7 @@ function mewZoneFeedbackMarkup(z,counts){
  const name=String(z.name||""),description=String(z.description||""),type=String(z.zone_type||"");
  const threshold=type==="danger"||type==="restricted"||/(flood|road closed|washout|closure|closed)/i.test(name+" "+description)?5:3;
  const still=Number(counts?.still_unsafe||0),safe=Number(counts?.safe_now||0);
- return `<div class="mew-zone-feedback" data-zone-feedback-wrap="${esc(z.id)}"><strong>Are conditions still unsafe here?</strong><div class="mew-zone-feedback-counts"><span>⚠️ Still unsafe: <b data-zone-unsafe-count>${still}</b></span><span>✓ Safe now: <b data-zone-safe-count>${safe}</b></span></div><div class="mew-zone-feedback-actions"><button type="button" data-zone-vote="still_unsafe" data-zone-id="${esc(z.id)}">⚠️ Still unsafe</button><button type="button" data-zone-vote="safe_now" data-zone-id="${esc(z.id)}">✓ Safe now</button></div><small>Zone is hidden from the public map after ${threshold} “Safe now” votes and more safe votes than unsafe votes. Community feedback is not official clearance.</small></div>`;
+ return `<div class="mew-zone-feedback" data-zone-feedback-wrap="${esc(z.id)}"><strong>Are conditions still unsafe here?</strong><div class="mew-zone-feedback-counts"><span>⚠️ Still unsafe: <b data-zone-unsafe-count>${still}</b></span><span>✓ Safe now: <b data-zone-safe-count>${safe}</b></span></div><div class="mew-zone-feedback-actions"><button type="button" data-zone-vote="still_unsafe" data-zone-id="${esc(z.id)}">⚠️ Still unsafe</button><button type="button" data-zone-vote="safe_now" data-zone-id="${esc(z.id)}">✓ Safe now</button></div><small>Community feedback is informational only. A zone stays on the public map until an administrator verifies the conditions and updates it.</small></div>`;
 }
 function mewZoneVoterToken(){let token=localStorage.getItem("coastwatch_zone_feedback_token");if(!token){token=crypto.randomUUID();localStorage.setItem("coastwatch_zone_feedback_token",token);}return token;}
 document.addEventListener("click",async e=>{
@@ -2537,7 +2537,7 @@ document.addEventListener("click",async e=>{
   if(result.community_cleared){
    map.closePopup();
    await loadPublicZones();
-   alert("The community reached the safe-now threshold. This zone has been hidden from the public map, but remains in the admin zone list. This is community feedback, not official clearance.");
+   alert("An administrator has updated this zone.");
   }else{
    button.textContent="Vote recorded";
    buttons.forEach(b=>b.disabled=false);
