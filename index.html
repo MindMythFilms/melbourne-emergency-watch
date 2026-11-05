@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261104-boil-water-popup-every-visit-v5"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261104-palm-bay-damage-zones-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -2397,8 +2397,9 @@ async function loadPublicZones(){
    const isSignalOut=/traffic signal|traffic light/i.test(String(z.name||"")+" "+rawDescription);
    const isWashout=String(z.name||"").toLowerCase().includes("washout")||/washed out|washout/i.test(rawDescription);
    const isFlooded=/roadway flooded|outside lanes flooded|lanes flooded|flooded at|travel lanes underwater|standing water|water over (the )?roadway/i.test(rawDescription);
+   const isPropertyDamage=/flood damage|property damage/i.test(String(z.name||"")+" "+rawDescription);
    const facilityStatus=/^PARK CLOSED/i.test(String(z.name||""))?"PARK CLOSED":(/^DOG PARK CLOSED/i.test(String(z.name||""))?"DOG PARK CLOSED":(/^BOAT RAMP CLOSED/i.test(String(z.name||""))?"BOAT RAMP CLOSED":(/^TRAIL CLOSED/i.test(String(z.name||""))?"TRAIL CLOSED":(/^DOCK \/ RAMP DAMAGE/i.test(String(z.name||""))?"DOCK / RAMP DAMAGE":(/^ENTRANCE ROAD DAMAGED/i.test(String(z.name||""))?"ENTRANCE ROAD DAMAGED":"")))));
-   const situation=facilityStatus||(isStatusUnknown?(isSignalOut?"SIGNAL STATUS UNVERIFIED":"ROAD STATUS UNVERIFIED"):(isSignalOut?"TRAFFIC SIGNAL OUT":(isOpen?"ROAD OPEN":(isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"ROAD STATUS":"ROAD CLOSED"))))));
+   const situation=facilityStatus||(isStatusUnknown?(isSignalOut?"SIGNAL STATUS UNVERIFIED":"ROAD STATUS UNVERIFIED"):(isPropertyDamage?"PROPERTY FLOOD DAMAGE":(isSignalOut?"TRAFFIC SIGNAL OUT":(isOpen?"ROAD OPEN":(isWashout?"ROAD WASHED OUT":(isFlooded?"ROAD FLOODED":(zoneType==="information"?"INFORMATION":"ROAD CLOSED")))))));
    const displayStatus=isUnverified?situation+" · UNVERIFIED":situation;
    const openRoadCaution=isOpen?'<div class="mew-road-open-caution" role="note"><strong>⚠️ USE CAUTION</strong><br>This road is reported open, but standing water, debris, or changing conditions may still be present. Slow down and proceed carefully. Never drive through floodwater.</div>':"";
    const detailDescription=rawDescription.replace(/^UNVERIFIED:\s*/,"");
