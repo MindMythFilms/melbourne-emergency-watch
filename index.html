@@ -1868,6 +1868,13 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  
 
  <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div>
+ <details class="map-sidebar-details" id="mapAdvancedControls" open><summary>Map layers &amp; live conditions</summary><div class="map-sidebar-details-body">
+   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option><option value="shelters">Shelters & emergency resources</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
+   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
+   <details class="mew-map-resource-details" id="mewMapResourceDetails"><summary>Live conditions &amp; emergency resources <span>Radar · shelters · evacuation</span></summary><div class="mew-map-resource-items"><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
+   
+  </div></details>
+
  <div class="map-stage">
 <section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
   <div class="mew-gesture-dialog">
@@ -1899,12 +1906,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
    <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
-   <details class="map-sidebar-details" id="mapAdvancedControls" open><summary>Map layers &amp; live conditions</summary><div class="map-sidebar-details-body">
-   <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option><option value="shelters">Shelters & emergency resources</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
-   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
-   <details class="mew-map-resource-details" id="mewMapResourceDetails"><summary>Live conditions &amp; emergency resources <span>Radar · shelters · evacuation</span></summary><div class="mew-map-resource-items"><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
-   
-  </div></details></div></details>
+   </div></details>
   </aside>
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
@@ -2777,9 +2779,10 @@ setInterval(checkForSiteUpdates,180000);
  const heading=panel?.querySelector(".map-workspace-head");
  const dashboard=panel?.querySelector(".map-dashboard");
  const sidebar=panel?.querySelector(".map-sidebar");
+ const advanced=document.getElementById("mapAdvancedControls");
  const zones=document.getElementById("mapZonesCard");
  const resourceIds=["mewMapResourceDetails"];
- if(!panel||!stage||!heading||!dashboard||!sidebar||!zones)return;
+ if(!panel||!stage||!heading||!dashboard||!sidebar||!zones||!advanced)return;
  let strip=stage.querySelector("#map-resource-strip");
  if(!strip){
   strip=document.createElement("div");
@@ -2789,14 +2792,17 @@ setInterval(checkForSiteUpdates,180000);
  const desktop=window.matchMedia("(min-width: 901px)");
  const arrange=()=>{
   if(desktop.matches){
-   if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
+   if(heading.nextElementSibling!==advanced)panel.insertBefore(heading,advanced);
+   if(advanced.parentElement!==panel||advanced.nextElementSibling!==dashboard)panel.insertBefore(advanced,dashboard);
    if(stage.parentElement!==dashboard)dashboard.appendChild(stage);
    if(zones.parentElement!==stage)stage.appendChild(zones);
    if(strip.parentElement!==dashboard)dashboard.appendChild(strip);
    resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==strip)strip.appendChild(card);});
   }else{
-   if(stage.parentElement!==panel||stage.nextElementSibling!==heading)panel.insertBefore(stage,heading);
-   if(heading.nextElementSibling!==dashboard)panel.insertBefore(heading,dashboard);
+   if(heading.parentElement!==panel)panel.insertBefore(heading,dashboard);
+   if(advanced.parentElement!==panel||advanced.previousElementSibling!==heading)panel.insertBefore(advanced,heading.nextElementSibling);
+   if(stage.parentElement!==panel||stage.previousElementSibling!==advanced)panel.insertBefore(stage,advanced.nextElementSibling);
+   if(dashboard.parentElement!==panel)panel.appendChild(dashboard);
    if(strip.parentElement)strip.remove();
    resourceIds.forEach(id=>{const card=document.getElementById(id);if(card&&card.parentElement!==sidebar)sidebar.appendChild(card);});
    if(zones.parentElement!==stage)stage.appendChild(zones);
@@ -3131,6 +3137,28 @@ setInterval(checkForSiteUpdates,180000);
  #latest-news-panel .latest-news-subhead span{font-size:11px}
  #latest-news-panel .reportlist{padding:4px 16px 14px}
  #latest-news-panel #nwsAlertStatus{margin:8px 16px 10px!important}
+}
+</style>
+
+
+<style id="mew-map-controls-above-map">
+/* Full-width filter and live-condition controls sit between map toolbar and map canvas. */
+#map-panel>#mapAdvancedControls{display:block!important;width:auto!important;margin:0 0 10px!important;border:1px solid #176077!important;border-radius:14px!important;background:linear-gradient(120deg,#082b40,#09243a)!important;overflow:hidden!important}
+#map-panel>#mapAdvancedControls>summary{padding:13px 16px!important;font-size:15px!important}
+#map-panel>#mapAdvancedControls>.map-sidebar-details-body{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;padding:0 12px 12px!important}
+#map-panel>#mapAdvancedControls .map-filter-card{grid-column:1/-1!important;margin:0!important}
+#map-panel>#mapAdvancedControls .map-filters{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+#map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card{margin:0!important;min-width:0!important}
+#map-panel>#mapAdvancedControls .mew-map-resource-details{grid-column:1/-1!important}
+#map-panel>.map-stage{width:100%!important}
+@media(max-width:700px){
+ #map-panel>#mapAdvancedControls{margin:0 0 8px!important}
+ #map-panel>#mapAdvancedControls>.map-sidebar-details-body{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:0 8px 9px!important;gap:7px!important}
+ #map-panel>#mapAdvancedControls .map-filter-card{grid-column:1/-1!important}
+ #map-panel>#mapAdvancedControls .map-filters{grid-template-columns:1fr!important;gap:8px!important}
+ #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card{padding:9px!important}
+ #map-panel>#mapAdvancedControls .map-sidebar-details-body>.map-count-card:first-of-type{grid-column:1/-1!important}
+ #map-panel>#mapAdvancedControls .mew-map-resource-details{grid-column:1/-1!important}
 }
 </style>
 
