@@ -3770,4 +3770,17 @@ body.dark #map-panel .map-report-tools .map-report-button{
 @media(max-width:700px){#mewLocationMessage{font-size:11px!important;padding:8px 10px!important}}
 </style>
 
+
+<style id="mew-desktop-hide-map-tutorial">
+/* The two-finger map tutorial is for touch devices only. */
+@media (min-width: 701px) {
+  #map-panel .mew-gesture-help,
+  #map-panel .mew-gesture-overlay,
+  #map-panel .mew-gesture-overlay[hidden] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+</style>
 </body></html>
