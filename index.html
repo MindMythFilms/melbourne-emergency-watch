@@ -3671,4 +3671,66 @@ body.dark #map-panel .map-report-tools .map-report-button{
 })();
 </script>
 
+
+<style id="coastwatch-pc-controls-space-optimization">
+@media(min-width:901px){
+ /* Compact, balanced desktop controls; mobile styles remain unchanged. */
+ #map-panel .map-sidebar{gap:10px!important;padding:12px!important}
+ #map-panel .map-sidebar>.map-location-button{min-height:44px!important;max-width:none!important;margin:0!important}
+ #map-panel .map-sidebar>#mapAdvancedControls{width:100%!important;margin:0!important;padding:0!important}
+ #map-panel .map-sidebar>#mapAdvancedControls>.map-sidebar-details-body{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch!important;gap:9px!important;padding:0!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card{
+  grid-column:1/-1!important;display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  align-items:center!important;column-gap:14px!important;row-gap:7px!important;
+  padding:11px 13px!important;margin:0!important;min-width:0!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card h3{
+  grid-column:1/-1!important;margin:0!important;font-size:14px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-column:1/-1!important;gap:12px!important;width:100%!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters>label{
+  display:flex!important;flex-direction:column!important;gap:5px!important;
+  min-width:0!important;font-size:11px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card .map-filters>label select{
+  width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;
+  padding:8px 28px 8px 10px!important;font-size:12px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-sidebar-details-body>.map-count-card{
+  display:flex!important;align-items:center!important;gap:9px!important;
+  min-width:0!important;min-height:76px!important;padding:10px!important;margin:0!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .map-count-card .map-count-icon{font-size:23px!important;flex:0 0 auto!important}
+ #map-panel .map-sidebar>#mapAdvancedControls .map-count-card strong{font-size:16px!important;line-height:1.2!important;overflow-wrap:anywhere}
+ #map-panel .map-sidebar>#mapAdvancedControls .map-count-card small{font-size:10px!important;line-height:1.3!important}
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details{
+  grid-column:1/-1!important;width:100%!important;margin:0!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details>summary{
+  padding:11px 12px!important;font-size:12px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details>.mew-map-resource-items{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;padding:9px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details .map-count-card{
+  min-width:0!important;padding:9px!important;gap:7px!important
+ }
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details .map-count-card strong{font-size:12px!important}
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details .map-count-card small,
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details .map-count-card a{font-size:9px!important;line-height:1.3!important}
+}
+@media(min-width:901px) and (max-width:1150px){
+ #map-panel .map-sidebar>#mapAdvancedControls>.map-sidebar-details-body{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #map-panel .map-sidebar>#mapAdvancedControls .map-filter-card,
+ #map-panel .map-sidebar>#mapAdvancedControls .mew-map-resource-details{grid-column:1/-1!important}
+}
+</style>
+
 </body></html>
