@@ -2128,8 +2128,9 @@ map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450
 const shelterLayer=L.featureGroup();
 let shelterFetchInProgress=false;
 let mewShelterItems=[];
-function mewMakeCountCluster(count,latlng,bounds,kind){
- const icon=L.divIcon({className:"mew-count-cluster mew-"+kind+"-cluster",html:'<span>'+count+'</span>',iconSize:[48,48],iconAnchor:[24,24]});
+function mewMakeCountCluster(count,latlng,bounds,kind,color){
+ const safeColor=/^#[0-9a-f]{6}$/i.test(String(color||""))?String(color):"#174f78";
+ const icon=L.divIcon({className:"mew-count-cluster mew-"+kind+"-cluster",html:'<span style="background:'+safeColor+';outline-color:'+safeColor+'">'+count+'</span>',iconSize:[48,48],iconAnchor:[24,24]});
  const marker=L.marker(latlng,{icon,keyboard:true,title:count+" "+kind+" locations"});
  marker.on("click",()=>{if(bounds&&bounds.isValid())map.fitBounds(bounds,{padding:[55,55],maxZoom:Math.min(16,map.getZoom()+3),animate:true});});
  return marker;
@@ -2706,7 +2707,7 @@ function mewRefreshPublicZoneClusters(){
    if(group.items.length===1)group.items[0].layer.addTo(mewPublicZoneLayer);
    else{
     const kind=color==="#f59e0b"?"caution":(color==="#c81e1e"||color==="#dc2626"||color==="#c83b35"?"closure":"zone");
-    mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,kind).addTo(mewPublicZoneLayer);
+    mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,kind,color).addTo(mewPublicZoneLayer);
    }
   });
  });
