@@ -24,6 +24,19 @@
 body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 .cw-sponsor-form{max-width:100%;}.cw-sponsor-form label{color:#edf8fc}.cw-sponsor-form input:not([type=checkbox]):not([type=file]),.cw-sponsor-form select,.cw-sponsor-form textarea{font-family:inherit}.cw-sponsor-form select option{color:#102a43;background:#fff}
 .cw-form-privacy{color:#a9c2ce}.cw-footer{text-align:center;padding:22px 8px;color:#88a8b8;font-size:11px;line-height:1.6}
+.cw-support-use{margin:24px 0;padding:clamp(20px,3vw,30px);border:1px solid rgba(151,224,230,.24);border-radius:20px;background:linear-gradient(145deg,rgba(18,119,132,.16),rgba(255,255,255,.045));box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+.cw-support-use .cw-use-kicker{color:#8de5df;font-size:10px;font-weight:900;letter-spacing:.17em}
+.cw-support-use h2{margin:8px 0;color:#fff;font-size:clamp(22px,3vw,29px)}
+.cw-support-use>p{max-width:780px;margin:0;color:#c4dce6;font-size:13px;line-height:1.7}
+.cw-use-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:19px}
+.cw-use-item{padding:14px;border:1px solid rgba(173,216,228,.15);border-radius:13px;background:rgba(2,22,36,.34)}
+.cw-use-item strong{display:block;margin-bottom:5px;color:#f1fbff;font-size:13px}
+.cw-use-item span{display:block;color:#b6ced9;font-size:11px;line-height:1.6}
+.cw-use-vision{margin-top:16px;padding:15px 16px;border-left:3px solid #67d7d2;border-radius:0 12px 12px 0;background:rgba(48,166,164,.1)}
+.cw-use-vision strong{display:block;margin-bottom:5px;color:#fff;font-size:13px}
+.cw-use-vision p{margin:0;color:#c6dce5;font-size:12px;line-height:1.65}
+@media(max-width:620px){.cw-use-grid{grid-template-columns:1fr}}
+
 @media(max-width:650px){.cw-tier-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.cw-hero{padding-top:32px}.cw-top{padding-bottom:18px}}
 
 /* Interactive sponsorship level selector */
@@ -53,6 +66,22 @@ body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 <section class="cw-tier-details" id="cwTierDetails" aria-live="polite" hidden>
 <div class="cw-tier-details-copy"><span class="cw-tier-details-kicker">SPONSORSHIP LEVEL</span><h2 id="cwTierTitle"></h2><p id="cwTierDescription"></p><ul id="cwTierBenefits"></ul></div>
 <button class="cw-tier-choose" id="cwTierChoose" type="button">Choose this level</button>
+</section>
+<section class="cw-support-use" id="cw-where-support-goes" aria-labelledby="cw-support-use-title">
+<span class="cw-use-kicker">TRANSPARENCY & COMMUNITY IMPACT</span>
+<h2 id="cw-support-use-title">Where Your Support Goes</h2>
+<p>Support helps us maintain and improve CoastWatch FL so residents can access useful, timely community information. Contributions may help cover the technology and outreach needed to keep this resource dependable.</p>
+<div class="cw-use-grid">
+<div class="cw-use-item"><strong>Website & infrastructure</strong><span>Hosting, maintenance, technical services and the systems that keep the website available.</span></div>
+<div class="cw-use-item"><strong>Interactive map & reporting tools</strong><span>Building, maintaining and improving the map, hazard reports and other community information tools.</span></div>
+<div class="cw-use-item"><strong>Reliability & security</strong><span>Data services, website security, backups and improvements that help protect the service and keep information accessible.</span></div>
+<div class="cw-use-item"><strong>Community outreach</strong><span>Public awareness, local collaboration and communication so more residents know where to find reliable resources.</span></div>
+</div>
+<div class="cw-use-vision">
+<strong>Our vision goes beyond the website.</strong>
+<p>As CoastWatch FL grows, we hope to work with local businesses, nonprofits and community organizations to help residents connect with essential resources—and, when partnerships and funding allow, help coordinate or provide items such as food, drinking water, emergency supplies and hurricane-preparedness materials. We also aim to expand access to information, including multilingual resources.</p>
+</div>
+<p style="margin-top:14px;font-size:11px;color:#9fbac7">CoastWatch FL is currently a community information initiative, not an emergency-relief provider. Direct assistance and resource distribution will depend on future funding, partnerships, logistics and available supplies. Sponsorship support is used to develop the project and its community capabilities; it is not a tax-deductible donation unless expressly confirmed otherwise.</p>
 </section>
 <section class="cw-panel"><h2>Business sponsorship application</h2><p class="cw-panel-intro">Complete the information below. Applications are reviewed before payment is requested. Submitting this form does not guarantee approval or sponsor placement.</p>
 <form id="cwSponsorApplication" class="cw-sponsor-form">
