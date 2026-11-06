@@ -1847,6 +1847,14 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 @media(prefers-reduced-motion:reduce){.cw-support-pay{transition:none}}
 body.dark .cw-support-section{border-color:rgba(113,220,226,.25)}
 </style>
+
+<style id="cw-sponsor-application-styles">
+.cw-sponsor-application{margin:24px auto 0;padding:clamp(19px,3vw,30px);max-width:1080px;border:1px solid rgba(151,224,230,.24);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.cw-application-heading{text-align:center;max-width:740px;margin:0 auto 22px}.cw-application-heading h3{margin:8px 0;color:#fff;font-size:clamp(23px,3vw,31px);font-weight:850}.cw-application-heading p{margin:0;color:#c5dce6;font-size:13px;line-height:1.65}
+.cw-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cw-sponsor-form label{display:flex;flex-direction:column;gap:6px;min-width:0;color:#edf8fc;font-size:12px;font-weight:750}.cw-sponsor-form label>span{display:inline;color:#ffd38b}.cw-sponsor-form label small{color:#a9c3d0;font-size:10px;font-weight:500;line-height:1.45}.cw-sponsor-form input:not([type=checkbox]):not([type=file]),.cw-sponsor-form select,.cw-sponsor-form textarea{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid rgba(173,216,228,.27);border-radius:10px;background:rgba(1,16,29,.56);color:#f4fbff;font:500 13px inherit;outline:none}.cw-sponsor-form textarea{resize:vertical;min-height:88px}.cw-sponsor-form input::placeholder,.cw-sponsor-form textarea::placeholder{color:#89a7b7}.cw-sponsor-form input:focus,.cw-sponsor-form select:focus,.cw-sponsor-form textarea:focus{border-color:#69d8df;box-shadow:0 0 0 3px rgba(70,208,215,.13)}.cw-sponsor-form input[type=file]{width:100%;padding:9px;border:1px dashed rgba(173,216,228,.35);border-radius:10px;background:rgba(1,16,29,.35);color:#d8eaf1;font-size:11px}.cw-sponsor-form input[type=file]::file-selector-button{margin-right:10px;padding:7px 10px;border:0;border-radius:7px;background:#1c7187;color:#fff;font-weight:750}.cw-form-full{grid-column:1/-1}.cw-custom-check{display:flex!important;flex-direction:row!important;align-items:flex-start;gap:9px!important;margin-top:14px;color:#c9dce5!important;font-size:11px!important;font-weight:550!important;line-height:1.5}.cw-custom-check input{flex:0 0 auto;margin-top:2px;accent-color:#32b9b4}.cw-form-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}.cw-sponsor-submit{display:block;width:100%;margin-top:17px;padding:13px 18px;border:1px solid rgba(190,250,245,.35);border-radius:11px;background:linear-gradient(120deg,#159b98,#176b87);color:white;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 9px 22px rgba(13,130,137,.22)}.cw-sponsor-submit:disabled{opacity:.6;cursor:wait}.cw-form-status{display:none;margin-top:14px;padding:11px 13px;border-radius:10px;font-size:12px;line-height:1.5}.cw-form-status.is-visible{display:block}.cw-form-status.is-error{background:rgba(150,35,42,.24);border:1px solid rgba(255,135,135,.4);color:#ffdada}.cw-form-status.is-success{background:rgba(24,120,85,.22);border:1px solid rgba(113,230,177,.35);color:#d6ffea}.cw-form-privacy{margin:11px 0 0;color:#9eb8c5;font-size:10px;line-height:1.55;text-align:center}
+@media(max-width:620px){.cw-form-grid{grid-template-columns:1fr;gap:12px}.cw-form-full{grid-column:auto}.cw-sponsor-application{padding:18px 13px}.cw-sponsor-form input:not([type=checkbox]):not([type=file]),.cw-sponsor-form select{min-height:45px}}
+body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -2012,30 +2020,70 @@ body.dark .cw-support-section{border-color:rgba(113,220,226,.25)}
     <span class="cw-tier-label">COMMUNITY FOUNDING SPONSOR</span><strong class="cw-tier-price">$100<span>/month</span></strong>
     <p>Help keep essential community information accessible.</p>
     <ul><li>Founding sponsor recognition</li><li>Business name and website link</li><li>Launch partner acknowledgment</li></ul>
-    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+    <a class="cw-support-pay" href="#cw-sponsor-application">Apply to sponsor</a>
    </article>
    <article class="cw-support-tier">
     <span class="cw-tier-label">LOCAL FOUNDING PARTNER</span><strong class="cw-tier-price">$250<span>/month</span></strong>
     <p>Give your local partnership a stronger presence.</p>
     <ul><li>All Community benefits</li><li>Enhanced profile with logo and description</li><li>Prominent website recognition</li></ul>
-    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+    <a class="cw-support-pay" href="#cw-sponsor-application">Apply to sponsor</a>
    </article>
    <article class="cw-support-tier">
     <span class="cw-tier-label">REGIONAL FOUNDING PARTNER</span><strong class="cw-tier-price">$500<span>/month</span></strong>
     <p>Support broader community awareness across the region.</p>
     <ul><li>All Local benefits</li><li>Priority sponsor placement</li><li>Recognition in partner updates</li><li>Quarterly partnership check-in</li></ul>
-    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+    <a class="cw-support-pay" href="#cw-sponsor-application">Apply to sponsor</a>
    </article>
    <article class="cw-support-tier cw-support-featured">
     <span class="cw-tier-label">PRESENTING FOUNDING PARTNER</span><strong class="cw-tier-price">$1,000<span>+/month</span></strong>
     <p>Become a leading supporter of the CoastWatch FL mission.</p>
     <ul><li>All Regional benefits</li><li>Top-tier presenting recognition</li><li>Custom community-awareness collaboration</li><li>Quarterly impact briefing</li></ul>
-    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+    <a class="cw-support-pay" href="#cw-sponsor-application">Apply to sponsor</a>
    </article>
   </div>
+
+ <section class="cw-sponsor-application" id="cw-sponsor-application" aria-labelledby="cw-sponsor-application-title">
+  <div class="cw-application-heading">
+   <span class="cw-support-kicker">BECOME A COASTWATCH FL PARTNER</span>
+   <h3 id="cw-sponsor-application-title">Tell us about your business.</h3>
+   <p>Complete the application below. Our team will review your information and contact you with next steps. Payment is requested only after approval.</p>
+  </div>
+  <form id="cwSponsorApplication" class="cw-sponsor-form">
+   <div class="cw-form-grid">
+    <label>Business name <span>*</span><input name="business_name" required maxlength="120" autocomplete="organization" placeholder="Your business name"></label>
+    <label>Contact person's name <span>*</span><input name="contact_name" required maxlength="120" autocomplete="name" placeholder="Full name"></label>
+    <label>Business email <span>*</span><input name="email" type="email" required maxlength="254" autocomplete="email" placeholder="you@business.com"></label>
+    <label>Phone number<input name="phone" type="tel" maxlength="40" autocomplete="tel" placeholder="(321) 555-0123"></label>
+    <label>Business website<input name="website" type="url" maxlength="300" placeholder="https://"></label>
+    <label>City / primary location<input name="city" maxlength="100" placeholder="Melbourne, FL"></label>
+    <label>Areas you serve<input name="service_area" maxlength="200" placeholder="e.g. Brevard County, Central Florida"></label>
+    <label>Preferred sponsorship level <span>*</span>
+     <select name="sponsorship_tier" required>
+      <option value="community_100">$100/month — Community Founding Sponsor</option>
+      <option value="local_250">$250/month — Local Founding Partner</option>
+      <option value="regional_500">$500/month — Regional Founding Partner</option>
+      <option value="presenting_1000_plus">$1,000+/month — Presenting Founding Partner</option>
+      <option value="custom">I'd like to discuss a custom partnership</option>
+     </select>
+    </label>
+    <label class="cw-form-full">Upload business logo <small>PNG, JPG or WebP · up to 2 MB · optional if you need to send it later</small><input name="logo" type="file" accept="image/png,image/jpeg,image/webp"></label>
+    <label class="cw-form-full">Short business description <span>*</span><small>Tell residents who you are and what your business does. This may appear on your sponsor profile.</small><textarea name="description" required minlength="20" maxlength="600" rows="3" placeholder="A short introduction to your business..."></textarea></label>
+    <label class="cw-form-full">Products or services <span>*</span><small>What do you offer, and what would you like local residents to know?</small><textarea name="services" required minlength="10" maxlength="1000" rows="3" placeholder="Describe your main products, services or areas of expertise..."></textarea></label>
+    <label class="cw-form-full">Social media links <small>Optional — add links separated by commas</small><input name="social_links" maxlength="500" placeholder="Facebook, Instagram, LinkedIn..."></label>
+    <label class="cw-form-full">Preferred public display name<input name="preferred_display_name" maxlength="120" placeholder="If different from your business name"></label>
+   </div>
+   <label class="cw-custom-check"><input name="custom_partnership" type="checkbox" value="true"> I'd like to discuss a custom sponsorship or community collaboration.</label>
+   <label class="cw-custom-check"><input name="agreement" type="checkbox" required> I confirm that I am authorized to submit this information and that CoastWatch FL may contact me about this application. I understand submission does not guarantee approval or sponsorship placement.</label>
+   <div class="cw-form-honey" aria-hidden="true"><label>Leave this field empty<input name="company_fax" tabindex="-1" autocomplete="off"></label></div>
+   <div id="cwSponsorFormStatus" class="cw-form-status" role="status" aria-live="polite"></div>
+   <button class="cw-sponsor-submit" id="cwSponsorSubmit" type="submit">Submit sponsor application</button>
+   <p class="cw-form-privacy">Your application and uploaded logo are stored privately for CoastWatch FL review. Logos are not published unless your sponsorship is approved and activated. Please do not submit sensitive personal information.</p>
+  </form>
+ </section>
+
   <div class="cw-support-bottom">
    <div><strong>Prefer to discuss a partnership first?</strong><span>Visit our About section and get in touch before making a payment.</span></div>
-   <a href="#about" class="cw-support-contact">Talk with CoastWatch FL</a>
+   <a href="#cw-sponsor-application" class="cw-support-contact">Start an application</a>
   </div>
   <p class="cw-support-disclaimer">Sponsorship provides recognition only and does not grant sponsors control over community reports, map information, moderation, safety notices or editorial decisions. CoastWatch FL is not an emergency dispatch service or a substitute for official alerts. Sponsorship benefits are confirmed in writing before activation.</p>
  </div>
@@ -4112,4 +4160,56 @@ body.dark #map-panel .map-report-tools .map-report-button{
  #community-partner-ads:before,#community-partner-ads .cw-ad-slide:before{animation:none!important}
 }
 </style>
+
+<script id="cw-sponsor-application-handler">
+(()=>{
+ const form=document.getElementById("cwSponsorApplication");
+ if(!form||!window.db)return;
+ const status=document.getElementById("cwSponsorFormStatus"),button=document.getElementById("cwSponsorSubmit");
+ const show=(message,type)=>{status.textContent=message;status.className="cw-form-status is-visible "+(type==="error"?"is-error":"is-success");};
+ form.addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(!form.reportValidity())return;
+  const data=new FormData(form);
+  if(String(data.get("company_fax")||"").trim())return;
+  const file=data.get("logo");
+  if(file&&file.size>2*1024*1024){show("Please choose a logo smaller than 2 MB.","error");return;}
+  const allowed=["image/png","image/jpeg","image/webp"];
+  if(file&&file.size&&!allowed.includes(file.type)){show("Please upload a PNG, JPG or WebP image.","error");return;}
+  button.disabled=true;button.textContent="Submitting application…";status.className="cw-form-status";
+  let logoPath=null;
+  try{
+   if(file&&file.size){
+    const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
+    logoPath="applications/"+crypto.randomUUID()+"."+ext;
+    const upload=await db.storage.from("sponsor-logos").upload(logoPath,file,{contentType:file.type,upsert:false});
+    if(upload.error)throw upload.error;
+   }
+   const row={
+    business_name:String(data.get("business_name")).trim(),
+    contact_name:String(data.get("contact_name")).trim(),
+    email:String(data.get("email")).trim(),
+    phone:String(data.get("phone")||"").trim()||null,
+    website:String(data.get("website")||"").trim()||null,
+    city:String(data.get("city")||"").trim()||null,
+    service_area:String(data.get("service_area")||"").trim()||null,
+    logo_path:logoPath,
+    description:String(data.get("description")).trim(),
+    services:String(data.get("services")).trim(),
+    social_links:String(data.get("social_links")||"").trim()||null,
+    sponsorship_tier:String(data.get("sponsorship_tier")),
+    preferred_display_name:String(data.get("preferred_display_name")||"").trim()||null,
+    custom_partnership:data.get("custom_partnership")==="true"
+   };
+   const result=await db.from("sponsor_applications").insert(row);
+   if(result.error)throw result.error;
+   form.reset();
+   show("Thank you! Your sponsor application has been received. CoastWatch FL will review it and contact you about next steps. Please do not send payment until your application is approved.","success");
+  }catch(error){
+   console.error("CoastWatch sponsor application error:",error);
+   show("We couldn't submit your application right now. Please try again later or contact CoastWatch FL.","error");
+  }finally{button.disabled=false;button.textContent="Submit sponsor application";}
+ });
+})();
+</script>
 </body></html>
