@@ -4164,7 +4164,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 <script id="cw-sponsor-application-handler">
 (()=>{
  const form=document.getElementById("cwSponsorApplication");
- if(!form||!window.db)return;
+ if(!form)return;
  const status=document.getElementById("cwSponsorFormStatus"),button=document.getElementById("cwSponsorSubmit");
  const show=(message,type)=>{status.textContent=message;status.className="cw-form-status is-visible "+(type==="error"?"is-error":"is-success");};
  form.addEventListener("submit",async event=>{
