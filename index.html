@@ -2600,30 +2600,31 @@ async function loadPublicZones(){
   if(feedbackError)console.warn("Map-zone feedback counts unavailable:",feedbackError.message);
   const feedbackByZone=new Map((feedbackRows||[]).map(row=>[String(row.zone_id),row]));
   let zones=(data||[]).filter(z=>z.geometry&&["Point","Polygon","MultiPolygon"].includes(z.geometry.type));
-  // Use the City of Palm Bay's live GIS boil-water polygons when available.
-  // Keep the database pin as a fallback if the municipal service is unavailable.
+  // Pull the City's authoritative boil-water polygons. Active is a coded TEXT field
+  // in this ArcGIS layer, so query broadly and filter the returned attributes client-side.
   try{
-   const gisUrl="https://gis.palmbayflorida.org/arcgis/rest/services/BWN_Alert/FeatureServer/0/query?where=Active%3D1&outFields=*&returnGeometry=true&outSR=4326&f=geojson";
+   const gisUrl="https://gis.palmbayflorida.org/arcgis/rest/services/BWN_Alert/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&outSR=4326&f=geojson";
    const gisResponse=await fetch(gisUrl,{headers:{Accept:"application/geo+json,application/json"}});
    if(!gisResponse.ok)throw new Error("Palm Bay GIS HTTP "+gisResponse.status);
    const gisData=await gisResponse.json();
    if(gisData.error)throw new Error(gisData.error.message||"Palm Bay GIS error");
-   const terms=["port malabar","vance circle","yalta street","sabrina street","roberts lane","apollo circle","burman lane"];
    const activeFeatures=(gisData.features||[]).filter(f=>{
-    if(!f.geometry||!["Polygon","MultiPolygon"].includes(f.geometry.type))return false;
-    const p=f.properties||{},haystack=Object.values(p).map(v=>String(v||"")).join(" ").toLowerCase();
-    const coords=JSON.stringify(f.geometry.coordinates||[]);
-    const nearPortMalabar=coords.includes("-80.59")||coords.includes("28.01");
-    return terms.some(term=>haystack.includes(term))||nearPortMalabar;
+    const p=f.properties||{};
+    return f.geometry&&["Polygon","MultiPolygon"].includes(f.geometry.type)&&String(p.Active||"").trim()==="1";
    });
    if(activeFeatures.length){
     zones=zones.filter(z=>z.id!=="f57b4978-a1cf-4a92-803a-f5eeb7fde5a8");
-    activeFeatures.forEach((f,index)=>zones.push({
-     id:"palm-bay-bwn-gis-"+String(f.properties?.OBJECTID??index),
-     name:"BOIL WATER NOTICE · Palm Bay affected service area",
-     description:"ACTIVE — Official City of Palm Bay Utilities GIS polygon. This shaded area represents the City's mapped boil-water advisory boundary. Residents should follow the City notice and verify their exact address. Source: City of Palm Bay Utilities EGIS Division.",
-     zone_type:"caution",color:"#168BFF",geometry:f.geometry
-    }));
+    activeFeatures.forEach((f,index)=>{
+     const p=f.properties||{};
+     const street=String(p.ST_Name||"Palm Bay affected area");
+     const comments=String(p.Comments||"");
+     zones.push({
+      id:"palm-bay-bwn-gis-"+String(p.OBJECTID??index),
+      name:"BOIL WATER NOTICE · "+street,
+      description:"ACTIVE — Official City of Palm Bay Utilities GIS polygon. "+(comments?comments+" ":"")+"This blue shaded boundary is published by the City's Utilities EGIS Division. Check your exact address with Palm Bay Utilities before relying on the boundary.",
+      zone_type:"caution",color:"#168BFF",geometry:f.geometry
+     });
+    });
    }
   }catch(gisError){console.warn("Palm Bay official boil-water GIS overlay unavailable; using saved map marker:",gisError);}
 
