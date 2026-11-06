@@ -3103,7 +3103,7 @@ setInterval(checkForSiteUpdates,180000);
 <script>(function(){var d=document.getElementById("mapAdvancedControls");if(d&&window.matchMedia&&window.matchMedia("(max-width: 700px)").matches)d.open=false;})();</script>
 
 <script id="mew-two-finger-tutorial-script">
-(()=>{
+(()=> {
  const dialog=document.getElementById("mewGestureTutorial");
  const openButton=document.getElementById("mewGestureHelp");
  const closeButton=document.getElementById("mewGestureClose");
@@ -3128,24 +3128,15 @@ setInterval(checkForSiteUpdates,180000);
  dialog.addEventListener("click",e=>{if(e.target===dialog)close()});
  document.addEventListener("keydown",e=>{
   if(dialog.hidden)return;
-  if(e.key==="Escape"){e.preventDefault();close();return}
+  if(e.key==="Escape"){close();return}
   if(e.key==="Tab"){
-   const items=[...dialog.querySelectorAll('button:not([disabled])')];
+   const items=[...dialog.querySelectorAll('button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')];
    if(!items.length)return;
    if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items[items.length-1].focus()}
    else if(!e.shiftKey&&document.activeElement===items[items.length-1]){e.preventDefault();items[0].focus()}
   }
  });
- let shown=false;
- const showFirstTime=()=>{
-  if(shown)return;
-  shown=true;
-  let seen=false;
-  try{seen=localStorage.getItem("coastwatch-map-gesture-guide-seen-v2")==="1"}catch(e){seen=false}
-  if(!seen)open();
- };
- if(document.readyState==="complete")setTimeout(showFirstTime,1200);
- else window.addEventListener("load",()=>setTimeout(showFirstTime,1200),{once:true});
+ // The guide is now opened only when a visitor taps the help button.
 })();
 </script>
 
