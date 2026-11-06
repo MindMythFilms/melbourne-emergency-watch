@@ -2628,6 +2628,26 @@ async function loadPublicZones(){
     });
    }
   }catch(gisError){console.warn("Palm Bay official boil-water GIS overlay unavailable; using saved map marker:",gisError);}
+  // West Melbourne's notice applies to its water customers citywide. Use the
+  // county's official municipal boundary as a clearly labelled reference overlay;
+  // it is not a parcel-level utility-service boundary.
+  try{
+   const westMelbourneUrl="https://gis.brevardfl.gov/gissrv/rest/services/Base_Map/General_WKID102100/MapServer/5/query?where=CITY_NAME%3D%27WEST%20MELBOURNE%27&outFields=CITY_NAME&returnGeometry=true&outSR=4326&f=geojson";
+   const wmResponse=await fetch(westMelbourneUrl,{headers:{Accept:"application/geo+json,application/json"}});
+   if(!wmResponse.ok)throw new Error("Brevard GIS HTTP "+wmResponse.status);
+   const wmData=await wmResponse.json();
+   if(wmData.error)throw new Error(wmData.error.message||"Brevard GIS error");
+   const wmFeature=(wmData.features||[]).find(f=>f.geometry&&["Polygon","MultiPolygon"].includes(f.geometry.type));
+   if(wmFeature){
+    zones=zones.filter(z=>z.id!=="e8df528f-d88d-430e-b45f-752059cb4eba");
+    zones.push({
+     id:"west-melbourne-boil-water-boundary",
+     name:"BOIL WATER NOTICE · West Melbourne (city boundary reference)",
+     description:"ACTIVE — West Melbourne city update, Nov 6, 2026. The precautionary boil-water notice remains in effect for West Melbourne water customers while water samples are examined. Blue shading uses the official Brevard County municipal boundary as a geographic reference, NOT a parcel-level water-service boundary. West Melbourne's potable-water service area is primarily within city limits, but some service customers may be outside it. Verify your water provider/service address. Boil tap water at a rolling boil for at least 1 full minute before drinking, cooking, making ice, brushing teeth, or washing dishes; bottled water is an alternative. Continue until the City / water provider officially rescinds the notice. Source: City of West Melbourne update; Brevard County GIS municipal boundary.",
+     zone_type:"caution",color:"#168BFF",geometry:wmFeature.geometry
+    });
+   }
+  }catch(wmGisError){console.warn("West Melbourne boundary overlay unavailable; using saved point marker:",wmGisError);}
 
   const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
   zones.forEach(z=>{
