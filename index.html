@@ -1855,7 +1855,7 @@ body.dark .cw-support-section{border-color:rgba(113,220,226,.25)}
 @media(max-width:620px){.cw-form-grid{grid-template-columns:1fr;gap:12px}.cw-form-full{grid-column:auto}.cw-sponsor-application{padding:18px 13px}.cw-sponsor-form input:not([type=checkbox]):not([type=file]),.cw-sponsor-form select{min-height:45px}}
 body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 </style>
-</head>
+<style id="cw-support-apply-cta-style">.cw-support-apply-cta{max-width:760px;margin:22px auto 0;padding:22px;border:1px solid rgba(151,224,230,.22);border-radius:17px;background:rgba(255,255,255,.055);text-align:center}.cw-support-apply-cta p{margin:0 auto 15px;color:#d1e4ec;font-size:14px;line-height:1.6}.cw-support-apply-cta .cw-support-pay{max-width:280px;margin:0 auto;font-size:14px}</style></head>
 <body>
 <header class="site-header">
  <div class="site-header-inner">
@@ -2042,48 +2042,14 @@ body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
    </article>
   </div>
 
- <section class="cw-sponsor-application" id="cw-sponsor-application" aria-labelledby="cw-sponsor-application-title">
-  <div class="cw-application-heading">
-   <span class="cw-support-kicker">BECOME A COASTWATCH FL PARTNER</span>
-   <h3 id="cw-sponsor-application-title">Tell us about your business.</h3>
-   <p>Complete the application below. Our team will review your information and contact you with next steps. Payment is requested only after approval.</p>
+ <div class="cw-support-apply-cta">
+   <p>Interested in becoming a CoastWatch FL sponsor? Tell us about your business and the partnership you're looking for.</p>
+   <a class="cw-support-pay" href="/sponsor.html">Become a Sponsor</a>
   </div>
-  <form id="cwSponsorApplication" class="cw-sponsor-form">
-   <div class="cw-form-grid">
-    <label>Business name <span>*</span><input name="business_name" required maxlength="120" autocomplete="organization" placeholder="Your business name"></label>
-    <label>Contact person's name <span>*</span><input name="contact_name" required maxlength="120" autocomplete="name" placeholder="Full name"></label>
-    <label>Business email <span>*</span><input name="email" type="email" required maxlength="254" autocomplete="email" placeholder="you@business.com"></label>
-    <label>Phone number<input name="phone" type="tel" maxlength="40" autocomplete="tel" placeholder="(321) 555-0123"></label>
-    <label>Business website<input name="website" type="url" maxlength="300" placeholder="https://"></label>
-    <label>City / primary location<input name="city" maxlength="100" placeholder="Melbourne, FL"></label>
-    <label>Areas you serve<input name="service_area" maxlength="200" placeholder="e.g. Brevard County, Central Florida"></label>
-    <label>Preferred sponsorship level <span>*</span>
-     <select name="sponsorship_tier" required>
-      <option value="community_100">$100/month — Community Founding Sponsor</option>
-      <option value="local_250">$250/month — Local Founding Partner</option>
-      <option value="regional_500">$500/month — Regional Founding Partner</option>
-      <option value="presenting_1000_plus">$1,000+/month — Presenting Founding Partner</option>
-      <option value="custom">I'd like to discuss a custom partnership</option>
-     </select>
-    </label>
-    <label class="cw-form-full">Upload business logo <small>PNG, JPG or WebP · up to 2 MB · optional if you need to send it later</small><input name="logo" type="file" accept="image/png,image/jpeg,image/webp"></label>
-    <label class="cw-form-full">Short business description <span>*</span><small>Tell residents who you are and what your business does. This may appear on your sponsor profile.</small><textarea name="description" required minlength="20" maxlength="600" rows="3" placeholder="A short introduction to your business..."></textarea></label>
-    <label class="cw-form-full">Products or services <span>*</span><small>What do you offer, and what would you like local residents to know?</small><textarea name="services" required minlength="10" maxlength="1000" rows="3" placeholder="Describe your main products, services or areas of expertise..."></textarea></label>
-    <label class="cw-form-full">Social media links <small>Optional — add links separated by commas</small><input name="social_links" maxlength="500" placeholder="Facebook, Instagram, LinkedIn..."></label>
-    <label class="cw-form-full">Preferred public display name<input name="preferred_display_name" maxlength="120" placeholder="If different from your business name"></label>
-   </div>
-   <label class="cw-custom-check"><input name="custom_partnership" type="checkbox" value="true"> I'd like to discuss a custom sponsorship or community collaboration.</label>
-   <label class="cw-custom-check"><input name="agreement" type="checkbox" required> I confirm that I am authorized to submit this information and that CoastWatch FL may contact me about this application. I understand submission does not guarantee approval or sponsorship placement.</label>
-   <div class="cw-form-honey" aria-hidden="true"><label>Leave this field empty<input name="company_fax" tabindex="-1" autocomplete="off"></label></div>
-   <div id="cwSponsorFormStatus" class="cw-form-status" role="status" aria-live="polite"></div>
-   <button class="cw-sponsor-submit" id="cwSponsorSubmit" type="submit">Submit sponsor application</button>
-   <p class="cw-form-privacy">Your application and uploaded logo are stored privately for CoastWatch FL review. Logos are not published unless your sponsorship is approved and activated. Please do not submit sensitive personal information.</p>
-  </form>
- </section>
 
   <div class="cw-support-bottom">
    <div><strong>Prefer to discuss a partnership first?</strong><span>Visit our About section and get in touch before making a payment.</span></div>
-   <a href="#cw-sponsor-application" class="cw-support-contact">Start an application</a>
+   <a href="/sponsor.html" class="cw-support-contact">Become a Sponsor</a>
   </div>
   <p class="cw-support-disclaimer">Sponsorship provides recognition only and does not grant sponsors control over community reports, map information, moderation, safety notices or editorial decisions. CoastWatch FL is not an emergency dispatch service or a substitute for official alerts. Sponsorship benefits are confirmed in writing before activation.</p>
  </div>
