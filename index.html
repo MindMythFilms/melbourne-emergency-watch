@@ -2660,7 +2660,7 @@ async function loadPublicZones(){
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
    group.bindPopup('<strong class="mew-zone-popup-title">'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+openRoadCaution+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+photoLinkMarkup+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))),{className:"mew-public-zone-popup"});
-   nextEntries.set(String(z.id),{bounds,group,labelMarker,isBoilNotice});
+   nextEntries.set(String(z.id),{bounds,group,labelMarker,isBoilNotice,clusterColor:isBoilNotice?"#168BFF":(isLaneClosure?"#f59e0b":(isRoadClosure?"#c81e1e":String(z.color||"#ef3340").toLowerCase()))});
    nextBounds.set(String(z.id),bounds);
    nextLayers.push(group);
   });
@@ -2687,16 +2687,28 @@ function mewRefreshPublicZoneClusters(){
  if(!mewPublicZoneLayer)return;
  mewPublicZoneLayer.clearLayers();
  const entries=[...mewPublicZoneEntries.values()];
- // Keep active boil-water notices independently visible at every zoom level.
+ // Boil-water notices stay individually visible at every zoom.
  const boilEntries=entries.filter(entry=>entry.isBoilNotice);
  const otherEntries=entries.filter(entry=>!entry.isBoilNotice);
  boilEntries.forEach(entry=>entry.group.addTo(mewPublicZoneLayer));
  const clusterZoom=window.matchMedia("(max-width:700px)").matches?13:12;
  if(map.getZoom()>=clusterZoom){otherEntries.forEach(entry=>entry.group.addTo(mewPublicZoneLayer));return;}
- const items=otherEntries.map(entry=>({latlng:entry.bounds.getCenter(),layer:entry.group,bounds:entry.bounds}));
- mewGroupNearby(items,68).forEach(group=>{
-  if(group.items.length===1)group.items[0].layer.addTo(mewPublicZoneLayer);
-  else mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,"road").addTo(mewPublicZoneLayer);
+ // Only combine hazards with the same color; separate types keep separate counts.
+ const colorGroups=new Map();
+ otherEntries.forEach(entry=>{
+  const color=entry.clusterColor||"#ef3340";
+  if(!colorGroups.has(color))colorGroups.set(color,[]);
+  colorGroups.get(color).push(entry);
+ });
+ colorGroups.forEach((matchingEntries,color)=>{
+  const items=matchingEntries.map(entry=>({latlng:entry.bounds.getCenter(),layer:entry.group,bounds:entry.bounds}));
+  mewGroupNearby(items,68).forEach(group=>{
+   if(group.items.length===1)group.items[0].layer.addTo(mewPublicZoneLayer);
+   else{
+    const kind=color==="#f59e0b"?"caution":(color==="#c81e1e"||color==="#dc2626"||color==="#c83b35"?"closure":"zone");
+    mewMakeCountCluster(group.items.length,group.bounds.getCenter(),group.bounds,kind).addTo(mewPublicZoneLayer);
+   }
+  });
  });
 }
 // Auto-pan on popup open emits moveend. Rebuilding clustered layers during that
