@@ -1837,6 +1837,16 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 #community-partner-ads .cw-ad-slide:after{display:none!important}
 @media(max-width:760px){#community-partner-ads .cw-ad-slides{aspect-ratio:auto!important}}
 </style>
+
+<style id="cw-monthly-sponsorship-section">
+.cw-support-section{position:relative;margin:30px 0 26px;padding:clamp(22px,4vw,46px);overflow:hidden;border:1px solid rgba(113,220,226,.28);border-radius:26px;background:radial-gradient(ellipse at 8% 0%,rgba(34,176,177,.19),transparent 38%),radial-gradient(ellipse at 95% 100%,rgba(43,126,177,.20),transparent 42%),linear-gradient(135deg,#071b2d,#0b3548 58%,#092337);color:#f3fbff;box-shadow:0 22px 55px rgba(4,20,34,.22),inset 0 1px 0 rgba(255,255,255,.16)}
+.cw-support-inner{max-width:1320px;margin:0 auto}.cw-support-intro{max-width:820px;margin:0 auto 27px;text-align:center}.cw-support-kicker{display:inline-block;color:#8de5df;font-size:11px;font-weight:900;letter-spacing:.18em}.cw-support-intro h2{margin:10px 0 12px;color:#fff;font:800 clamp(27px,4vw,42px)/1.12 Manrope,'DM Sans',sans-serif;letter-spacing:-1.1px}.cw-support-intro>p{margin:0 auto 10px;max-width:760px;color:#c7dce7;font-size:15px;line-height:1.7}.cw-support-note{padding:12px 15px;border:1px solid rgba(142,224,229,.2);border-radius:12px;background:rgba(255,255,255,.055);font-size:13px!important}
+.cw-support-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;align-items:stretch}.cw-support-tier{display:flex;flex-direction:column;min-width:0;padding:20px 17px;border:1px solid rgba(181,226,235,.2);border-radius:18px;background:linear-gradient(155deg,rgba(255,255,255,.105),rgba(255,255,255,.045));box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 12px 28px rgba(0,0,0,.13);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.cw-support-featured{border-color:rgba(244,207,129,.65);background:linear-gradient(155deg,rgba(139,111,54,.25),rgba(255,255,255,.055));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 25px rgba(239,194,106,.09)}.cw-tier-label{min-height:32px;color:#9ee8e4;font-size:10px;font-weight:900;letter-spacing:.11em;line-height:1.5}.cw-support-featured .cw-tier-label{color:#f5d58f}.cw-tier-price{display:block;margin:5px 0 8px;color:#fff;font:800 clamp(27px,3vw,35px)/1 Manrope,'DM Sans',sans-serif;letter-spacing:-1px}.cw-tier-price span{margin-left:4px;color:#b9d0dc;font:600 12px 'DM Sans',sans-serif;letter-spacing:0}.cw-support-tier>p{min-height:44px;margin:0 0 11px;color:#d4e3eb;font-size:12px;line-height:1.5}.cw-support-tier ul{flex:1;margin:0 0 17px;padding-left:17px;color:#c3d7e2;font-size:12px;line-height:1.65}.cw-support-tier li{padding:2px 0}.cw-support-pay{display:flex;justify-content:center;align-items:center;min-height:43px;padding:10px 12px;border:1px solid rgba(129,236,225,.45);border-radius:11px;background:linear-gradient(135deg,#159d9a,#116c83);color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 7px 17px rgba(12,137,139,.25);transition:transform .18s,filter .18s,box-shadow .18s}.cw-support-pay:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 10px 22px rgba(12,137,139,.34)}.cw-support-bottom{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:17px;padding:16px 18px;border:1px solid rgba(188,224,233,.18);border-radius:15px;background:rgba(1,14,26,.3)}.cw-support-bottom strong,.cw-support-bottom span{display:block}.cw-support-bottom strong{color:#fff;font-size:14px}.cw-support-bottom span{margin-top:3px;color:#bdd2dd;font-size:12px}.cw-support-contact{flex:0 0 auto;padding:10px 14px;border:1px solid rgba(255,255,255,.28);border-radius:10px;color:#fff;text-decoration:none;font-size:12px;font-weight:800}.cw-support-disclaimer{max-width:1000px;margin:14px auto 0;color:#9fb8c6;font-size:11px;line-height:1.55;text-align:center}
+@media(max-width:1000px){.cw-support-tiers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.cw-support-section{margin:18px 0;padding:22px 15px;border-radius:19px}.cw-support-intro{margin-bottom:19px}.cw-support-intro>p{font-size:13px}.cw-support-tiers{grid-template-columns:1fr;gap:10px}.cw-support-tier{padding:17px}.cw-tier-label{min-height:0}.cw-support-tier>p{min-height:0}.cw-support-bottom{align-items:stretch;flex-direction:column}.cw-support-contact{text-align:center}}
+@media(prefers-reduced-motion:reduce){.cw-support-pay{transition:none}}
+body.dark .cw-support-section{border-color:rgba(113,220,226,.25)}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -1850,6 +1860,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
    <a class="nav-link" href="#official-alerts-panel">Alerts</a>
    <a class="nav-link" href="#about">About</a>
    <a class="nav-link" href="#safety-announcement">Safety</a>
+   <a class="nav-link" href="#support-coastwatch">Support</a>
    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">☼ Theme</button>
    <a class="nav-report" href="#report-panel">＋ Report Hazard</a>
   </nav>
@@ -1987,6 +1998,48 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
 
 
 <section class="panel mew-about-panel" id="about"><details class="mew-about-details"><summary>About CoastWatch FL, terms &amp; privacy</summary><div style="padding:16px 18px;color:#536579"><p>CoastWatch FL is a volunteer-run, non-commercial community information project. It is not affiliated with any government, police, fire, emergency management, or utility agency.</p><p>Reports are user-submitted and may be inaccurate, incomplete, delayed, or removed. New reports appear automatically as “Unverified community report.” CoastWatch FL does not fact-check or independently verify reports. Approved photographs have passed a content and privacy screening only; photo approval does not verify the reported event.</p><p>Do not approach hazards to take photographs. Never enter floodwater, approach fires or downed power lines, or enter damaged structures. For emergencies call 911. For official weather alerts visit <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a> and <a href="https://www.floridadisaster.org/" target="_blank" rel="noopener">Florida Division of Emergency Management</a>.</p><p><a href="#terms" id="showTerms">Terms of Use</a> · <a href="#privacy" id="showPrivacy">Privacy Notice</a> · <a href="mailto:CONTACT_EMAIL">Contact CoastWatch FL</a></p><details id="privacy" style="margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px"><summary style="cursor:pointer;font-weight:800">Privacy Notice — what information is stored?</summary><p>Browsing does not require an account. Reports you submit may store the location you select, details you enter, optional display name, and photos you choose to upload. Photos remain pending review until approved. Anonymous reports are supported.</p><p>If you use “My location,” your device location is used in the page to center the map and is not sent to CoastWatch FL or saved as a visitor-location record. You can choose a map location manually.</p><p>When you accept the terms, the site records the terms version, acceptance time, a browser-session identifier, and browser/user-agent information. Hosting and service providers may also process technical connection information to operate and protect the site.</p></details></div></details></section>
+
+<section id="support-coastwatch" class="cw-support-section" aria-labelledby="cw-support-title">
+ <div class="cw-support-inner">
+  <div class="cw-support-intro">
+   <span class="cw-support-kicker">COMMUNITY POWERED · LOCALLY FOCUSED</span>
+   <h2 id="cw-support-title">Help keep our neighbors informed.</h2>
+   <p>CoastWatch FL is building an accessible community information resource for flooding, road hazards, shelter information and changing local conditions. Monthly sponsors help support the technology, hosting, maintenance and outreach that keep this resource available.</p>
+   <p class="cw-support-note">Choose a monthly sponsorship level below. Payments are currently made manually through Venmo; this is not an automatic recurring charge. Please include your business name and sponsorship level in the payment note, then contact us so we can confirm your partnership.</p>
+  </div>
+  <div class="cw-support-tiers">
+   <article class="cw-support-tier">
+    <span class="cw-tier-label">COMMUNITY FOUNDING SPONSOR</span><strong class="cw-tier-price">$100<span>/month</span></strong>
+    <p>Help keep essential community information accessible.</p>
+    <ul><li>Founding sponsor recognition</li><li>Business name and website link</li><li>Launch partner acknowledgment</li></ul>
+    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+   </article>
+   <article class="cw-support-tier">
+    <span class="cw-tier-label">LOCAL FOUNDING PARTNER</span><strong class="cw-tier-price">$250<span>/month</span></strong>
+    <p>Give your local partnership a stronger presence.</p>
+    <ul><li>All Community benefits</li><li>Enhanced profile with logo and description</li><li>Prominent website recognition</li></ul>
+    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+   </article>
+   <article class="cw-support-tier">
+    <span class="cw-tier-label">REGIONAL FOUNDING PARTNER</span><strong class="cw-tier-price">$500<span>/month</span></strong>
+    <p>Support broader community awareness across the region.</p>
+    <ul><li>All Local benefits</li><li>Priority sponsor placement</li><li>Recognition in partner updates</li><li>Quarterly partnership check-in</li></ul>
+    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+   </article>
+   <article class="cw-support-tier cw-support-featured">
+    <span class="cw-tier-label">PRESENTING FOUNDING PARTNER</span><strong class="cw-tier-price">$1,000<span>+/month</span></strong>
+    <p>Become a leading supporter of the CoastWatch FL mission.</p>
+    <ul><li>All Regional benefits</li><li>Top-tier presenting recognition</li><li>Custom community-awareness collaboration</li><li>Quarterly impact briefing</li></ul>
+    <a class="cw-support-pay" href="https://venmo.com/u/CoastwatchFL" target="_blank" rel="noopener noreferrer">Pay via Venmo</a>
+   </article>
+  </div>
+  <div class="cw-support-bottom">
+   <div><strong>Prefer to discuss a partnership first?</strong><span>Visit our About section and get in touch before making a payment.</span></div>
+   <a href="#about" class="cw-support-contact">Talk with CoastWatch FL</a>
+  </div>
+  <p class="cw-support-disclaimer">Sponsorship provides recognition only and does not grant sponsors control over community reports, map information, moderation, safety notices or editorial decisions. CoastWatch FL is not an emergency dispatch service or a substitute for official alerts. Sponsorship benefits are confirmed in writing before activation.</p>
+ </div>
+</section>
 </main>
 <div class="mew-photo-viewer" id="photoViewer" role="dialog" aria-modal="true" aria-label="Enlarged community report photo"><button class="mew-photo-viewer-close" id="photoViewerClose" type="button" aria-label="Close enlarged photo">×</button><img id="photoViewerImage" alt="Enlarged administrator-approved community report photo"><div class="mew-photo-viewer-hint">Click outside the photo or press Escape to close</div></div>
 <footer>© CoastWatch FL · Community information only · Not an emergency response service.</footer>
