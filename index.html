@@ -2654,7 +2654,9 @@ async function loadPublicZones(){
    if(isPoint)casing.setStyle({fillColor:color});
    const outline=isPoint?L.circleMarker(bounds.getCenter(),{radius:5,color,weight:2,fillColor:color,fillOpacity:.2}):L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
    const isBoilNotice=/^BOIL WATER NOTICE/i.test(String(z.name||""));
-   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label'+(isBoilNotice?' mew-zone-label-boil':(isOpen?' mew-zone-label-open':''))+'">'+(isBoilNotice?'<b>💧 BOIL WATER</b><small>ACTIVE · PALM BAY</small>':(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':(isOpen?'USE CAUTION':'STATUS'))+'</small>')+'</span>',iconSize:[1,1],iconAnchor:[0,0]});
+   const isLaneClosure=/^LANE CLOSURE/i.test(String(z.name||""));
+   const isRoadClosure=/^ROAD CLOSED/i.test(String(z.name||""));
+   const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label'+(isBoilNotice?' mew-zone-label-boil':(isLaneClosure?' mew-zone-label-lane':(isRoadClosure?' mew-zone-label-closure':(isOpen?' mew-zone-label-open':''))))+'">'+(isBoilNotice?'<b>💧 BOIL WATER</b><small>ACTIVE · PALM BAY</small>':(isLaneClosure?'<b>🚧 LANE CLOSED</b><small>TRAFFIC HAZARD</small>':(isRoadClosure?'<b>⛔ ROAD CLOSED</b><small>DO NOT ENTER</small>':(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':(isOpen?'USE CAUTION':'STATUS'))+'</small>')))+'</span>',iconSize:[1,1],iconAnchor:[0,0]});
    const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
    group.bindPopup('<strong class="mew-zone-popup-title">'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+openRoadCaution+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+photoLinkMarkup+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))),{className:"mew-public-zone-popup"});
@@ -4093,6 +4095,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
  #community-partner-ads:before,#community-partner-ads .cw-ad-slide:before{animation:none!important}
 }
 .mew-zone-label-boil{background:#0878e8f2!important;border:2px solid #fff!important;border-radius:12px!important;padding:9px 13px!important;box-shadow:0 3px 12px #001a35cc,0 0 0 3px #168bff66!important;min-width:112px!important;} .mew-zone-label-boil b{font-size:13px!important;color:#fff!important;} .mew-zone-label-boil small{font-size:9px!important;color:#e8f4ff!important;}
+.mew-zone-label-lane{background:#f59e0bf2!important;border:2px solid #fff!important;border-radius:11px!important;padding:8px 11px!important;box-shadow:0 3px 12px #000b,0 0 0 3px #f59e0b66!important;min-width:108px!important}.mew-zone-label-lane b{font-size:12px!important;color:#171717!important}.mew-zone-label-lane small{font-size:9px!important;color:#171717!important}.mew-zone-label-closure{background:#c81e1eF2!important;border:2px solid #fff!important;border-radius:11px!important;padding:8px 11px!important;box-shadow:0 3px 12px #000b,0 0 0 3px #ef444466!important;min-width:108px!important}.mew-zone-label-closure b,.mew-zone-label-closure small{color:#fff!important}
 </style>
 
 <script id="cw-sponsor-application-handler">
