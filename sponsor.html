@@ -25,18 +25,35 @@ body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 .cw-sponsor-form{max-width:100%;}.cw-sponsor-form label{color:#edf8fc}.cw-sponsor-form input:not([type=checkbox]):not([type=file]),.cw-sponsor-form select,.cw-sponsor-form textarea{font-family:inherit}.cw-sponsor-form select option{color:#102a43;background:#fff}
 .cw-form-privacy{color:#a9c2ce}.cw-footer{text-align:center;padding:22px 8px;color:#88a8b8;font-size:11px;line-height:1.6}
 @media(max-width:650px){.cw-tier-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.cw-hero{padding-top:32px}.cw-top{padding-bottom:18px}}
+
+/* Interactive sponsorship level selector */
+.cw-tier-strip{align-items:stretch}
+.cw-tier-chip{display:block;width:100%;font:inherit;color:inherit;cursor:pointer;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s}
+.cw-tier-chip strong,.cw-tier-chip span{pointer-events:none}
+.cw-tier-chip:hover,.cw-tier-chip:focus-visible{border-color:rgba(112,229,220,.8);background:rgba(39,160,164,.17);outline:none;transform:translateY(-2px)}
+.cw-tier-chip[aria-expanded=true]{border-color:#72e3dc;background:linear-gradient(145deg,rgba(32,166,164,.27),rgba(255,255,255,.08));box-shadow:0 0 0 2px rgba(92,220,213,.13),inset 0 1px 0 rgba(255,255,255,.12)}
+.cw-tier-details{display:flex;align-items:center;justify-content:space-between;gap:22px;margin:0 0 22px;padding:20px 22px;border:1px solid rgba(112,229,220,.32);border-radius:17px;background:linear-gradient(135deg,rgba(24,130,143,.2),rgba(255,255,255,.055));box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.cw-tier-details[hidden]{display:none}
+.cw-tier-details-copy{min-width:0}.cw-tier-details-kicker{color:#8de5df;font-size:10px;font-weight:900;letter-spacing:.16em}.cw-tier-details h2{margin:5px 0 7px;color:#fff;font-size:21px}.cw-tier-details p{margin:0;color:#c4dce6;font-size:13px;line-height:1.6}.cw-tier-details ul{display:flex;flex-wrap:wrap;gap:7px 20px;margin:12px 0 0;padding-left:18px;color:#e4f4f7;font-size:12px;line-height:1.5}
+.cw-tier-choose{flex:0 0 auto;padding:12px 17px;border:1px solid rgba(190,250,245,.35);border-radius:10px;background:linear-gradient(120deg,#159b98,#176b87);color:#fff;font-size:12px;font-weight:850;cursor:pointer}
+.cw-tier-choose:hover{filter:brightness(1.1)}
+@media(max-width:620px){.cw-tier-details{align-items:stretch;flex-direction:column;padding:17px}.cw-tier-choose{width:100%}.cw-tier-details ul{display:block}.cw-tier-details li{margin:4px 0}}
 </style>
 </head>
 <body>
 <div class="cw-page">
 <header class="cw-top"><a class="cw-brand" href="/">COASTWATCH <span>FL</span></a><a class="cw-back" href="/#support-coastwatch">← Back to CoastWatch FL</a></header>
 <section class="cw-hero"><span class="cw-kicker">FOUNDING SPONSOR PROGRAM</span><h1>Become a CoastWatch FL Sponsor.</h1><p>Help keep neighbors informed and strengthen access to local hazard and preparedness information. Tell us about your business and the kind of community partnership you'd like to build.</p></section>
-<div class="cw-tier-strip">
-<div class="cw-tier-chip"><strong>$100</strong><span>Community Founding Sponsor / month</span></div>
-<div class="cw-tier-chip"><strong>$250</strong><span>Local Founding Partner / month</span></div>
-<div class="cw-tier-chip"><strong>$500</strong><span>Regional Founding Partner / month</span></div>
-<div class="cw-tier-chip"><strong>$1,000+</strong><span>Presenting Founding Partner / month</span></div>
+<div class="cw-tier-strip" role="group" aria-label="Choose a sponsorship level">
+<button class="cw-tier-chip" type="button" data-tier="community_100" aria-expanded="false" aria-controls="cwTierDetails"><strong>$100</strong><span>Community Founding Sponsor / month</span></button>
+<button class="cw-tier-chip" type="button" data-tier="local_250" aria-expanded="false" aria-controls="cwTierDetails"><strong>$250</strong><span>Local Founding Partner / month</span></button>
+<button class="cw-tier-chip" type="button" data-tier="regional_500" aria-expanded="false" aria-controls="cwTierDetails"><strong>$500</strong><span>Regional Founding Partner / month</span></button>
+<button class="cw-tier-chip" type="button" data-tier="presenting_1000_plus" aria-expanded="false" aria-controls="cwTierDetails"><strong>$1,000+</strong><span>Presenting Founding Partner / month</span></button>
 </div>
+<section class="cw-tier-details" id="cwTierDetails" aria-live="polite" hidden>
+<div class="cw-tier-details-copy"><span class="cw-tier-details-kicker">SPONSORSHIP LEVEL</span><h2 id="cwTierTitle"></h2><p id="cwTierDescription"></p><ul id="cwTierBenefits"></ul></div>
+<button class="cw-tier-choose" id="cwTierChoose" type="button">Choose this level</button>
+</section>
 <section class="cw-panel"><h2>Business sponsorship application</h2><p class="cw-panel-intro">Complete the information below. Applications are reviewed before payment is requested. Submitting this form does not guarantee approval or sponsor placement.</p>
 <form id="cwSponsorApplication" class="cw-sponsor-form">
 <div class="cw-form-grid">
@@ -91,6 +108,31 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:f
    form.reset();show("Thank you! Your application has been received. CoastWatch FL will review it and contact you about next steps. Please do not send payment until your application is approved.","success");
   }catch(error){console.error("CoastWatch sponsor application error:",error);show("We couldn't submit your application right now. Please try again later or contact CoastWatch FL.","error");}
   finally{button.disabled=false;button.textContent="Submit sponsor application";}
+ });
+})();
+</script>
+
+<script>
+(()=>{
+ const tiers={
+  community_100:{title:"$100/month — Community Founding Sponsor",description:"A practical entry point for a local business that wants to help keep CoastWatch FL available while receiving founding-partner recognition.",benefits:["Founding sponsor recognition","Business name and website link","Launch partner acknowledgment"]},
+  local_250:{title:"$250/month — Local Founding Partner",description:"For a business that wants a more visible presence and a fuller introduction to residents in the local community.",benefits:["Everything in the Community level","Enhanced profile with logo and description","Prominent website recognition"]},
+  regional_500:{title:"$500/month — Regional Founding Partner",description:"For an organization serving a wider area that wants stronger visibility across the region and recognition in CoastWatch FL partner communications.",benefits:["Everything in the Local level","Priority sponsor placement","Recognition in partner updates","Quarterly partnership check-in"]},
+  presenting_1000_plus:{title:"$1,000+/month — Presenting Founding Partner",description:"A leading partnership for an organization looking to support the CoastWatch FL mission at a broader level and collaborate on community awareness.",benefits:["Everything in the Regional level","Top-tier presenting recognition","Custom community-awareness collaboration","Quarterly impact briefing"]}
+ };
+ const buttons=[...document.querySelectorAll(".cw-tier-chip[data-tier]")],panel=document.getElementById("cwTierDetails"),title=document.getElementById("cwTierTitle"),description=document.getElementById("cwTierDescription"),list=document.getElementById("cwTierBenefits"),choose=document.getElementById("cwTierChoose"),select=document.querySelector('select[name="sponsorship_tier"]');
+ let active="";
+ buttons.forEach(button=>button.addEventListener("click",()=>{
+  const key=button.dataset.tier;active=key;
+  buttons.forEach(item=>item.setAttribute("aria-expanded",String(item===button)));
+  const tier=tiers[key];title.textContent=tier.title;description.textContent=tier.description;list.replaceChildren(...tier.benefits.map(item=>{const li=document.createElement("li");li.textContent=item;return li;}));
+  panel.hidden=false;
+  if(select)select.value=key;
+ }));
+ choose.addEventListener("click",()=>{
+  if(select&&active)select.value=active;
+  document.getElementById("cwSponsorApplication").scrollIntoView({behavior:"smooth",block:"start"});
+  if(select){select.focus({preventScroll:true});}
  });
 })();
 </script>
