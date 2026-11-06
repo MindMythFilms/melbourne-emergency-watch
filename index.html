@@ -2628,8 +2628,25 @@ async function loadPublicZones(){
     });
    }
   }catch(gisError){console.warn("Palm Bay official boil-water GIS overlay unavailable; using saved map marker:",gisError);}
-  // West Melbourne's Melbourne-supplied boil-water notice was rescinded Nov. 5, 2026.
-  // Keep the database record inactive; do not draw a city-boundary boil-water overlay.
+  // West Melbourne's notice status is awaiting explicit confirmation from the City of West Melbourne.
+  // Use the official municipal boundary as a geographic reference, not a parcel-level utility boundary.
+  try{
+   const westMelbourneUrl="https://gis.brevardfl.gov/gissrv/rest/services/Base_Map/General_WKID102100/MapServer/5/query?where=CITY_NAME%3D%27WEST%20MELBOURNE%27&outFields=CITY_NAME&returnGeometry=true&outSR=4326&f=geojson";
+   const wmResponse=await fetch(westMelbourneUrl,{headers:{Accept:"application/geo+json,application/json"}});
+   if(!wmResponse.ok)throw new Error("Brevard GIS HTTP "+wmResponse.status);
+   const wmData=await wmResponse.json();
+   if(wmData.error)throw new Error(wmData.error.message||"Brevard GIS error");
+   const wmFeature=(wmData.features||[]).find(f=>f.geometry&&["Polygon","MultiPolygon"].includes(f.geometry.type));
+   if(wmFeature){
+    zones=zones.filter(z=>z.id!=="e8df528f-d88d-430e-b45f-752059cb4eba");
+    zones.push({
+     id:"west-melbourne-boil-water-boundary",
+     name:"BOIL WATER NOTICE · West Melbourne (awaiting confirmation)",
+     description:"STATUS: AWAITING OFFICIAL WEST MELBOURNE CONFIRMATION — Nov. 6, 2026. The City of Melbourne has rescinded its notice, but West Melbourne residents should continue following their own water provider's instructions until the City of West Melbourne confirms its notice is lifted. Blue shading uses the official Brevard County municipal boundary as a geographic reference, NOT a parcel-level water-service boundary. Verify your water provider and service address. Until official rescission is confirmed, boil tap water at a rolling boil for at least 1 full minute before drinking, cooking, making ice, brushing teeth, or washing dishes; bottled water is an alternative. Source: City of West Melbourne Emergency Information and City of Melbourne rescission notice.",
+     zone_type:"caution",color:"#168BFF",geometry:wmFeature.geometry
+    });
+   }
+  }catch(wmGisError){console.warn("West Melbourne boundary overlay unavailable; using saved point marker:",wmGisError);}
 
 
   const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
