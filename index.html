@@ -2627,7 +2627,25 @@ async function loadPublicZones(){
   // West Melbourne is included in the City of Melbourne wholesale supply area.
   // The City of Melbourne rescinded the notice for all water customers on Nov. 5, 2026,
   // and Brevard County confirmed the rescission in its 6:30 p.m. community report.
-  // Keep the West Melbourne record inactive and do not draw the boil-water boundary.
+  // Keep West Melbourne's precautionary boil-water warning active pending direct confirmation
+  // from the City of West Melbourne. Municipal boundary is a geographic reference only.
+  try{
+   const westMelbourneUrl="https://gis.brevardfl.gov/gissrv/rest/services/Base_Map/General_WKID102100/MapServer/5/query?where=CITY_NAME%3D%27WEST%20MELBOURNE%27&outFields=CITY_NAME&returnGeometry=true&outSR=4326&f=geojson";
+   const wmResponse=await fetch(westMelbourneUrl,{headers:{Accept:"application/geo+json,application/json"}});
+   if(!wmResponse.ok)throw new Error("Brevard GIS HTTP "+wmResponse.status);
+   const wmData=await wmResponse.json();
+   if(wmData.error)throw new Error(wmData.error.message||"Brevard GIS error");
+   const wmFeature=(wmData.features||[]).find(f=>f.geometry&&["Polygon","MultiPolygon"].includes(f.geometry.type));
+   if(wmFeature){
+    zones=zones.filter(z=>z.id!=="e8df528f-d88d-430e-b45f-752059cb4eba");
+    zones.push({
+     id:"west-melbourne-boil-water-boundary",
+     name:"BOIL WATER NOTICE · West Melbourne (confirmation pending)",
+     description:"PRECAUTIONARY STATUS — AWAITING DIRECT CONFIRMATION FROM THE CITY OF WEST MELBOURNE. The City of Melbourne announced rescission for its water customers, and Brevard County's Nov. 5 community report repeated that update. However, CoastWatch FL is keeping this West Melbourne precautionary warning visible until West Melbourne directly confirms that its customers are cleared. Blue shading uses the official Brevard County municipal boundary as a geographic reference, NOT a parcel-level water-service boundary. Verify your water provider and service address. As a precaution, boil tap water at a rolling boil for at least 1 full minute before drinking, cooking, making ice, brushing teeth, or washing dishes, unless your water provider confirms the notice is lifted. Source: City of West Melbourne Emergency Information; City of Melbourne rescission notice.",
+     zone_type:"caution",color:"#168BFF",geometry:wmFeature.geometry
+    });
+   }
+  }catch(wmGisError){console.warn("West Melbourne boundary overlay unavailable; using saved point marker:",wmGisError);}
 
 
   const nextEntries=new Map(),nextBounds=new Map(),nextLayers=[];
