@@ -2654,7 +2654,7 @@ async function loadPublicZones(){
    const isPoint=z.geometry.type==="Point";
    let casing,bounds;
    if(isPoint){const c=z.geometry.coordinates;if(!Array.isArray(c)||c.length<2)return;const ll=L.latLng(c[1],c[0]);casing=L.circleMarker(ll,{radius:9,color:"#ffffff",weight:3,fillColor:z.color||"#ef3340",fillOpacity:.98});bounds=L.latLngBounds([ll,ll]).pad(.002);}
-   else{const isBoilArea=/^BOIL WATER NOTICE/i.test(String(z.name||""))||z.id==="west-melbourne-boil-water-boundary";casing=L.geoJSON(z.geometry,{style:{color:isBoilArea?"#168BFF":"#ffffff",weight:isBoilArea?4:6,opacity:isBoilArea?0.82:0.9,fillColor:z.color||"#ef3340",fillOpacity:isBoilArea?0.075:0.16,lineCap:"round",lineJoin:"round",dashArray:isBoilArea?"9 7":null}});bounds=casing.getBounds();}
+   else{const isBoilArea=/^BOIL WATER NOTICE/i.test(String(z.name||""));casing=L.geoJSON(z.geometry,{style:{color:isBoilArea?"#ffffff":"#ffffff",weight:6,opacity:.9,fillColor:z.color||"#ef3340",fillOpacity:isBoilArea?.16:.16,lineCap:"round",lineJoin:"round"}});bounds=casing.getBounds();}
    if(!bounds||!bounds.isValid())return;
    const rawDescription=String(z.description||"");
    const isUnverified=rawDescription.startsWith("UNVERIFIED:");
@@ -2678,11 +2678,9 @@ async function loadPublicZones(){
    const isRoadClosure=/^ROAD CLOSED/i.test(String(z.name||""));
    const color=isOpen?"#22c55e":isRoadClosed?"#dc2626":isLaneClosure?"#f59e0b":isStatusUnknown?"#94a3b8":(z.color||"#ef3340");
    if(isPoint)casing.setStyle({fillColor:color});
-   const isReferenceBoundary=z.id==="west-melbourne-boil-water-boundary";
-   const outline=isPoint?L.circleMarker(bounds.getCenter(),{radius:5,color,weight:2,fillColor:color,fillOpacity:.2}):L.geoJSON(z.geometry,{style:{color:isBoilNotice?"#0878e8":color,weight:isBoilNotice?2.5:4,opacity:isBoilNotice?.92:.88,fillColor:color,fillOpacity:isBoilNotice?.045:.12,lineCap:"round",lineJoin:"round",dashArray:isBoilNotice?"3 7":null}});
+   const outline=isPoint?L.circleMarker(bounds.getCenter(),{radius:5,color,weight:2,fillColor:color,fillOpacity:.2}):L.geoJSON(z.geometry,{style:{color,weight:4,opacity:.88,fillColor:color,fillOpacity:.12,lineCap:"round",lineJoin:"round"}});
    const label=L.divIcon({className:"mew-zone-label-icon",html:'<span class="mew-zone-label'+(isBoilNotice?' mew-zone-label-boil':(isLaneClosure?' mew-zone-label-lane':(isRoadClosure?' mew-zone-label-closure':(isOpen?' mew-zone-label-open':''))))+'">'+(isBoilNotice?'<b>💧 BOIL WATER AREA</b><small>ACTIVE · '+(String(z.name||"").toUpperCase().includes("WEST MELBOURNE")?'WEST MELBOURNE':'PALM BAY')+'</small>':(isLaneClosure?'<b>🚧 LANE CLOSED</b><small>TRAFFIC HAZARD</small>':(isRoadClosure?'<b>⛔ ROAD CLOSED</b><small>DO NOT ENTER</small>':(isSignalOut?'<b>🚦 '+esc(situation)+'</b>':'<b>'+esc(situation)+'</b>')+'<small>'+(isUnverified?'UNVERIFIED':(isOpen?'USE CAUTION':'STATUS'))+'</small>')))+'</span>',iconSize:[1,1],iconAnchor:[0,0]});
-   const labelPosition=isBoilNotice&&!isPoint?bounds.getNorthWest():bounds.getCenter();
-   const labelMarker=L.marker(labelPosition,{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
+   const labelMarker=L.marker(bounds.getCenter(),{icon:label,interactive:true,keyboard:true,zIndexOffset:1200,title:z.name||"Active map zone"});
    const group=L.featureGroup([casing,outline,labelMarker]);
    group.bindPopup('<strong class="mew-zone-popup-title">'+esc(z.name)+'</strong><br><span>'+esc(displayStatus)+'</span>'+openRoadCaution+(detailDescription?'<p>'+esc(detailDescription)+'</p>':'')+photoLinkMarkup+'<small>'+sourceLabel+'</small>'+mewZoneFeedbackMarkup(z,feedbackByZone.get(String(z.id))),{className:"mew-public-zone-popup"});
    nextEntries.set(String(z.id),{bounds,group,labelMarker,isBoilNotice,clusterColor:isBoilNotice?"#168BFF":(isOpen?"#22c55e":(isRoadClosed?"#dc2626":(isLaneClosure?"#f59e0b":(isRoadClosure?"#c81e1e":String(z.color||"#ef3340").toLowerCase()))))});
