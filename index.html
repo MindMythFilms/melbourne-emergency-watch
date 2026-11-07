@@ -4235,6 +4235,16 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwFloodSafetyPopup .cw-flood-close:focus-visible,#cwFloodSafetyPopup .cw-flood-dismiss:focus-visible{outline:3px solid #ffca66;outline-offset:3px}
 @media(max-width:560px){#cwFloodSafetyPopup{align-items:flex-start;padding:max(12px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom))}#cwFloodSafetyPopup .cw-flood-dialog{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);padding:21px 16px;border-radius:18px}#cwFloodSafetyPopup .cw-flood-hazards{grid-template-columns:1fr;gap:8px}#cwFloodSafetyPopup .cw-flood-hazard{padding:10px 12px}#cwFloodSafetyPopup .cw-flood-lead{font-size:14px}}
 @media(prefers-reduced-motion:reduce){#cwFloodSafetyPopup *{scroll-behavior:auto!important}}
+
+/* Close control: high-contrast red and clear of the mobile kicker text. */
+#cwFloodSafetyPopup .cw-flood-close{background:#b42318;border:1px solid #ffb4ab;color:#fff;box-shadow:0 3px 10px #0005}
+#cwFloodSafetyPopup .cw-flood-close:hover{background:#8f1d14}
+@media(max-width:560px){
+ #cwFloodSafetyPopup .cw-flood-dialog{padding-top:24px}
+ #cwFloodSafetyPopup .cw-flood-kicker{padding-right:58px;line-height:1.5;overflow-wrap:anywhere}
+ #cwFloodSafetyPopup .cw-flood-close{top:12px;right:12px;width:42px;height:42px;border-radius:12px}
+}
+
 </style>
 
 <div id="cwFloodSafetyPopup" hidden>
