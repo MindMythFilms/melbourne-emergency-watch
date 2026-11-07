@@ -4214,4 +4214,81 @@ body.dark #map-panel .map-report-tools .map-report-button{
  });
 })();
 </script>
+
+<style id="cw-flood-safety-popup-styles">
+#cwFloodSafetyPopup[hidden]{display:none!important}
+#cwFloodSafetyPopup{position:fixed;inset:0;z-index:250000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(3,13,25,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+#cwFloodSafetyPopup .cw-flood-dialog{position:relative;width:min(620px,100%);max-height:min(90dvh,850px);overflow:auto;border:1px solid rgba(87,207,220,.38);border-radius:22px;background:linear-gradient(145deg,#102b40 0%,#0b1b2c 70%,#132b3b 100%);color:#edf7fc;box-shadow:0 28px 90px #0009;padding:26px}
+#cwFloodSafetyPopup .cw-flood-kicker{display:flex;align-items:center;gap:8px;color:#79e4e8;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+#cwFloodSafetyPopup .cw-flood-kicker:before{content:"";width:8px;height:8px;border-radius:50%;background:#ffbf47;box-shadow:0 0 0 5px #ffbf4722}
+#cwFloodSafetyPopup h2{margin:12px 42px 10px 0;color:#fff;font:900 clamp(25px,5vw,34px)/1.12 Manrope,sans-serif;letter-spacing:-.7px}
+#cwFloodSafetyPopup .cw-flood-lead{margin:0 0 17px;color:#c7d8e5;font-size:15px;line-height:1.65}
+#cwFloodSafetyPopup .cw-flood-alert{margin:16px 0;padding:13px 15px;border:1px solid #a9782d;border-left:4px solid #f4b94f;border-radius:12px;background:#392e1d;color:#ffe7b6;font-size:14px;line-height:1.55}
+#cwFloodSafetyPopup .cw-flood-hazards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+#cwFloodSafetyPopup .cw-flood-hazard{padding:12px;border:1px solid #29475d;border-radius:12px;background:#142f43}
+#cwFloodSafetyPopup .cw-flood-hazard strong{display:block;margin-bottom:4px;color:#fff;font-size:13px}
+#cwFloodSafetyPopup .cw-flood-hazard span{display:block;color:#bfd0dc;font-size:12px;line-height:1.5}
+#cwFloodSafetyPopup .cw-flood-footer{margin:15px 0 0;color:#aebfce;font-size:12px;line-height:1.55}
+#cwFloodSafetyPopup a{color:#7ce4e8;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+#cwFloodSafetyPopup .cw-flood-close{position:absolute;top:15px;right:15px;width:38px;height:38px;border:1px solid #527187;border-radius:11px;background:#19364b;color:#fff;font-size:25px;line-height:1;cursor:pointer}
+#cwFloodSafetyPopup .cw-flood-dismiss{width:100%;margin-top:19px;padding:14px 16px;border:0;border-radius:12px;background:linear-gradient(100deg,#087f9a,#12a9b1);color:#fff;font-weight:900;font-size:14px;cursor:pointer}
+#cwFloodSafetyPopup .cw-flood-close:focus-visible,#cwFloodSafetyPopup .cw-flood-dismiss:focus-visible{outline:3px solid #ffca66;outline-offset:3px}
+@media(max-width:560px){#cwFloodSafetyPopup{align-items:flex-start;padding:max(12px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom))}#cwFloodSafetyPopup .cw-flood-dialog{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);padding:21px 16px;border-radius:18px}#cwFloodSafetyPopup .cw-flood-hazards{grid-template-columns:1fr;gap:8px}#cwFloodSafetyPopup .cw-flood-hazard{padding:10px 12px}#cwFloodSafetyPopup .cw-flood-lead{font-size:14px}}
+@media(prefers-reduced-motion:reduce){#cwFloodSafetyPopup *{scroll-behavior:auto!important}}
+</style>
+
+<div id="cwFloodSafetyPopup" hidden>
+ <section class="cw-flood-dialog" role="dialog" aria-modal="true" aria-labelledby="cwFloodSafetyTitle" aria-describedby="cwFloodSafetyIntro">
+  <button class="cw-flood-close" id="cwFloodSafetyClose" type="button" aria-label="Close flood safety announcement">×</button>
+  <div class="cw-flood-kicker">CoastWatch FL · Flood Safety Advisory · Nov 7, 2026</div>
+  <h2 id="cwFloodSafetyTitle">Floodwater is going down. The danger may not be.</h2>
+  <p class="cw-flood-lead" id="cwFloodSafetyIntro">As floodwaters recede in parts of Central and South Florida, standing water can still hide serious hazards. Water that looks shallow or harmless may be contaminated or conceal dangers you cannot see.</p>
+  <div class="cw-flood-alert"><strong>⚠️ Stay out of floodwater.</strong> Do not walk, swim, or drive through flooded areas—even after the rain stops and water levels begin to fall.</div>
+  <div class="cw-flood-hazards">
+   <div class="cw-flood-hazard"><strong>🦠 Contaminated water</strong><span>Sewage, bacteria, chemicals, and other pollutants can cause illness or infection.</span></div>
+   <div class="cw-flood-hazard"><strong>⚠️ Hidden debris</strong><span>Floodwater can conceal broken glass, nails, sharp objects, damaged pavement, and unstable ground.</span></div>
+   <div class="cw-flood-hazard"><strong>🐍 Wildlife</strong><span>Snakes, fire ants, insects, and other displaced animals may be present in or near standing water.</span></div>
+   <div class="cw-flood-hazard"><strong>⚡ Electrical hazards</strong><span>Downed power lines can energize surrounding water. Keep away and report them immediately.</span></div>
+  </div>
+  <p class="cw-flood-lead"><strong>Never take a chance with floodwater.</strong> Turn around, find another route, and keep children and pets away from flooded areas.</p>
+  <p class="cw-flood-footer">Follow local emergency instructions and check official updates from the <a href="https://FloridaDisaster.org/FallFlooding" target="_blank" rel="noopener noreferrer">Florida Division of Emergency Management</a>. CoastWatch FL is a community information platform—not an emergency response service. For immediate danger, call <strong>911</strong>.</p>
+  <button class="cw-flood-dismiss" id="cwFloodSafetyGotIt" type="button">I UNDERSTAND · CLOSE NOTICE</button>
+ </section>
+</div>
+<script id="cw-flood-safety-popup-controller">
+(()=>{
+ const overlay=document.getElementById("cwFloodSafetyPopup");
+ if(!overlay)return;
+ const closeButton=document.getElementById("cwFloodSafetyClose");
+ const doneButton=document.getElementById("cwFloodSafetyGotIt");
+ const dialog=overlay.querySelector(".cw-flood-dialog");
+ const storageKey="coastwatch-flood-safety-nov-7-2026";
+ let dismissed=false;
+ try{dismissed=localStorage.getItem(storageKey)==="1";}catch(_){}
+ if(dismissed)return;
+ const previousFocus=document.activeElement;
+ const close=()=>{
+  overlay.hidden=true;
+  try{localStorage.setItem(storageKey,"1");}catch(_){}
+  if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
+ };
+ closeButton.addEventListener("click",close);
+ doneButton.addEventListener("click",close);
+ overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
+ document.addEventListener("keydown",event=>{
+  if(overlay.hidden)return;
+  if(event.key==="Escape"){event.preventDefault();close();return;}
+  if(event.key==="Tab"){
+   const items=Array.from(dialog.querySelectorAll('a[href],button:not([disabled])'));
+   if(!items.length)return;
+   const first=items[0],last=items[items.length-1];
+   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  }
+ });
+ overlay.hidden=false;
+ window.setTimeout(()=>closeButton.focus(),80);
+})();
+</script>
+
 </body></html>
