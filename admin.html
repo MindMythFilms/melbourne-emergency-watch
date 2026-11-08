@@ -207,6 +207,42 @@ body:before{
  .admin-tabs{gap:7px!important;padding:7px!important}
  .admin-tab{font-size:12px!important;padding:10px 7px!important}
 }
+
+/* Editorial review workspace */
+.admin-tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.editorial-panel .pad{padding:22px}
+.editorial-heading,.editorial-queue-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.editorial-heading h2{margin:4px 0;font:800 23px Manrope,sans-serif;color:#f2fbff}
+.editorial-heading p{margin:5px 0 0;max-width:760px;color:#a9c3d1}
+.editorial-kicker{font-size:10px;letter-spacing:.16em;font-weight:900;color:#62d8ce}
+.editorial-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.editorial-stats>div{padding:13px 15px;border:1px solid #174a63;border-radius:12px;background:#0b2b43}
+.editorial-stats b{display:block;font:800 25px Manrope,sans-serif;color:#6be0d6}
+.editorial-stats span{font-size:11px;color:#a9c3d1}
+.editorial-composer{margin:18px 0 22px;padding:17px;border:1px solid #1c6170;border-radius:14px;background:#08283b}
+.editorial-composer h3,.editorial-queue-head h3{margin:0 0 4px;font:800 16px Manrope,sans-serif;color:#f2fbff}
+.editorial-composer>p{margin:0 0 12px}
+.editorial-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px}
+.editorial-wide{grid-column:1/-1}
+.editorial-composer textarea{width:100%;resize:vertical}
+.editorial-queue-head{margin:22px 0 12px}
+.editorial-queue-head select{min-width:180px}
+.editorial-item{padding:17px;margin:12px 0;border:1px solid #1c5068;border-radius:14px;background:linear-gradient(145deg,#0b2b43,#071e30)}
+.editorial-item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.editorial-item h4{margin:0 0 4px;font:800 15px Manrope,sans-serif;color:#f2fbff}
+.editorial-status{display:inline-block;border-radius:20px;padding:4px 9px;background:#173d52;color:#bfeef0;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.editorial-status.published{background:#0b4b3b;color:#9cf0d5}.editorial-status.rejected{background:#4b2631;color:#ffc3cc}
+.editorial-item-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 13px}
+.editorial-item-grid label{display:block;margin:0 0 4px;color:#a9c3d1;font-size:11px;font-weight:800}
+.editorial-item-grid input,.editorial-item-grid select,.editorial-item-grid textarea{width:100%;min-width:0}
+.editorial-item-grid textarea{min-height:76px;resize:vertical}
+.editorial-item-grid .wide{grid-column:1/-1}
+.editorial-source{display:inline-block;margin-top:10px;color:#75e0d7;font-size:12px;overflow-wrap:anywhere}
+.editorial-item .actions{margin-top:12px}
+.editorial-item .actions button{font-size:12px}
+.editorial-readonly{color:#a9c3d1;font-size:12px;margin-top:8px}
+@media(max-width:900px){.admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:600px){.editorial-panel .pad{padding:13px}.editorial-form-grid,.editorial-item-grid{grid-template-columns:1fr}.editorial-wide,.editorial-item-grid .wide{grid-column:auto}.editorial-stats{gap:7px}.editorial-stats>div{padding:10px}.editorial-stats b{font-size:21px}.editorial-composer{padding:12px}.editorial-item{padding:12px}.editorial-queue-head select{width:100%}}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
@@ -215,11 +251,36 @@ body:before{
 <button type="button" class="admin-tab active" role="tab" aria-selected="true" data-admin-tab="reports">Hazard reports <span id="tabReportCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="map">Map operations</button>
 </nav>
 <div class="admin-tab-panel active" id="adminTabReports" role="tabpanel"><div class="stats"><div class="stat"><b id="total">0</b><span>Reports in queue</span></div><div class="stat"><b id="pending">0</b><span>Unverified reports</span></div><div class="stat"><b id="published">0</b><span>Reviewed reports</span></div><div class="stat"><b id="resolved">0</b><span>Resolved reports</span></div></div></div>
 <div class="admin-tab-panel" id="adminTabClearance" role="tabpanel" hidden></div>
 <div class="admin-tab-panel" id="adminTabFlags" role="tabpanel" hidden></div>
+<div class="admin-tab-panel" id="adminTabNews" role="tabpanel" hidden>
+ <section class="panel editorial-panel">
+  <div class="pad">
+   <div class="editorial-heading"><div><span class="editorial-kicker">EDITORIAL WORKFLOW</span><h2>News &amp; Updates</h2><p>Review source-backed updates before they appear on the public CoastWatch FL website. Nothing is published without an administrator approval.</p></div><button type="button" class="gray" id="refreshEditorial">Refresh queue</button></div>
+   <div class="editorial-stats"><div><b id="newsPendingCount">0</b><span>Awaiting review</span></div><div><b id="newsPublishedCount">0</b><span>Published</span></div><div><b id="newsRejectedCount">0</b><span>Rejected</span></div></div>
+   <div id="newsMsg" class="msg hidden" role="status" aria-live="polite"></div>
+   <form id="editorialComposer" class="editorial-composer">
+    <h3>Prepare a new update</h3><p class="meta">New entries are saved as pending and remain private until approved.</p>
+    <div class="editorial-form-grid">
+     <div class="field"><label for="newsTitle">Headline</label><input id="newsTitle" maxlength="180" required placeholder="Clear, factual headline"></div>
+     <div class="field"><label for="newsCategory">Category</label><select id="newsCategory" required><option>Emergency Alerts</option><option>Flood Recovery</option><option>Road Closures</option><option>Water Advisories</option><option>Weather &amp; Safety</option><option>Local News</option></select></div>
+     <div class="field editorial-wide"><label for="newsSummary">Short summary</label><textarea id="newsSummary" maxlength="500" required rows="2" placeholder="One or two sentences for the public feed"></textarea></div>
+     <div class="field editorial-wide"><label for="newsBody">Full update</label><textarea id="newsBody" maxlength="12000" required rows="5" placeholder="Explain what happened, who is affected, timing, limitations and safety context."></textarea></div>
+     <div class="field"><label for="newsSourceName">Source name</label><input id="newsSourceName" required placeholder="Official agency or publisher"></div>
+     <div class="field"><label for="newsSourceUrl">Original source URL (HTTPS)</label><input id="newsSourceUrl" type="url" pattern="https://.*" required placeholder="https://..."></div>
+     <div class="field editorial-wide"><label for="newsSourceDate">Source publication time (optional)</label><input id="newsSourceDate" type="datetime-local"></div>
+    </div>
+    <div class="actions"><button type="submit" id="createEditorial">Save as pending</button></div>
+   </form>
+   <div class="editorial-queue-head"><div><h3>Review queue</h3><span class="meta">Edit the copy, verify the source, then publish or reject.</span></div><select id="editorialFilter" aria-label="Filter updates"><option value="pending">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="all">All updates</option></select></div>
+   <div id="editorialQueue" aria-live="polite"><div class="empty">Loading editorial updates…</div></div>
+  </div>
+ </section>
+</div>
 <div class="admin-tab-panel" id="adminTabMap" role="tabpanel" hidden><div class="map-workspace"><div id="mapWorkspaceMain"></div><aside id="mapWorkspaceSide"></aside></div></div>
 <div id="pageMsg" class="msg hidden"></div>
 
@@ -333,7 +394,7 @@ $("loginForm").onsubmit=async e=>{e.preventDefault();const {data,error}=await db
 async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
-async function load(){try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;rows=data||[];render();await loadMap();await loadPhotos();await loadFlags();await loadClearanceQueue()}catch(e){msg("Could not load reports: "+e.message,"error")}}
+async function load(){try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;rows=data||[];render();await loadMap();await loadPhotos();await loadFlags();await loadClearanceQueue();await loadEditorialQueue()}catch(e){msg("Could not load reports: "+e.message,"error")}}
 let photoLoadVersion=0;
 async function loadPhotos(){const version=++photoLoadVersion;document.querySelectorAll("[data-photo-container]").forEach(host=>{host.innerHTML="";});const ids=rows.map(r=>r.id);if(!ids.length)return;const {data,error}=await db.from("incident_photos").select("id,incident_id,storage_path,status,created_at").in("incident_id",ids).order("created_at",{ascending:false});if(error){msg("Could not load photo moderation queue: "+error.message,"error");return}if(version!==photoLoadVersion)return;const seen=new Set();for(const photo of (data||[])){const uniqueKey=photo.id;if(seen.has(uniqueKey))continue;seen.add(uniqueKey);const host=document.querySelector(`[data-photo-container="${photo.incident_id}"]`);if(!host||host.dataset.photoRendered===uniqueKey)continue;const {data:signed,error:signedError}=await db.storage.from("incident-photos").createSignedUrl(photo.storage_path,300);if(version!==photoLoadVersion)return;if(signedError)continue;const card=document.createElement("div");card.className="photo-card";card.innerHTML=`<img src="${esc(signed.signedUrl)}" alt="User-submitted photo"><div class="meta">Photo status: ${esc(photo.status)}</div>${photo.status==="pending"?`<div class="actions"><button class="green" data-photo-status="${photo.id}" data-value="approved">Approve image</button><button class="gray" data-photo-status="${photo.id}" data-value="rejected">Reject image</button></div>`:""}`;host.appendChild(card);host.dataset.photoRendered=uniqueKey}}
 function render(){const filter=$("statusFilter").value;const list=rows.filter(r=>filter==="all"?r.status!=="rejected":filter==="expired"?["unverified","confirmed","resolved"].includes(r.status)&&r.expires_at&&new Date(r.expires_at)<=new Date():r.status===filter);$("total").textContent=rows.length;const tabCount=$("tabReportCount");if(tabCount)tabCount.textContent=rows.filter(r=>r.status!=="rejected").length;$("pending").textContent=rows.filter(r=>r.status==="unverified").length;$("published").textContent=rows.filter(r=>r.status==="confirmed").length;$("resolved").textContent=rows.filter(r=>r.status==="resolved").length;
@@ -513,6 +574,80 @@ map.on(L.Draw.Event.EDITED,async e=>{for(const layer of e.layers.getLayers()){if
 map.on(L.Draw.Event.DELETED,async e=>{for(const layer of e.layers.getLayers()){if(!layer._zoneId)continue;const {error}=await db.from("map_zones").delete().eq("id",layer._zoneId);if(error){zoneMsg("Could not delete zone: "+error.message,"error");return;}}zoneMsg("Selected zone(s) deleted.","good");await loadAdminZones();});
 $("saveZone").onclick=async()=>{if(!pendingZoneLayer&&!editingZoneId)return zoneMsg("Place a marker or draw an area first.","error");const name=$("zoneName").value.trim();if(name.length<2)return zoneMsg("Enter a zone name (at least 2 characters).","error");const {data:{user}}=await db.auth.getUser();const payload={name,description:$("zoneDescription").value.trim()||null,zone_type:$("zoneType").value,color:$("zoneColor").value,active:$("zoneActive").checked,updated_at:new Date().toISOString()};if(pendingZoneLayer)payload.geometry=zoneGeoJSON(pendingZoneLayer);$("saveZone").disabled=true;const result=editingZoneId?await db.from("map_zones").update(payload).eq("id",editingZoneId):await db.from("map_zones").insert({...payload,geometry:zoneGeoJSON(pendingZoneLayer),created_by:user.id});$("saveZone").disabled=false;if(result.error){zoneMsg("Could not save zone: "+result.error.message,"error");return;}if(pendingZoneLayer){zoneLayers.removeLayer(pendingZoneLayer);pendingZoneLayer=null;}editingZoneId=null;$("zoneForm").classList.add("hidden");$("saveZone").textContent="Save zone";zoneMsg("Zone saved successfully.","good");await loadAdminZones();};
 document.addEventListener("click",async e=>{const edit=e.target.closest("[data-zone-edit]"),toggle=e.target.closest("[data-zone-toggle]"),del=e.target.closest("[data-zone-delete]");if(edit){const z=zones.find(item=>item.id===edit.dataset.zoneEdit);if(!z)return;editingZoneId=z.id;pendingZoneLayer=null;$("zoneFormHeading").textContent="Edit zone details";$("saveZone").textContent="Save changes";$("zoneName").value=z.name;$("zoneDescription").value=z.description||"";$("zoneType").value=z.zone_type;$("zoneColor").value=z.color;$("zoneActive").checked=z.active;$("zoneForm").classList.remove("hidden");$("zoneForm").scrollIntoView({behavior:"smooth",block:"center"});}if(toggle){const active=toggle.dataset.active==="true";const {error}=await db.from("map_zones").update({active,updated_at:new Date().toISOString()}).eq("id",toggle.dataset.zoneToggle);if(error){zoneMsg("Could not update zone: "+error.message,"error");return;}zoneMsg(active?"Zone is now visible on the public map.":"Zone hidden from the public map.","good");await loadAdminZones();}if(del){if(!confirm("Permanently delete this map zone?"))return;const {error}=await db.from("map_zones").delete().eq("id",del.dataset.zoneDelete);if(error){zoneMsg("Could not delete zone: "+error.message,"error");return;}zoneMsg("Zone deleted.","good");await loadAdminZones();}});
+
+
+const editorialCategories=["Emergency Alerts","Flood Recovery","Road Closures","Water Advisories","Local News","Weather & Safety"];
+function editorialMsg(text,kind){const el=$("newsMsg");el.textContent=text;el.className="msg "+(kind||"");}
+function editorialStatusLabel(status){return status==="published"?"Published":status==="rejected"?"Rejected":status==="archived"?"Archived":"Awaiting review";}
+function editorialCard(item){
+ const canEdit=role==="owner"||role==="admin";
+ const opts=editorialCategories.map(c=>'<option value="'+esc(c)+'" '+(item.category===c?'selected':'')+'>'+esc(c)+'</option>').join("");
+ const sourceDate=item.source_published_at?new Date(item.source_published_at).toLocaleString():"Not supplied";
+ const statusClass=item.status==="published"||item.status==="rejected"?item.status:"pending";
+ return '<article class="editorial-item" data-news-id="'+esc(item.id)+'">'+
+  '<div class="editorial-item-head"><div><h4>'+esc(item.title)+'</h4><div class="meta">Created '+new Date(item.created_at).toLocaleString()+' · Source date: '+esc(sourceDate)+'</div></div><span class="editorial-status '+statusClass+'">'+esc(editorialStatusLabel(item.status))+'</span></div>'+
+  '<div class="editorial-item-grid">'+
+   '<div><label>Headline</label><input data-news-field="title" maxlength="180" value="'+esc(item.title)+'" '+(canEdit?'':'disabled')+'></div>'+
+   '<div><label>Category</label><select data-news-field="category" '+(canEdit?'':'disabled')+'>'+opts+'</select></div>'+
+   '<div class="wide"><label>Short summary</label><textarea data-news-field="summary" maxlength="500" '+(canEdit?'':'disabled')+'>'+esc(item.summary)+'</textarea></div>'+
+   '<div class="wide"><label>Full update</label><textarea data-news-field="body" maxlength="12000" '+(canEdit?'':'disabled')+'>'+esc(item.body)+'</textarea></div>'+
+   '<div><label>Source name</label><input data-news-field="source_name" value="'+esc(item.source_name)+'" '+(canEdit?'':'disabled')+'></div>'+
+   '<div><label>Source URL</label><input data-news-field="source_url" type="url" value="'+esc(item.source_url)+'" '+(canEdit?'':'disabled')+'></div>'+
+  '</div><a class="editorial-source" href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original source ↗</a>'+
+  (item.rejection_reason?'<p class="editorial-readonly">Rejection note: '+esc(item.rejection_reason)+'</p>':'')+
+  (canEdit?'<div class="actions"><button type="button" class="gray" data-news-save>Save edits</button>'+
+   (item.status==="published"?'<button type="button" class="gray" data-news-pending>Return to review</button>':'')+
+   (item.status!=="published"?'<button type="button" class="green" data-news-publish>Approve &amp; Publish</button>':'')+
+   (item.status==="pending"?'<button type="button" class="red" data-news-reject>Reject</button>':'')+
+   '</div>':'<div class="editorial-readonly">Read-only access. An owner or administrator must approve or edit this item.</div>')+
+ '</article>';
+}
+let editorialRows=[];
+async function loadEditorialQueue(){
+ const host=$("editorialQueue");if(!host)return;
+ const {data,error}=await db.from("editorial_updates").select("id,title,summary,body,category,source_name,source_url,source_published_at,status,created_at,published_at,rejection_reason").order("created_at",{ascending:false}).limit(100);
+ if(error){host.innerHTML='<div class="empty">Could not load editorial queue: '+esc(error.message)+'</div>';return;}
+ editorialRows=data||[];
+ const pending=editorialRows.filter(x=>x.status==="pending").length,published=editorialRows.filter(x=>x.status==="published").length,rejected=editorialRows.filter(x=>x.status==="rejected").length;
+ $("newsPendingCount").textContent=pending;$("newsPublishedCount").textContent=published;$("newsRejectedCount").textContent=rejected;$("tabNewsCount").textContent=pending;
+ const filter=$("editorialFilter")?$("editorialFilter").value:"pending";
+ const visible=editorialRows.filter(x=>filter==="all"||x.status===filter);
+ host.innerHTML=visible.map(editorialCard).join("")||'<div class="empty">No '+(filter==="all"?"editorial updates":filter+" updates")+' found.</div>';
+}
+$("refreshEditorial").addEventListener("click",loadEditorialQueue);
+$("editorialFilter").addEventListener("change",loadEditorialQueue);
+$("editorialComposer").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!["owner","admin"].includes(role)){editorialMsg("Only an owner or administrator can create editorial updates.","error");return;}
+ const button=$("createEditorial");button.disabled=true;button.textContent="Saving…";
+ try{
+  const {data:{user}}=await db.auth.getUser();
+  const rawDate=$("newsSourceDate").value;
+  const row={title:$("newsTitle").value.trim(),category:$("newsCategory").value,summary:$("newsSummary").value.trim(),body:$("newsBody").value.trim(),source_name:$("newsSourceName").value.trim(),source_url:$("newsSourceUrl").value.trim(),source_published_at:rawDate?new Date(rawDate).toISOString():null,status:"pending",created_by:user?user.id:null,updated_by:user?user.id:null};
+  const {error}=await db.from("editorial_updates").insert(row);if(error)throw error;
+  $("editorialComposer").reset();$("editorialFilter").value="pending";editorialMsg("Update saved privately. It will not appear publicly until approved.","good");await loadEditorialQueue();
+ }catch(error){editorialMsg("Could not save update: "+error.message,"error");}
+ finally{button.disabled=false;button.textContent="Save as pending";}
+});
+$("editorialQueue").addEventListener("click",async e=>{
+ const button=e.target.closest("button[data-news-save],button[data-news-publish],button[data-news-reject],button[data-news-pending]");if(!button)return;
+ if(!["owner","admin"].includes(role)){editorialMsg("Only an owner or administrator can change publication status.","error");return;}
+ const card=button.closest("[data-news-id]");if(!card)return;
+ const id=card.dataset.newsId;
+ const value=name=>card.querySelector('[data-news-field="'+name+'"]').value.trim();
+ const changes={title:value("title"),category:value("category"),summary:value("summary"),body:value("body"),source_name:value("source_name"),source_url:value("source_url"),updated_by:null,updated_at:new Date().toISOString()};
+ if(!changes.source_url.startsWith("https://")){editorialMsg("Source URL must begin with https://.","error");return;}
+ const {data:{user}}=await db.auth.getUser();changes.updated_by=user?user.id:null;
+ if(button.hasAttribute("data-news-publish")){changes.status="published";changes.published_at=new Date().toISOString();changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=null;}
+ else if(button.hasAttribute("data-news-reject")){const reason=window.prompt("Optional reason for rejecting this update:");if(reason===null)return;changes.status="rejected";changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=reason.trim()||null;}
+ else if(button.hasAttribute("data-news-pending")){changes.status="pending";changes.published_at=null;changes.reviewed_at=null;changes.reviewed_by=null;changes.rejection_reason=null;}
+ button.disabled=true;
+ try{
+  const {error}=await db.from("editorial_updates").update(changes).eq("id",id);if(error)throw error;
+  editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":"Edits saved.","good");
+  await loadEditorialQueue();
+ }catch(error){button.disabled=false;editorialMsg("Could not update editorial item: "+error.message,"error");}
+});
 
 db.auth.onAuthStateChange(()=>setTimeout(checkSession,0));checkSession();setInterval(()=>{if(role&&!window.mewZoneDrawActive&&$("zoneForm").classList.contains("hidden")&&!(zoneEditControl&&zoneEditControl._toolbars&&zoneEditControl._toolbars.edit&&zoneEditControl._toolbars.edit.handler.enabled()))load()},30000);
 </script></body></html>
