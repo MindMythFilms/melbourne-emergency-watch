@@ -584,7 +584,7 @@ function editorialCard(item){
  const opts=editorialCategories.map(c=>'<option value="'+esc(c)+'" '+(item.category===c?'selected':'')+'>'+esc(c)+'</option>').join("");
  const sourceDate=item.source_published_at?new Date(item.source_published_at).toLocaleString():"Not supplied";
  const statusClass=item.status==="published"||item.status==="rejected"?item.status:"pending";
- return '<article class="editorial-item" data-news-id="'+esc(item.id)+'">'+
+ return '<article class="editorial-item" data-news-id="'+esc(item.id)+'" data-news-status="'+esc(item.status)+'">'+
   '<div class="editorial-item-head"><div><h4>'+esc(item.title)+'</h4><div class="meta">Created '+new Date(item.created_at).toLocaleString()+' · Source date: '+esc(sourceDate)+'</div></div><span class="editorial-status '+statusClass+'">'+esc(editorialStatusLabel(item.status))+'</span></div>'+
   '<div class="editorial-item-grid">'+
    '<div><label>Headline</label><input data-news-field="title" maxlength="180" value="'+esc(item.title)+'" '+(canEdit?'':'disabled')+'></div>'+
@@ -641,13 +641,15 @@ $("editorialQueue").addEventListener("click",async e=>{
  if(button.hasAttribute("data-news-publish")){changes.status="published";changes.published_at=new Date().toISOString();changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=null;}
  else if(button.hasAttribute("data-news-reject")){const reason=window.prompt("Optional reason for rejecting this update:");if(reason===null)return;changes.status="rejected";changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=reason.trim()||null;}
  else if(button.hasAttribute("data-news-pending")){changes.status="pending";changes.published_at=null;changes.reviewed_at=null;changes.reviewed_by=null;changes.rejection_reason=null;}
+ const editingPublished=button.hasAttribute("data-news-save")&&card.dataset.newsStatus==="published";
+ if(editingPublished){changes.status="pending";changes.published_at=null;changes.reviewed_at=null;changes.reviewed_by=null;changes.rejection_reason=null;}
  button.disabled=true;
  try{
   const {error}=await db.from("editorial_updates").update(changes).eq("id",id);if(error)throw error;
-  editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":"Edits saved.","good");
+  editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":editingPublished?"Published copy edited and returned to the private review queue for re-approval.":"Edits saved.","good");
   await loadEditorialQueue();
  }catch(error){button.disabled=false;editorialMsg("Could not update editorial item: "+error.message,"error");}
 });
 
-db.auth.onAuthStateChange(()=>setTimeout(checkSession,0));checkSession();setInterval(()=>{if(role&&!window.mewZoneDrawActive&&$("zoneForm").classList.contains("hidden")&&!(zoneEditControl&&zoneEditControl._toolbars&&zoneEditControl._toolbars.edit&&zoneEditControl._toolbars.edit.handler.enabled()))load()},30000);
+db.auth.onAuthStateChange(()=>setTimeout(checkSession,0));checkSession();setInterval(()=>{if(role&&!window.mewZoneDrawActive&&$("zoneForm").classList.contains("hidden")&&!(zoneEditControl&&zoneEditControl._toolbars&&zoneEditControl._toolbars.edit&&zoneEditControl._toolbars.edit.handler.enabled())&&!$("adminTabNews").contains(document.activeElement))load()},30000);
 </script></body></html>
