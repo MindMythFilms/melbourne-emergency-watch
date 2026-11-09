@@ -2053,9 +2053,30 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
   <a href="https://www.brevardfl.gov/eahome" target="_blank" rel="noopener">Brevard County official closure announcement ↗</a>
  </article>
  <article class="mew-recovery-card mew-utility-card">
-  <div class="mew-recovery-kicker">NWS MELBOURNE · FLOOD WARNING · UPDATED NOV 7, 2026 · 8:46 PM EST</div>
+  <div class="mew-recovery-kicker">NATIONAL WEATHER SERVICE · COASTAL HAZARD · NOV 8, 2026</div>
+  <h2>High rip-current risk through late Monday night</h2>
+  <p>Dangerous rip currents are forecast along Brevard County beaches. Entering the surf is strongly discouraged, even for experienced swimmers. Follow lifeguard instructions, beach flags and posted signs.</p>
+  <a href="https://forecast.weather.gov/showsigwx.php?firewxzone=FLZ647&lat=28.0799&local_place1=Melbourne+FL&lon=-80.6035&product1=Wind+Advisory&warncounty=FLC009&warnzone=FLZ647" target="_blank" rel="noopener">Official NWS coastal hazard statement ↗</a>
+ </article>
+ <article class="mew-recovery-card">
+  <div class="mew-recovery-kicker">FDOT DISTRICT 5 · TRAFFIC ADVISORY · NOV 8–12, 2026</div>
+  <h2>Overnight I-95 / US-192 ramp closures</h2>
+  <p><strong>Nov 8–10, 9 PM–5 AM:</strong> Southbound I-95 Exit 180 to US-192 closes nightly. Detour: continue to Palm Bay Road (Exit 176), use eastbound Palm Bay Road, re-enter northbound I-95 and take Exit 180.</p>
+  <p><strong>Nov 11, 9 PM–5 AM Nov 12:</strong> US-192 ramp to southbound I-95 closes. Detours use South John Rodes Boulevard / Ellis Road or St. Johns Heritage Parkway / Ellis Road.</p>
+  <p><strong>Nov 8–12, 7 PM–6 AM:</strong> Expect alternating single- and double-lane closures on northbound I-95 between US-192 and north of Fiske Boulevard, plus the outside lane between Malabar Road and US-192.</p>
+  <a href="https://www.cflroads.com/news/article/53130/traffic-advisory-overnight-ramp-closures-at-i-95-interchange-november-8-12" target="_blank" rel="noopener">FDOT official traffic advisory and detour maps ↗</a>
+ </article>
+ <article class="mew-recovery-card">
+  <div class="mew-recovery-kicker">BREVARD COUNTY · FACILITY CLOSURES · NOV 4, 2026</div>
+  <h2>County community centers closed until further notice</h2>
+  <p>The County lists Nancy Higgs Community Center (500 Old Florida Trail, Melbourne Beach), Walter Butler Community Center (4201 N. Cocoa Blvd., Cocoa), and Wickham Park Community Center (2815 Leisure Way, Melbourne) as closed until further notice.</p>
+  <p><strong>Wickham Park Senior Center</strong> (2785 Leisure Way, Melbourne) is closed for regular programs but is being used as an American Red Cross emergency shelter. Confirm shelter operation before traveling.</p>
+  <a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener">Brevard County Storm Center ↗</a>
+ </article>
+ <article class="mew-recovery-card mew-utility-card">
+  <div class="mew-recovery-kicker">NWS MELBOURNE · FLOOD WARNING · UPDATED NOV 8, 2026 · 8:07 PM EST</div>
   <h2>St. Johns River near Cocoa: major flooding forecast</h2>
-  <p>The latest NWS statement available for this update reported a river stage of <strong>16.9 feet at 8:15 PM EST on November 7</strong> — above the 16.0-foot flood stage. Moderate flooding was occurring, with a crest near <strong>17.1 feet forecast by midweek</strong> and major flooding expected. This is a timestamped observation, not a live gauge reading.</p>
+  <p>The NWS statement issued Sunday evening reported a river stage of <strong>16.97 feet at 7:15 PM EST on November 8</strong> — above the 16.0-foot flood stage. Moderate flooding is occurring and major flooding is forecast. The river may rise slightly early this week and remain in major flood stage through at least Friday. This is a timestamped gauge observation, not a live reading.</p>
   <p>At 17.2 feet, NWS identifies potential impacts to low-lying homes near Lake Poinsett, Silver Pines and Shakespeare Park, and possible loss of access near Providence Road, Mullet Lane and Bass Road. Do not drive around barricades or enter floodwater.</p>
   <a href="https://water.noaa.gov/gauges/COCF1" target="_blank" rel="noopener">NOAA live Cocoa river gauge ↗</a>
   <a href="https://www.weather.gov/wwamap/wwatxtget.php?cwa=usa&wwa=flood+warning" target="_blank" rel="noopener">NWS flood statements ↗</a>
@@ -2521,13 +2542,22 @@ async function loadNwsAlerts(){
  nwsAlertFetchInProgress=true;
  const status=$("nwsAlertStatus");
  try{
-  const response=await fetch("https://api.weather.gov/alerts/active?zone=FLC009",{headers:{Accept:"application/geo+json"},cache:"no-store"});
-  if(!response.ok)throw new Error("NWS API returned HTTP "+response.status);
-  const body=await response.json();
-  const features=(body.features||[]).filter(f=>{
-   const p=f&&f.properties||{};
-   return p.status!=="Test"&&p.messageType!=="Cancel"&&p.status!=="Expired";
-  });
+  // Include Brevard County and all four Brevard coastal/mainland forecast zones.
+  // County-only alerts omit coastal rip-current products.
+  const nwsZones=["FLC009","FLZ247","FLZ347","FLZ647","FLZ747"];
+  const zoneResponses=await Promise.all(nwsZones.map(async zone=>{
+   const response=await fetch("https://api.weather.gov/alerts/active?zone="+encodeURIComponent(zone),{headers:{Accept:"application/geo+json"},cache:"no-store"});
+   if(!response.ok)throw new Error("NWS API returned HTTP "+response.status+" for "+zone);
+   return response.json();
+  }));
+  const uniqueFeatures=new Map();
+  zoneResponses.forEach(body=>(body.features||[]).forEach(feature=>{
+   const p=feature&&feature.properties||{};
+   if(p.status!=="Test"&&p.messageType!=="Cancel"&&p.status!=="Expired"){
+    uniqueFeatures.set(feature.id||p.id||[p.event,p.effective,p.areaDesc].join("|"),feature);
+   }
+  }));
+  const features=Array.from(uniqueFeatures.values());
   nwsAlertLayer.clearLayers();
   features.forEach(feature=>{
    const p=feature.properties||{},color=nwsSeverityColor(p.severity),popup=nwsPopup(p,!feature.geometry);
