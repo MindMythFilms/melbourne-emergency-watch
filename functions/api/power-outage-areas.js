@@ -3,6 +3,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     "Access-Control-Allow-Origin": "https://coastwatch-fl.pages.dev",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Accept",
+    "Access-Control-Expose-Headers": "X-CoastWatch-Fetched-At, X-CoastWatch-Cache, X-Data-Source, X-Data-Notice, Retry-After",
     "Vary": "Origin"
   };
   const error = (message, status) => new Response(JSON.stringify({ error: message }), {
@@ -12,7 +13,11 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const cache = caches.default;
   const cacheKey = new Request(new URL("/api/power-outage-areas", request.url).toString(), { method: "GET" });
   const cached = await cache.match(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    const headers = new Headers(cached.headers);
+    headers.set("X-CoastWatch-Cache", "HIT");
+    return new Response(cached.body, { status: cached.status, headers });
+  }
   try {
     const upstream = await fetch("https://massoutage.com/api/v1/live/counties/12009/areas?format=geojson&active=true", {
       headers: { "Accept": "application/geo+json, application/json", "Authorization": "Bearer " + env.MASSOUTAGE_API_KEY }
@@ -22,7 +27,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
       ...cors,
       "Content-Type": upstream.headers.get("Content-Type") || "application/geo+json",
       "Cache-Control": upstream.ok ? "public, max-age=60, s-maxage=300" : "no-store",
-      "X-Data-Source": "MassOutage"
+      "X-Data-Source": "MassOutage",
+      "X-CoastWatch-Fetched-At": new Date().toISOString(),
+      "X-CoastWatch-Cache": "MISS"
     });
     for (const name of ["Retry-After", "X-Request-Id", "X-API-Version", "X-Data-Notice"]) {
       const value = upstream.headers.get(name);
