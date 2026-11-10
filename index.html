@@ -1980,8 +1980,8 @@ body.dark #cwRipCurrentNotice a{color:#ffe28a}
 <section id="cwRipCurrentNotice" aria-labelledby="cwRipCurrentTitle">
  <div class="cw-rip-kicker">CoastWatch FL · Official NWS Coastal Hazard · November 9, 2026</div>
  <h2 id="cwRipCurrentTitle">⚠️ High Rip Current Risk Along the Atlantic Coast</h2>
- <p>The National Weather Service Melbourne has issued a <strong>High Rip Current Risk</strong> for beaches in Volusia, Indian River, St. Lucie, Martin, and Brevard Counties. The alert includes Northern and Southern Brevard and their barrier islands.</p>
- <p><strong>In effect through late Tuesday night, November 10.</strong> Dangerous rip currents can pull even experienced swimmers away from shore into deeper water. Entering the surf is strongly discouraged.</p>
+ <p id="cwRipCurrentSummary">The National Weather Service Melbourne has issued a High Rip Current Risk for beaches in Volusia, Indian River, St. Lucie, Martin, and Brevard Counties.</p>
+ <p id="cwRipCurrentTiming"><strong>In effect through late Tuesday night, November 10.</strong> Dangerous rip currents can pull even experienced swimmers away from shore into deeper water. Entering the surf is strongly discouraged.</p>
  <div class="cw-rip-map-key"><span class="cw-rip-swatch" aria-hidden="true"></span> Yellow map polygon: approximate Brevard coastal risk corridor</div>
  <p>If caught in a rip current, stay calm and float. Do not swim against the current. If able, swim parallel to the shoreline; if you cannot escape, face shore and signal or call for help. Follow lifeguards, beach flags, and posted signs.</p>
  <p><a href="https://forecast.weather.gov/wwamap/wwatxtget.php?cwa=MLB&amp;wwa=all" target="_blank" rel="noopener noreferrer">Read the official National Weather Service alert</a>.</p>
@@ -2346,7 +2346,7 @@ async function loadShelters(){
   const payload=await response.json();
   if(payload.error)throw new Error(payload.error.message||"FEMA shelter service error");
   const features=(payload.features||[]).filter(f=>f.geometry&&(Array.isArray(f.geometry.coordinates)||(Number.isFinite(Number(f.geometry.x))&&Number.isFinite(Number(f.geometry.y)))));
-  const items=[];
+  let items=[];
   const palette={OPEN:"#16834a",STANDBY:"#d69e18",ALERT:"#dc6b20",FULL:"#c2413b",CLOSED:"#64748b"};
   const labels={OPEN:"OPEN · FEMA status",STANDBY:"STANDBY · not confirmed open",ALERT:"ALERT · check official instructions",FULL:"FULL · do not assume space is available",CLOSED:"CLOSED",UNKNOWN:"STATUS UNAVAILABLE"};
   features.forEach(feature=>{
@@ -2419,7 +2419,7 @@ async function loadUSGSWaterLevels(){
  if(usgsWaterFetchInProgress||document.visibilityState==="hidden")return;usgsWaterFetchInProgress=true;
  const count=$("usgsWaterCount"),updated=$("usgsWaterUpdated");
  try{
-  const url="https://api.waterdata.usgs.gov/ogcapi/v0/collections/latest-continuous/items?f=json&limit=500&state_code=12&county_code=009&parameter_code=00065";
+  const url="https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous/items?f=json&limit=500&state_code=12&county_code=009&parameter_code=00065";
   const response=await fetch(url,{headers:{Accept:"application/geo+json, application/json"},cache:"no-store"});
   if(!response.ok)throw new Error("USGS HTTP "+response.status);
   const payload=await response.json();
@@ -2440,11 +2440,16 @@ async function loadUSGSWaterLevels(){
    const station=esc(p.monitoring_location_name||p.monitoring_location_id||"USGS monitoring station");
    const timestamp=p.time?new Date(p.time).toLocaleString():"Time not reported";
    const status=String(p.approval_status||"").toLowerCase()==="approved"?"Approved":"Provisional / subject to revision";
-   const popupHtml='<div style="min-width:210px"><strong>💧 USGS water-level monitoring</strong><div style="margin-top:5px"><b>'+station+'</b></div><div><b>Latest gage height:</b> '+esc(Number.isFinite(value)?value.toLocaleString(undefined,{maximumFractionDigits:3}):p.value)+' '+esc(unit)+'</div><div><b>Reading time:</b> '+esc(timestamp)+'</div><div><b>Data status:</b> '+esc(status)+'</div><small>Source: U.S. Geological Survey · Live monitoring observation. A gauge reading does not confirm flooding at nearby roads or properties.</small><p><a href="https://waterdata.usgs.gov/monitoring-location/'+encodeURIComponent(p.monitoring_location_id||"")+'" target="_blank" rel="noopener noreferrer">Open USGS station details ↗</a></p></div>';
+    const modified=p.last_modified?new Date(p.last_modified).toLocaleString():"Not provided";
+    const ageHours=p.time?(Date.now()-new Date(p.time).getTime())/3600000:Infinity;
+    const freshness=ageHours>24?"Older than 24 hours · last available observation":ageHours>6?"Older than 6 hours":"Recent observation";
+   const popupHtml='<div style="min-width:210px"><strong>💧 USGS water-level monitoring</strong><div style="margin-top:5px"><b>'+station+'</b></div><div><b>Latest gage height:</b> '+esc(Number.isFinite(value)?value.toLocaleString(undefined,{maximumFractionDigits:3}):p.value)+' '+esc(unit)+'</div><div><b>Reading time:</b> '+esc(timestamp)+'</div><div><b>Data status:</b> '+esc(status)+'</div><div><b>Freshness:</b> '+esc(freshness)+'</div><div><b>USGS last modified:</b> '+esc(modified)+'</div><small>Source: U.S. Geological Survey. Observation time is shown above; telemetry may be delayed. A gauge reading does not confirm flooding at nearby roads or properties.</small><p><a href="https://waterdata.usgs.gov/monitoring-location/'+encodeURIComponent(p.monitoring_location_id||"")+'" target="_blank" rel="noopener noreferrer">Open USGS station details ↗</a></p></div>';
    L.marker([coords[1],coords[0]],{icon:waterIcon,zIndexOffset:300}).bindPopup(popupHtml).addTo(usgsWaterLayer);
   });
-  if(count)count.textContent=latestBySite.size+" live water-level "+(latestBySite.size===1?"station":"stations");
-  if(updated)updated.textContent="USGS · Gage height · Updated "+new Date().toLocaleTimeString();
+  if(count)count.textContent=latestBySite.size?latestBySite.size+" water-level "+(latestBySite.size===1?"station":"stations"):"No recent USGS readings";
+  const observationTimes=Array.from(latestBySite.values()).map(f=>new Date(f.properties?.time||0)).filter(d=>Number.isFinite(d.getTime())&&d.getTime()>0);
+  const newestObservation=observationTimes.length?new Date(Math.max(...observationTimes.map(d=>d.getTime()))):null;
+  if(updated)updated.textContent=newestObservation?"USGS · Latest observation "+newestObservation.toLocaleString():"USGS has no recent Brevard gage-height observations · Check NWS river alerts";
  }catch(error){
   console.warn("CoastWatch USGS water data unavailable:",error);
   if(count)count.textContent="Water data unavailable";
@@ -2581,6 +2586,21 @@ function nwsPopup(p,approximate){
  ];
  return '<div style="min-width:220px;max-width:320px">'+rows.filter(Boolean).join("")+"</div>";
 }
+function updateRipCurrentNotice(features){
+ const section=$("cwRipCurrentNotice");if(!section)return;
+ const active=(features||[]).filter(feature=>String(feature.properties?.event||"").toLowerCase().includes("rip current")).sort((a,b)=>new Date(a.properties?.expires||0)-new Date(b.properties?.expires||0));
+ if(!active.length){section.hidden=true;return;}
+ const p=active[0].properties||{};
+ section.hidden=false;
+ const summary=$("cwRipCurrentSummary"),timing=$("cwRipCurrentTiming"),link=section.querySelector("a"),kicker=section.querySelector(".cw-rip-kicker");
+ if(kicker)kicker.textContent="CoastWatch FL · Official NWS Coastal Hazard · Checked "+new Date().toLocaleString();
+ if(summary)summary.textContent=p.headline||("The National Weather Service has an active "+(p.event||"rip current")+" alert for "+(p.areaDesc||"the Brevard County coast")+".");
+ if(timing){
+  const expiry=p.expires?new Date(p.expires):null;
+  timing.textContent=expiry&&!Number.isNaN(expiry.getTime())?"In effect until "+expiry.toLocaleString()+". Entering the surf is strongly discouraged. Follow lifeguards, beach flags, and posted signs.":"An active NWS coastal hazard is in effect. Entering the surf is strongly discouraged.";
+ }
+ if(link&&p.web)link.href=p.web;
+}
 function renderNwsAlertList(features){
  const host=$("nwsAlertList");if(!host)return;
  if(!features.length){host.innerHTML='<div class="mew-news-empty"><span>✓</span><div><strong>No active NWS alerts</strong><small>No active National Weather Service alerts are currently listed for Brevard County.</small></div></div>';return;}
@@ -2628,7 +2648,8 @@ async function loadNwsAlerts(){
     L.circleMarker(nwsCountyCenter,{interactive:true,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
    }
   });
-  renderNwsAlertList(features);
+  updateRipCurrentNotice(features);
+   renderNwsAlertList(features);
   if(status)status.textContent="Official NWS alerts: "+features.length+" active for Brevard County · refreshed "+new Date().toLocaleTimeString()+".";
  }catch(error){
   console.warn("CoastWatch NWS feed unavailable:",error);
