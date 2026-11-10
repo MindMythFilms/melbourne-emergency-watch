@@ -1919,7 +1919,7 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  <div class="map-basemap-card" id="mapBasemapCard"><strong>Map style</strong><div class="map-basemap-buttons"><button class="secondary active" id="satelliteBtn" type="button">Satellite view</button><button class="secondary" id="streetBtn" type="button">Street view</button><button class="secondary" id="shelterToggleBtn" type="button" aria-pressed="true">Shelters: On</button></div></div>
  <details class="map-sidebar-details" id="mapAdvancedControls"><summary>Map layers &amp; live conditions</summary><div class="map-sidebar-details-body">
    <div class="map-filter-card"><h3><span>▽</span> Map Filters</h3><div class="map-filters"><label for="sourceFilter">Map layers<select id="sourceFilter" aria-label="Choose which map layers to show"><option value="both">All sources</option><option value="official">Official alerts</option><option value="community">Community reports</option><option value="power">Power outages</option><option value="water">USGS water levels</option><option value="radar">Rain radar</option><option value="evacuation">Evacuation zones</option><option value="shelters">Shelters & emergency resources</option></select></label><label for="mapFilter">Hazard type<select id="mapFilter" aria-label="Filter community reports by hazard type"><option value="all">All hazards</option><option value="flooding">Flooding</option><option value="coastal_flooding">Coastal flooding</option><option value="storm_damage">Storm damage</option><option value="tornado_damage">Tornado damage</option><option value="fire">Fire / smoke</option><option value="road_hazard">Road hazards</option><option value="road_closure">Road closures</option><option value="power_outage">Power outages</option><option value="erosion_washout">Erosion / washout</option><option value="other_hazard">Other</option></select></label></div></div>
-   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
+   <div class="map-count-card"><span class="map-count-icon">▤</span><div><strong id="countLabel">Loading…</strong><small>Visible on map</small></div></div><div class="map-count-card" id="powerOutageStatus" role="status"><span class="map-count-icon">⚡</span><div><strong id="powerOutageCount">Loading power data…</strong><small id="powerOutageUpdated">MassOutage · Brevard County</small><a class="mew-shelter-status-link" href="https://www.fpl.com/outage/" target="_blank" rel="noopener noreferrer">Official FPL outage map</a></div></div><div class="map-count-card" id="usgsWaterStatus" role="status"><span class="map-count-icon">💧</span><div><strong id="usgsWaterCount">Loading water levels…</strong><small id="usgsWaterUpdated">USGS · Brevard County</small></div></div>
    <details class="mew-map-resource-details" id="mewMapResourceDetails"><summary>Live conditions &amp; emergency resources <span>Radar · shelters · evacuation</span></summary><div class="mew-map-resource-items"><div class="map-count-card" id="rainRadarStatus" role="status"><span class="map-count-icon">🌧️</span><div><strong>Rain radar overlay</strong><small id="rainRadarUpdated">NWS KMLB · toggle in Map layers</small></div></div><div class="map-count-card" id="shelterStatus" role="status"><span class="map-count-icon">🏠</span><div><strong id="shelterCount">Loading shelter data…</strong><small id="shelterUpdated">FEMA National Shelter System · Brevard County</small><a class="mew-shelter-status-link" href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Official Brevard shelter announcements</a></div></div><div class="map-count-card" id="evacuationStatus" role="status"><span class="map-count-icon">🧭</span><div><strong>Evacuation reference</strong><small id="evacuationUpdated">Loading designated zones…</small><a href="https://maps.floridadisaster.org/county/EVAC_BREVARD.pdf" target="_blank" rel="noopener noreferrer" style="display:block;margin-top:5px">Official Brevard evacuation map (PDF)</a></div></div>
    
   </div></details>
@@ -2503,6 +2503,10 @@ async function loadPowerOutages(){
  try{
   const response=await fetch("/api/power-outages",{headers:{"Accept":"application/geo+json, application/json"},cache:"no-store"});
   if(!response.ok){const err=new Error("HTTP "+response.status);err.status=response.status;err.retryAfter=response.headers.get("Retry-After");throw err;}
+  const fetchedAt=response.headers.get("X-CoastWatch-Fetched-At");
+  const cacheState=response.headers.get("X-CoastWatch-Cache");
+  const dataSource=response.headers.get("X-Data-Source")||"MassOutage";
+  const headerNotice=response.headers.get("X-Data-Notice");
   const payload=await response.json();
   const features=Array.isArray(payload.features)?payload.features:(Array.isArray(payload.data?.features)?payload.data.features:[]);
   const outageIcon=L.divIcon({className:"mew-power-outage-icon",html:'<span style="display:block;color:#facc15;font-size:30px;font-weight:900;line-height:34px;text-shadow:-1.5px -1.5px 0 #704600,1.5px 1.5px 0 #704600,0 2px 4px #000b">⚡</span>',iconSize:[30,34],iconAnchor:[15,17]});
@@ -2521,7 +2525,7 @@ async function loadPowerOutages(){
    const restoration=pick(p.etr,p.estimated_restoration,p.estimated_restore_time,p.restoration_time);
    const crew=pick(p.crew_status,p.status,p.outage_status);
    const started=pick(p.started_at,p.start_time,p.outage_start,p.reported_at);
-   const updatedAt=pick(p.as_of,p.updated_at,p.last_updated,p.timestamp);
+   const updatedAt=pick(p.as_of,p.updated_at,p.last_updated,p.timestamp,p.last_modified);
    const location=pick(p.location,p.address,p.area_name,p.municipality);
    const rows=["<strong>⚡ Reported power outage</strong>",
     utility?"<div><b>Utility:</b> "+esc(utility)+"</div>":"",
@@ -2532,7 +2536,7 @@ async function loadPowerOutages(){
     started?"<div><b>Outage began:</b> "+esc(outageDate(started))+"</div>":"",
     updatedAt?"<div><b>Utility update:</b> "+esc(outageDate(updatedAt))+"</div>":"",
     location?"<div><b>Reported area:</b> "+esc(location)+"</div>":"",
-    '<small>Source: MassOutage · Utility-reported information may be approximate or delayed. Confirm with your electric provider.</small>'];
+    '<small>Source: '+esc(dataSource)+' · Utility-reported information may be approximate or delayed. Confirm with your electric provider.</small><div><a href="https://www.fpl.com/outage/" target="_blank" rel="noopener noreferrer">Check the official FPL outage map ↗</a></div>'];
    layer.bindPopup('<div style="min-width:200px">'+rows.filter(Boolean).join("")+'</div>');
   }});
   powerOutageLayer.clearLayers();freshLayer.addTo(powerOutageLayer);
@@ -2540,7 +2544,12 @@ async function loadPowerOutages(){
   const total=features.length;
   if(count)count.textContent=total+" outage "+(total===1?"incident":"incidents");
   const live=payload.meta?.live||payload.meta?.status||{},delayed=live.status==="delayed";
-  if(updated)updated.textContent=delayed?(live.notice||"Data may be delayed · MassOutage"):"Brevard County · MassOutage · Updated "+powerOutageLastSuccessAt.toLocaleTimeString();
+  const sourceUpdated=pick(payload.meta?.as_of,payload.meta?.updated_at,payload.meta?.last_updated,payload.meta?.generated_at);
+  const fetchedLabel=fetchedAt&&!Number.isNaN(Date.parse(fetchedAt))?new Date(fetchedAt).toLocaleString():powerOutageLastSuccessAt.toLocaleString();
+  const freshnessLabel=sourceUpdated?"Source data timestamp "+outageDate(sourceUpdated):"Retrieved "+fetchedLabel;
+  const cacheLabel=cacheState==="HIT"?" · cached response":"";
+  const notice=headerNotice||live.notice;
+  if(updated)updated.textContent=(notice||"MassOutage utility outage reports")+" · "+freshnessLabel+cacheLabel+(delayed?" · delayed":"");
  }catch(error){
   console.warn("CoastWatch power outage feed unavailable:",error);
   if(error.status===429){
