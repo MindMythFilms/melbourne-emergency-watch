@@ -2452,9 +2452,8 @@ async function loadUSGSWaterLevels(){
 }
 
 async function loadPowerOutages(){
- if(powerOutageFetchInProgress)return;
- const count=$("powerOutageCount"),updated=$("powerOutageUpdated");
- const now=Date.now();
+ if(powerOutageFetchInProgress||document.visibilityState==="hidden")return;
+ const count=$("powerOutageCount"),updated=$("powerOutageUpdated"),now=Date.now();
  if(now<powerOutageNextAllowedAt){
   const waitMinutes=Math.max(1,Math.ceil((powerOutageNextAllowedAt-now)/60000));
   if(updated)updated.textContent="MassOutage rate limit · retry in about "+waitMinutes+" min"+(powerOutageLastSuccessAt?" · Last successful update "+powerOutageLastSuccessAt.toLocaleTimeString():" · No successful update yet");
@@ -2463,46 +2462,50 @@ async function loadPowerOutages(){
  powerOutageFetchInProgress=true;
  try{
   const response=await fetch("/api/power-outages",{headers:{"Accept":"application/geo+json, application/json"},cache:"no-store"});
-  if(!response.ok){
-   const err=new Error("HTTP "+response.status);err.status=response.status;
-   err.retryAfter=response.headers.get("Retry-After");
-   throw err;
-  }
+  if(!response.ok){const err=new Error("HTTP "+response.status);err.status=response.status;err.retryAfter=response.headers.get("Retry-After");throw err;}
   const payload=await response.json();
-  const features=Array.isArray(payload.features)?payload.features:(Array.isArray(payload.data?.features)?payload.data.features:[]);
+  const county=payload.county?.data||payload.county||{};
+  const incidentBody=payload.incidents||{};
+  const areaBody=payload.areas||{};
+  const incidents=Array.isArray(incidentBody.features)?incidentBody.features:(Array.isArray(incidentBody.data?.features)?incidentBody.data.features:[]);
+  const areas=Array.isArray(areaBody.features)?areaBody.features:(Array.isArray(areaBody.data?.features)?areaBody.data.features:[]);
+  const live=payload.meta?.live||county.meta?.live||incidentBody.meta?.live||areaBody.meta?.live||{};
   const outageIcon=L.divIcon({className:"mew-power-outage-icon",html:'<span style="display:block;color:#facc15;font-size:30px;font-weight:900;line-height:34px;text-shadow:-1.5px -1.5px 0 #704600,1.5px 1.5px 0 #704600,0 2px 4px #000b">⚡</span>',iconSize:[30,34],iconAnchor:[15,17]});
-  const freshLayer=L.geoJSON({type:"FeatureCollection",features},{pointToLayer:(feature,latlng)=>L.marker(latlng,{icon:outageIcon,zIndexOffset:350}),onEachFeature:(feature,layer)=>{
-   const p=feature.properties||{};
-   const rows=["<strong>⚡ Reported power outage</strong>",
-    p.utility||p.utility_name?"<div><b>Utility:</b> "+esc(p.utility||p.utility_name)+"</div>":"",
-    p.cause?"<div><b>Cause:</b> "+esc(p.cause)+"</div>":"",
-    p.customers_out!=null?"<div><b>Customers affected:</b> "+esc(Number(p.customers_out).toLocaleString())+"</div>":"",
-    p.etr||p.estimated_restoration?"<div><b>Estimated restoration:</b> "+esc(p.etr||p.estimated_restoration)+"</div>":"",
-    p.crew_status?"<div><b>Crew status:</b> "+esc(p.crew_status)+"</div>":"",
-    p.location||p.address?"<div>"+esc(p.location||p.address)+"</div>":"",
-    '<small>Source: MassOutage · Aggregated utility data. Confirm with your electric provider.</small>'];
-   layer.bindPopup('<div style="min-width:200px">'+rows.filter(Boolean).join("")+'</div>');
-  }});
-  powerOutageLayer.clearLayers();
-  freshLayer.addTo(powerOutageLayer);
-  powerOutageLastSuccessAt=new Date();
-  powerOutageNextAllowedAt=0;
-  const total=features.length;
-  if(count)count.textContent=total+" outage "+(total===1?"incident":"incidents");
-  const live=payload.meta?.live||payload.meta?.status||{};
-  const delayed=live.status==="delayed";
-  if(updated)updated.textContent=delayed?(live.notice||"Data may be delayed · MassOutage"):( "Brevard County · MassOutage · Updated "+powerOutageLastSuccessAt.toLocaleTimeString());
+  const freshLayer=L.featureGroup();
+  const areaFeatures=areas.filter(f=>f&&f.geometry);
+  if(areaFeatures.length){
+   L.geoJSON({type:"FeatureCollection",features:areaFeatures},{style:()=>({color:"#f59e0b",weight:2,opacity:.9,fillColor:"#facc15",fillOpacity:.13,dashArray:"6 5"}),onEachFeature:(feature,layer)=>{
+    const p=feature.properties||{},name=p.name||p.area_name||"Reported service area",utility=p.utility_name||p.utility||"Utility not identified";
+    const out=p.customers_out==null?"Not reported":Number(p.customers_out).toLocaleString(),served=p.customers_served==null?"Not reported":Number(p.customers_served).toLocaleString();
+    const etr=p.etr?new Date(p.etr).toLocaleString():"Not provided";
+    layer.bindPopup('<div style="min-width:210px"><strong>⚡ Approximate outage area</strong><div><b>'+esc(name)+'</b></div><div><b>Utility:</b> '+esc(utility)+'</div><div><b>Customers out:</b> '+esc(out)+'</div><div><b>Customers served:</b> '+esc(served)+'</div><div><b>Estimated restoration:</b> '+esc(etr)+'</div><small>Dashed boundary is a utility-reported area bounding box, not an exact outage footprint or street-level boundary. Source: MassOutage.</small></div>');
+   }}).addTo(freshLayer);
+  }
+  L.geoJSON({type:"FeatureCollection",features:incidents},{pointToLayer:(feature,latlng)=>L.marker(latlng,{icon:outageIcon,zIndexOffset:350}),onEachFeature:(feature,layer)=>{
+   const p=feature.properties||{},customers=p.customers_out!=null?Number(p.customers_out).toLocaleString():(p.customers_below!=null?"Less than "+Number(p.customers_below).toLocaleString():"Not reported");
+   const etr=p.etr?new Date(p.etr).toLocaleString():"Not provided",started=p.started_at?new Date(p.started_at).toLocaleString():"Not provided",asOf=p.as_of?new Date(p.as_of).toLocaleString():"Not provided";
+   const rows=["<strong>⚡ Reported power outage</strong>",p.utility_name||p.utility_key?"<div><b>Utility:</b> "+esc(p.utility_name||p.utility_key)+"</div>":"",p.cause?"<div><b>Cause:</b> "+esc(p.cause)+"</div>":"","<div><b>Customers affected:</b> "+esc(customers)+"</div>",p.etr?"<div><b>Estimated restoration:</b> "+esc(etr)+"</div>":"",p.crew_status?"<div><b>Crew status:</b> "+esc(p.crew_status)+"</div>","<div><b>Started:</b> "+esc(started)+"</div>","<div><b>Utility feed time:</b> "+esc(asOf)+"</div>",'<small>Source: MassOutage · Utility-provided locations may be approximate. Confirm with your electric provider.</small>'];
+   layer.bindPopup('<div style="min-width:210px">'+rows.filter(Boolean).join("")+'</div>');
+  }}).addTo(freshLayer);
+  powerOutageLayer.clearLayers();freshLayer.addTo(powerOutageLayer);
+  powerOutageLastSuccessAt=new Date();powerOutageNextAllowedAt=0;
+  const totalCustomers=county.customers_out??county.live?.customers_out;
+  const incidentCount=county.incident_count??incidents.length;
+  if(count)count.textContent=(totalCustomers==null?"Customers out not reported":Number(totalCustomers).toLocaleString()+" customers out")+" · "+Number(incidentCount).toLocaleString()+" "+(Number(incidentCount)===1?"incident":"incidents");
+  const delayed=live.status==="delayed",behind=live.behind_min;
+  const areaCount=areaFeatures.length;
+  const freshness=delayed?(live.notice||"Data delayed · last utility poll is not current"):"Live feed current";
+  if(updated)updated.textContent="Brevard County · "+areaCount+" approximate affected-area "+(areaCount===1?"outline":"outlines")+" · "+freshness+" · Checked "+powerOutageLastSuccessAt.toLocaleTimeString();
  }catch(error){
   console.warn("CoastWatch power outage feed unavailable:",error);
   if(error.status===429){
-   const retrySeconds=Number(error.retryAfter);
-   const retryDate=error.retryAfter&&!Number.isNaN(Date.parse(error.retryAfter))?Date.parse(error.retryAfter):0;
+   const retrySeconds=Number(error.retryAfter),retryDate=error.retryAfter&&!Number.isNaN(Date.parse(error.retryAfter))?Date.parse(error.retryAfter):0;
    const backoffMs=retryDate?Math.max(15*60*1000,retryDate-Date.now()):(Number.isFinite(retrySeconds)&&retrySeconds>0?Math.max(15*60*1000,retrySeconds*1000):15*60*1000);
    powerOutageNextAllowedAt=Date.now()+backoffMs;
-   if(count)count.textContent=powerOutageLayer.getLayers().length?"Showing last known data":"Rate limited";
+   if(count)count.textContent=powerOutageLayer.getLayers().length?"Showing last known outage data":"Rate limited";
    if(updated)updated.textContent="MassOutage rate limit · retry in "+Math.ceil(backoffMs/60000)+" min"+(powerOutageLastSuccessAt?" · Last successful update "+powerOutageLastSuccessAt.toLocaleTimeString():" · No successful update yet");
   }else{
-   if(count)count.textContent=powerOutageLayer.getLayers().length?"Showing last known data":"Power data unavailable";
+   if(count)count.textContent=powerOutageLayer.getLayers().length?"Showing last known outage data":"Power data unavailable";
    if(updated)updated.textContent="MassOutage unavailable"+(powerOutageLastSuccessAt?" · Last successful update "+powerOutageLastSuccessAt.toLocaleTimeString():" · No successful update yet");
   }
  }finally{powerOutageFetchInProgress=false;}
