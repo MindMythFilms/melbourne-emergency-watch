@@ -2238,6 +2238,7 @@ map.on("popupclose",()=>mewMapStage?.classList.remove("mew-popup-visible"));
 // COASTWATCH_NWS_ALERTS_V2 — isolated official-alert overlay; never modifies community report loading.
 const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
+const powerOutageAreaLayer=L.featureGroup();
 const usgsWaterLayer=L.featureGroup().addTo(map);
 const evacuationZoneLayer=L.featureGroup();
 map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450";
@@ -2295,7 +2296,7 @@ function applySourceFilter(){
  const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=sheltersVisible&&(mode==="both"||mode==="shelters");
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
-  if(showPower){if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer);
+  if(showPower){if(!map.hasLayer(powerOutageAreaLayer))powerOutageAreaLayer.addTo(map);if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else{if(map.hasLayer(powerOutageAreaLayer))map.removeLayer(powerOutageAreaLayer);if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer)}
   if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
  if(showRadar){if(!map.hasLayer(rainRadarLayer))rainRadarLayer.addTo(map)}else if(map.hasLayer(rainRadarLayer))map.removeLayer(rainRadarLayer);
  if(showEvacuation){if(!map.hasLayer(evacuationZoneLayer))evacuationZoneLayer.addTo(map)}else if(map.hasLayer(evacuationZoneLayer))map.removeLayer(evacuationZoneLayer);
@@ -2451,6 +2452,39 @@ async function loadUSGSWaterLevels(){
  }finally{usgsWaterFetchInProgress=false;}
 }
 
+let powerOutageAreasFetchInProgress=false;
+async function loadPowerOutageAreas(){
+ if(powerOutageAreasFetchInProgress||document.visibilityState==="hidden")return;
+ powerOutageAreasFetchInProgress=true;
+ try{
+  const response=await fetch("/api/power-outage-areas",{headers:{"Accept":"application/geo+json, application/json"},cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  const payload=await response.json();
+  const features=Array.isArray(payload.features)?payload.features:(Array.isArray(payload.data?.features)?payload.data.features:[]);
+  const valid=features.filter(f=>f&&f.geometry);
+  const areas=L.geoJSON({type:"FeatureCollection",features:valid},{style:()=>({color:"#f59e0b",weight:2,opacity:.9,fillColor:"#facc15",fillOpacity:.12,dashArray:"6 5"}),onEachFeature:(feature,layer)=>{
+   const p=feature.properties||{};
+   const name=p.name||p.area_name||"Reported municipality";
+   const utility=p.utility_name||p.utility_key||"Utility not identified";
+   const customers=p.customers_out==null?"Not reported":Number(p.customers_out).toLocaleString();
+   const masked=Number(p.masked_outages||0);
+   const served=p.customers_served==null?"Not reported":Number(p.customers_served).toLocaleString();
+   const percent=p.pct_out==null?"Not reported":Number(p.pct_out).toFixed(1)+"%";
+   const incidents=p.incident_count==null?"Not reported":Number(p.incident_count).toLocaleString();
+   const etr=p.etr?new Date(p.etr).toLocaleString():"Not provided";
+   const notice=masked>0?"<div><b>Additional masked outages:</b> "+esc(masked.toLocaleString())+" (reported below a privacy threshold)</div>":"";
+   layer.bindPopup('<div style="min-width:220px"><strong>⚡ Approximate outage area</strong><div><b>'+esc(name)+'</b></div><div><b>Utility:</b> '+esc(utility)+'</div><div><b>Customers out:</b> '+esc(customers)+'</div>'+notice+'<div><b>Customers served:</b> '+esc(served)+'</div><div><b>Share affected:</b> '+esc(percent)+'</div><div><b>Incidents:</b> '+esc(incidents)+'</div><div><b>Estimated restoration:</b> '+esc(etr)+'</div><small>Dashed polygon is a bounding box around a utility-reported municipality, not an exact outage footprint or confirmation that every address inside is without power. Source: MassOutage.</small></div>');
+  }});
+  powerOutageAreaLayer.clearLayers();
+  areas.addTo(powerOutageAreaLayer);
+  const live=payload.meta?.live||{};
+  const status=$("powerOutageUpdated");
+  if(status&&live.status==="delayed")status.textContent=(live.notice||"MassOutage outage-area data may be delayed")+" · Approximate boundaries";
+ }catch(error){
+  console.warn("CoastWatch outage-area overlay unavailable:",error);
+  // Polygon failures are isolated: incident markers continue to work normally.
+ }finally{powerOutageAreasFetchInProgress=false;}
+}
 async function loadPowerOutages(){
  if(powerOutageFetchInProgress)return;
  const count=$("powerOutageCount"),updated=$("powerOutageUpdated");
@@ -2968,7 +3002,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();loadPublicZones();loadPowerOutages();loadUSGSWaterLevels();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
+loadReports();loadPublicZones();loadPowerOutages();loadPowerOutageAreas();loadUSGSWaterLevels();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadPowerOutageAreas,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 
 // Align the report action with the actual map canvas on small screens.
