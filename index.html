@@ -2467,16 +2467,33 @@ async function loadPowerOutages(){
   const payload=await response.json();
   const features=Array.isArray(payload.features)?payload.features:(Array.isArray(payload.data?.features)?payload.data.features:[]);
   const outageIcon=L.divIcon({className:"mew-power-outage-icon",html:'<span style="display:block;color:#facc15;font-size:30px;font-weight:900;line-height:34px;text-shadow:-1.5px -1.5px 0 #704600,1.5px 1.5px 0 #704600,0 2px 4px #000b">⚡</span>',iconSize:[30,34],iconAnchor:[15,17]});
+  const outageDate=value=>{
+   if(!value)return "";
+   const date=new Date(value);
+   return Number.isNaN(date.getTime())?String(value):date.toLocaleString();
+  };
+  const pick=(...values)=>values.find(value=>value!==undefined&&value!==null&&String(value).trim()!=="");
   const freshLayer=L.geoJSON({type:"FeatureCollection",features},{pointToLayer:(feature,latlng)=>L.marker(latlng,{icon:outageIcon,zIndexOffset:350}),onEachFeature:(feature,layer)=>{
    const p=feature.properties||{};
+   const utility=pick(p.utility_name,p.utility,p.utility_key,p.provider_name);
+   const customers=pick(p.customers_out,p.customers_affected,p.affected_customers,p.customer_count);
+   const threshold=pick(p.customers_below,p.customers_out_below,p.customer_count_threshold);
+   const cause=pick(p.cause,p.cause_description,p.outage_cause);
+   const restoration=pick(p.etr,p.estimated_restoration,p.estimated_restore_time,p.restoration_time);
+   const crew=pick(p.crew_status,p.status,p.outage_status);
+   const started=pick(p.started_at,p.start_time,p.outage_start,p.reported_at);
+   const updatedAt=pick(p.as_of,p.updated_at,p.last_updated,p.timestamp);
+   const location=pick(p.location,p.address,p.area_name,p.municipality);
    const rows=["<strong>⚡ Reported power outage</strong>",
-    p.utility||p.utility_name?"<div><b>Utility:</b> "+esc(p.utility||p.utility_name)+"</div>":"",
-    p.cause?"<div><b>Cause:</b> "+esc(p.cause)+"</div>":"",
-    p.customers_out!=null?"<div><b>Customers affected:</b> "+esc(Number(p.customers_out).toLocaleString())+"</div>":"",
-    p.etr||p.estimated_restoration?"<div><b>Estimated restoration:</b> "+esc(p.etr||p.estimated_restoration)+"</div>":"",
-    p.crew_status?"<div><b>Crew status:</b> "+esc(p.crew_status)+"</div>":"",
-    p.location||p.address?"<div>"+esc(p.location||p.address)+"</div>":"",
-    '<small>Source: MassOutage · Aggregated utility data. Confirm with your electric provider.</small>'];
+    utility?"<div><b>Utility:</b> "+esc(utility)+"</div>":"",
+    cause?"<div><b>Cause:</b> "+esc(cause)+"</div>":"",
+    customers!=null?"<div><b>Customers affected:</b> "+esc(Number.isFinite(Number(customers))?Number(customers).toLocaleString():customers)+"</div>":threshold!=null?"<div><b>Customers affected:</b> Less than "+esc(threshold)+"</div>":"",
+    restoration?"<div><b>Estimated restoration:</b> "+esc(outageDate(restoration))+"</div>":"",
+    crew?"<div><b>Crew / outage status:</b> "+esc(crew)+"</div>":"",
+    started?"<div><b>Outage began:</b> "+esc(outageDate(started))+"</div>":"",
+    updatedAt?"<div><b>Utility update:</b> "+esc(outageDate(updatedAt))+"</div>":"",
+    location?"<div><b>Reported area:</b> "+esc(location)+"</div>":"",
+    '<small>Source: MassOutage · Utility-reported information may be approximate or delayed. Confirm with your electric provider.</small>'];
    layer.bindPopup('<div style="min-width:200px">'+rows.filter(Boolean).join("")+'</div>');
   }});
   powerOutageLayer.clearLayers();freshLayer.addTo(powerOutageLayer);
