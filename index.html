@@ -2346,7 +2346,7 @@ async function loadShelters(){
   const payload=await response.json();
   if(payload.error)throw new Error(payload.error.message||"FEMA shelter service error");
   const features=(payload.features||[]).filter(f=>f.geometry&&(Array.isArray(f.geometry.coordinates)||(Number.isFinite(Number(f.geometry.x))&&Number.isFinite(Number(f.geometry.y)))));
-  let items=[];
+  let items=[],femaOpenCount=0;
   const palette={OPEN:"#16834a",STANDBY:"#d69e18",ALERT:"#dc6b20",FULL:"#c2413b",CLOSED:"#64748b"};
   const labels={OPEN:"OPEN · FEMA status",STANDBY:"STANDBY · not confirmed open",ALERT:"ALERT · check official instructions",FULL:"FULL · do not assume space is available",CLOSED:"CLOSED",UNKNOWN:"STATUS UNAVAILABLE"};
   features.forEach(feature=>{
@@ -2364,7 +2364,7 @@ async function loadShelters(){
    const icon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+color+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">⌂</span>',iconSize:[42,42],iconAnchor:[21,21]});
    const popupHtml='<div style="min-width:220px"><strong>🏠 '+name+'</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+color+';color:#fff;font-weight:800">'+esc(labels[status])+'</div><div>'+address+'</div>'+(accessible?'<div><b>Wheelchair / ADA:</b> '+esc(accessible)+'</div>':'')+(pet?'<div><b>Pet information:</b> '+esc(pet)+'</div>':'')+(phone?'<div><b>Phone:</b> '+esc(phone)+'</div>':'')+'<small style="display:block;margin-top:8px">Source: FEMA National Shelter System. Status and capacity can change. A listed location is not a direction to evacuate. Confirm opening with Brevard County before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Check official Brevard shelter announcements</a></p></div>';
    const marker=L.marker([lat,lng],{icon,pane:"mewShelterPane",title:(p.shelter_name||"Shelter")+" — "+labels[status]}).bindPopup(popupHtml,{maxWidth:300});
-   items.push({latlng:L.latLng(lat,lng),layer:marker});
+   items.push({latlng:L.latLng(lat,lng),layer:marker});femaOpenCount++;
   });
   // Brevard County Emergency Management reported South Mainland Community Center CLOSED
   // in its Nov. 5, 2026, 6:30 PM community update. Override stale FEMA/open feed entries.
@@ -2372,8 +2372,8 @@ async function loadShelters(){
   items=items.filter(item=>item.latlng.distanceTo(L.latLng(southMainlandLat,southMainlandLng))>=120);
   const southMainlandClosedColor="#64748b";
   const southMainlandClosedIcon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+southMainlandClosedColor+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">✕</span>',iconSize:[46,46],iconAnchor:[23,23]});
-  const southMainlandClosedPopup='<div style="min-width:220px"><strong>🏠 South Mainland Community Center</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+southMainlandClosedColor+';color:#fff;font-weight:800">SHELTER CLOSED</div><div>3700 Allen Ave, Micco, FL 32976</div><small style="display:block;margin-top:8px">Brevard County Emergency Management reported this shelter closed in its Nov. 5, 2026, 6:30 PM community update. Do not travel here expecting shelter services. For current shelter information, check the Brevard County Storm Center or call 2-1-1.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
-  const southMainlandClosedMarker=L.marker([southMainlandLat,southMainlandLng],{icon:southMainlandClosedIcon,pane:"mewShelterPane",title:"South Mainland Community Center — SHELTER CLOSED"}).bindPopup(southMainlandClosedPopup,{maxWidth:300});
+  const southMainlandClosedPopup='<div style="min-width:220px"><strong>🏠 South Mainland Community Center</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+southMainlandClosedColor+';color:#fff;font-weight:800">CLOSED · LAST COUNTY REPORT NOV 5 · VERIFY</div><div>3700 Allen Ave, Micco, FL 32976</div><small style="display:block;margin-top:8px">Brevard County Emergency Management last reported this shelter closed on November 5, 2026. This is not a live status check; verify with the County Storm Center or call 2-1-1 before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
+  const southMainlandClosedMarker=L.marker([southMainlandLat,southMainlandLng],{icon:southMainlandClosedIcon,pane:"mewShelterPane",title:"South Mainland Community Center — LAST REPORTED CLOSED NOV 5"}).bindPopup(southMainlandClosedPopup,{maxWidth:300});
   items.push({latlng:L.latLng(southMainlandLat,southMainlandLng),layer:southMainlandClosedMarker});
   // Community-confirmed active shelter: Wickham Park Senior Center, Melbourne.
   // Address/location reference: 2785 Leisure Way, Melbourne, FL 32935.
@@ -2388,15 +2388,15 @@ async function loadShelters(){
   }
   mewShelterItems=items;
   mewRefreshShelterClusters();
-  if(count)count.textContent=items.length?items.length+" open shelters":"No currently open shelter records returned for Brevard County";
-  if(updated)updated.textContent="Open shelters · FEMA + Brevard EOC · refreshed "+new Date().toLocaleTimeString()+" · numbered clusters when zoomed out";
+  if(count)count.textContent=femaOpenCount?femaOpenCount+" FEMA-confirmed open shelters":"No FEMA-confirmed open shelters";
+  if(updated)updated.textContent="FEMA National Shelter System · checked "+new Date().toLocaleTimeString()+" · only explicit OPEN statuses shown";
  }catch(error){
   console.warn("CoastWatch shelter locations unavailable:",error);
   // Keep the county-confirmed CLOSED status visible even if FEMA's feed fails.
   const southMainlandClosedColor="#64748b";
   const southMainlandClosedIcon=L.divIcon({className:"mew-shelter-marker",html:'<span style="display:flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 5px;border:3px solid #fff;border-radius:12px;background:'+southMainlandClosedColor+';box-shadow:0 2px 9px #0008;color:#fff;font-size:20px;font-weight:900">✕</span>',iconSize:[46,46],iconAnchor:[23,23]});
-  const southMainlandClosedPopup='<div style="min-width:220px"><strong>🏠 South Mainland Community Center</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+southMainlandClosedColor+';color:#fff;font-weight:800">SHELTER CLOSED</div><div>3700 Allen Ave, Micco, FL 32976</div><small>Brevard County Emergency Management reported this shelter closed in its Nov. 5, 2026, 6:30 PM community update. Do not travel here expecting shelter services. Check the Brevard County Storm Center or call 2-1-1.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
-  const southMainlandClosedMarker=L.marker([27.8589916,-80.5012966],{icon:southMainlandClosedIcon,pane:"mewShelterPane",title:"South Mainland Community Center — SHELTER CLOSED"}).bindPopup(southMainlandClosedPopup,{maxWidth:300});
+  const southMainlandClosedPopup='<div style="min-width:220px"><strong>🏠 South Mainland Community Center</strong><div style="margin:6px 0;padding:7px 9px;border-radius:7px;background:'+southMainlandClosedColor+';color:#fff;font-weight:800">CLOSED · LAST COUNTY REPORT NOV 5 · VERIFY</div><div>3700 Allen Ave, Micco, FL 32976</div><small>Brevard County Emergency Management last reported this shelter closed on November 5, 2026. This is not a live status check; verify with the County Storm Center or call 2-1-1 before traveling.</small><p><a href="https://www.brevardfl.gov/StormCenter" target="_blank" rel="noopener noreferrer">Brevard County Storm Center</a></p></div>';
+  const southMainlandClosedMarker=L.marker([27.8589916,-80.5012966],{icon:southMainlandClosedIcon,pane:"mewShelterPane",title:"South Mainland Community Center — LAST REPORTED CLOSED NOV 5"}).bindPopup(southMainlandClosedPopup,{maxWidth:300});
   mewShelterItems=mewShelterItems.filter(item=>item.latlng.distanceTo(L.latLng(27.8589916,-80.5012966))>=120);
   mewShelterItems.push({latlng:L.latLng(27.8589916,-80.5012966),layer:southMainlandClosedMarker});
   mewRefreshShelterClusters();
