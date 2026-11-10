@@ -1983,6 +1983,31 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  <div class="mapnote">Satellite imagery is not live and may be outdated. Community pins are unverified resident submissions. Official NWS alerts are shown separately with colored warning areas and alert markers. CoastWatch FL is not an emergency service. Imagery © Esri and its contributors.</div>
 </section>
 
+<style id="cw-rip-current-advisory-style">
+#cwRipCurrentNotice{margin:0 0 20px;padding:22px 24px;border:1px solid #eab308;border-left:7px solid #eab308;border-radius:17px;background:linear-gradient(120deg,#fffbea,#fff 72%);color:#263547;box-shadow:0 12px 32px #8a650d18}
+#cwRipCurrentNotice .cw-rip-kicker{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#916500}
+#cwRipCurrentNotice h2{margin:5px 0 10px;font:900 clamp(20px,2.5vw,27px)/1.2 Manrope,sans-serif;color:#735300}
+#cwRipCurrentNotice p{margin:8px 0;line-height:1.65}
+#cwRipCurrentNotice .cw-rip-map-key{display:inline-flex;align-items:center;gap:8px;margin:7px 0 4px;font-size:13px;font-weight:800}
+#cwRipCurrentNotice .cw-rip-swatch{width:24px;height:13px;border:2px solid #eab308;background:#facc154d;border-radius:3px}
+#cwRipCurrentNotice a{color:#795900;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+body.dark #cwRipCurrentNotice{background:linear-gradient(120deg,#342c14,#172536 75%);border-color:#a98216;border-left-color:#facc15;color:#edf1f5}
+body.dark #cwRipCurrentNotice .cw-rip-kicker{color:#f6d56a}
+body.dark #cwRipCurrentNotice h2{color:#ffe28a}
+body.dark #cwRipCurrentNotice a{color:#ffe28a}
+@media(max-width:650px){#cwRipCurrentNotice{padding:18px 16px;margin-bottom:15px;border-radius:15px}}
+</style>
+<section id="cwRipCurrentNotice" aria-labelledby="cwRipCurrentTitle">
+ <div class="cw-rip-kicker">CoastWatch FL · Official NWS Coastal Hazard · November 9, 2026</div>
+ <h2 id="cwRipCurrentTitle">⚠️ High Rip Current Risk Along the Atlantic Coast</h2>
+ <p>The National Weather Service Melbourne has issued a <strong>High Rip Current Risk</strong> for beaches in Volusia, Indian River, St. Lucie, Martin, and Brevard Counties. The alert includes Northern and Southern Brevard and their barrier islands.</p>
+ <p><strong>In effect through late Tuesday night, November 10.</strong> Dangerous rip currents can pull even experienced swimmers away from shore into deeper water. Entering the surf is strongly discouraged.</p>
+ <div class="cw-rip-map-key"><span class="cw-rip-swatch" aria-hidden="true"></span> Yellow map polygon: approximate Brevard coastal risk corridor</div>
+ <p>If caught in a rip current, stay calm and float. Do not swim against the current. If able, swim parallel to the shoreline; if you cannot escape, face shore and signal or call for help. Follow lifeguards, beach flags, and posted signs.</p>
+ <p><a href="https://forecast.weather.gov/wwamap/wwatxtget.php?cwa=MLB&amp;wwa=all" target="_blank" rel="noopener noreferrer">Read the official National Weather Service alert</a>.</p>
+ <p><small>Source: National Weather Service Melbourne, issued 10:44 PM EST November 9, 2026. The yellow polygon is a visual approximation of the Brevard beach corridor, not a surveyed hazard boundary. The advisory itself covers the listed counties.</small></p>
+</section>
+
 <section id="cwFloodSafetyNotice" aria-labelledby="cwFloodSafetyTitle">
  <div class="cw-flood-kicker">CoastWatch FL · Flood Safety Advisory · Nov 7, 2026</div>
  <h2 id="cwFloodSafetyTitle">Floodwater is going down. The danger may not be.</h2>
@@ -2544,7 +2569,7 @@ async function loadNwsAlerts(){
  try{
   // Include Brevard County and all four Brevard coastal/mainland forecast zones.
   // County-only alerts omit coastal rip-current products.
-  const nwsZones=["FLC009","FLZ247","FLZ347","FLZ647","FLZ747"];
+  const nwsZones=["FLC009","FLZ141","FLZ154","FLZ159","FLZ164","FLZ247","FLZ347","FLZ447","FLZ647","FLZ747"];
   const zoneResponses=await Promise.all(nwsZones.map(async zone=>{
    const response=await fetch("https://api.weather.gov/alerts/active?zone="+encodeURIComponent(zone),{headers:{Accept:"application/geo+json"},cache:"no-store"});
    if(!response.ok)throw new Error("NWS API returned HTTP "+response.status+" for "+zone);
@@ -2560,20 +2585,18 @@ async function loadNwsAlerts(){
   const features=Array.from(uniqueFeatures.values());
   nwsAlertLayer.clearLayers();
   features.forEach(feature=>{
-   const p=feature.properties||{},color=nwsSeverityColor(p.severity),popup=nwsPopup(p,!feature.geometry);
-   if(feature.geometry){
+   const p=feature.properties||{},eventName=String(p.event||"").toLowerCase(),isRipCurrent=eventName.includes("rip current"),color=isRipCurrent?"#facc15":nwsSeverityColor(p.severity),popup=nwsPopup(p,!feature.geometry);
+   if(isRipCurrent){
+    // Approximate Brevard beach/water corridor only; the full multi-county alert remains in the official alert details.
+    const coastRisk=[[28.78,-80.48],[28.66,-80.52],[28.52,-80.55],[28.38,-80.56],[28.22,-80.55],[28.06,-80.54],[27.91,-80.51],[27.82,-80.48],[27.82,-80.40],[27.93,-80.42],[28.08,-80.44],[28.24,-80.45],[28.40,-80.46],[28.55,-80.46],[28.69,-80.44],[28.78,-80.42]];
+    L.polygon(coastRisk,{interactive:true,color:"#eab308",weight:3,opacity:1,fillColor:"#facc15",fillOpacity:.27,dashArray:"7 5"}).bindPopup(popup).addTo(nwsAlertLayer);
+   }else if(feature.geometry){
     L.geoJSON(feature,{interactive:false,style:()=>({color,weight:3,opacity:1,fillColor:color,fillOpacity:.15,dashArray:"6 4"}),pointToLayer:(_f,latlng)=>L.circleMarker(latlng,{interactive:true,radius:13.3,color:"#fff",weight:2,fillColor:color,fillOpacity:1}),onEachFeature:(f,layer)=>{if(["Point","MultiPoint"].includes(f.geometry?.type)){layer.options.interactive=true;layer.bindPopup(popup);}}}).addTo(nwsAlertLayer);
+   }else if(eventName.includes("flood")&&String(p.headline||"").toLowerCase().includes("st. johns river")){
+    const river=[[28.54,-80.99],[28.55,-80.90],[28.35,-80.80],[28.05,-80.72]];
+    L.polyline(river,{interactive:true,color,weight:7,opacity:.9,dashArray:"8 6"}).bindPopup(popup).addTo(nwsAlertLayer);
    }else{
-    const eventName=String(p.event||"").toLowerCase();
-    if(eventName.includes("rip current")){
-     const coast=[[28.78,-80.43],[28.62,-80.48],[28.46,-80.51],[28.28,-80.49],[28.10,-80.47],[27.92,-80.45],[27.82,-80.43]];
-     L.polyline(coast,{interactive:true,color,weight:7,opacity:.9,dashArray:"8 7"}).bindPopup(popup).addTo(nwsAlertLayer);
-    }else if(eventName.includes("flood")&&String(p.headline||"").toLowerCase().includes("st. johns river")){
-     const river=[[28.54,-80.99],[28.55,-80.90],[28.35,-80.80],[28.05,-80.72]];
-     L.polyline(river,{interactive:true,color,weight:7,opacity:.9,dashArray:"8 6"}).bindPopup(popup).addTo(nwsAlertLayer);
-    }else{
-     L.circleMarker(nwsCountyCenter,{interactive:true,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
-    }
+    L.circleMarker(nwsCountyCenter,{interactive:true,radius:11,color:"#fff",weight:2,fillColor:color,fillOpacity:1}).bindPopup(popup).addTo(nwsAlertLayer);
    }
   });
   renderNwsAlertList(features);
