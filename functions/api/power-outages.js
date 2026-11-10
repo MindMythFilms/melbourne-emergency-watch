@@ -3,6 +3,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     "Access-Control-Allow-Origin": "https://coastwatch-fl.pages.dev",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Accept",
+    "Access-Control-Expose-Headers": "X-CoastWatch-Fetched-At, X-CoastWatch-Cache, X-Data-Source, X-Data-Notice, Retry-After",
     "Vary": "Origin"
   };
   const jsonError = (message, status) => new Response(JSON.stringify({ error: message }), {
@@ -27,7 +28,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
       ...cors,
       "Content-Type": upstream.headers.get("Content-Type") || "application/geo+json",
       "Cache-Control": upstream.ok ? "public, max-age=60, s-maxage=300" : "no-store",
-      "X-Data-Source": "MassOutage"
+      "X-Data-Source": "MassOutage",
+      "X-CoastWatch-Fetched-At": new Date().toISOString(),
+      "X-CoastWatch-Cache": "MISS"
     });
     for (const name of ["Retry-After", "X-Request-Id", "X-API-Version", "X-Data-Notice"]) {
       const value = upstream.headers.get(name);
