@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="mew-build" content="20261110-live-feed-health-v1"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mew-build" content="20261110-live-feed-health-v2"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoastWatch FL</title>
 <meta name="description" content="CoastWatch FL is a volunteer-driven community hazard and weather awareness project for Melbourne and Brevard County, Florida. View the map and report local hazards.">
 <meta property="og:type" content="website">
@@ -3290,18 +3290,7 @@ setInterval(checkForSiteUpdates,180000);
 
 </style>
 
-<script>
-/* Show the active boil-water notice on every site visit; dismissal lasts only until navigation/reload. */
-(function(){
- const overlay=document.getElementById('mewWaterOverlay');
- if(!overlay)return;
- let previousFocus=document.activeElement;
- overlay.hidden=false;
- const close=()=>{
-  overlay.hidden=true;
-  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
- };;
-</script>
+
 
 <script id="cw-ad-carousel-controller">
 /* Reliable CoastWatch FL partner-ad rotation with working slide indicators. */
