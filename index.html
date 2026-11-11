@@ -4453,6 +4453,10 @@ body.dark #map-panel .map-report-tools .map-report-button{
  #cwi-panel .cwi-compose button{height:38px!important;min-height:38px!important;padding:0 12px!important;font-size:11px!important}
  #cwi-panel .cwi-foot{font-size:8px!important;padding:0 9px 7px!important}
 }
+
+/* Respect the hidden state toggled by the authentication controller. */
+#cwi-panel .cwi-auth[hidden],
+#cwi-panel #cwi-chat[hidden]{display:none!important}
 </style>
 <button id="cwi-launch" type="button" aria-expanded="false" aria-controls="cwi-panel">
 <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="cwi-metal" x2="0" y2="1"><stop stop-color="#e7fbff"/><stop offset="1" stop-color="#6bb4c8"/></linearGradient></defs><path d="M32 4v8M28 4h8" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><rect x="9" y="13" width="46" height="40" rx="13" fill="url(#cwi-metal)" stroke="#65dce7" stroke-width="2"/><rect x="14" y="20" width="36" height="25" rx="8" fill="#09263c"/><ellipse cx="24" cy="32" rx="4" ry="5" fill="#65f4ff"/><ellipse cx="40" cy="32" rx="4" ry="5" fill="#65f4ff"/><path d="M25 39q7 5 14 0" fill="none" stroke="#65f4ff" stroke-width="2" stroke-linecap="round"/><path d="M4 28H9M55 28h5" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="57" r="3" fill="#46dce5"/><circle cx="42" cy="57" r="3" fill="#46dce5"/></svg>
