@@ -4409,7 +4409,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 @media(max-width:650px){#cwi-invite{right:88px!important;bottom:26px!important;max-width:190px!important;padding:9px 12px!important;font-size:12px!important;border-radius:18px 18px 18px 5px!important}}
 
 #cwi-launch{position:fixed!important;right:24px!important;bottom:24px!important;z-index:1200!important;width:144px!important;height:144px!important;min-width:144px!important;min-height:144px!important;padding:3px!important;border:3px solid #72f4f0!important;border-radius:50%!important;background:radial-gradient(circle at 32% 22%,#1c9ba3,#07506d 72%)!important;color:#f2ffff!important;font-size:0!important;line-height:0!important;box-shadow:0 9px 30px #001b2c99,0 0 25px #35dce677!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important;isolation:isolate!important}
-#cwi-launch .cwi-launch-bot{display:block!important;width:138px!important;height:138px!important;max-width:none!important;object-fit:contain!important;flex:none!important;filter:drop-shadow(0 0 10px #42e8f0bb)!important;animation:cwi-bot-hover 2.4s ease-in-out infinite!important;will-change:transform!important}
+#cwi-launch .cwi-launch-bot{display:block!important;width:138px!important;height:138px!important;max-width:none!important;object-fit:contain!important;flex:none!important;filter:drop-shadow(0 0 10px #42e8f0bb)!important;animation:cwi-launch-natural-float 3.8s ease-in-out infinite!important;will-change:transform!important}
 @media(max-width:650px){#cwi-launch{right:14px!important;bottom:14px!important;width:66px!important;height:66px!important;min-width:66px!important;min-height:66px!important;padding:0!important;border-width:2px!important}#cwi-launch .cwi-launch-bot{width:64px!important;height:64px!important;max-width:64px!important;animation:none!important;filter:drop-shadow(0 0 7px #42e8f0aa)!important}}
 #cwi-panel{display:none!important;position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;z-index:1201!important;width:min(520px,calc(100vw - 32px))!important;height:min(720px,calc(100dvh - 48px))!important;min-height:0!important;max-height:calc(100dvh - 48px)!important;background:#071a2b!important;color:#eaf7fb!important;border:1px solid #326d83!important;border-radius:18px!important;box-shadow:0 24px 80px #000b!important;overflow:hidden!important;flex-direction:column!important;font-family:system-ui,sans-serif!important}
 #cwi-panel.open{display:flex!important}
@@ -4468,6 +4468,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwi-panel .cwi-eye:nth-of-type(3){animation-delay:2.7s}
 
 @keyframes cwi-bot-hover{0%,100%{transform:translateY(0) rotate(-2deg) scale(1)}50%{transform:translateY(-11px) rotate(2deg) scale(1.055)}}
+@keyframes cwi-launch-natural-float{0%,100%{transform:translate3d(0,0,0) rotate(-.15deg)}50%{transform:translate3d(0,-3px,0) rotate(.25deg)}}
 @keyframes cwi-eye-blink{0%,43%,47%,100%{transform:scaleY(1)}45%{transform:scaleY(.12)}}
 @media(prefers-reduced-motion:reduce){#cwi-launch .cwi-launch-bot,#cwi-panel .cwi-bot,#cwi-launch .cwi-eye,#cwi-panel .cwi-eye{animation:none!important}}
 /* Respect the hidden state toggled by the authentication controller. */
