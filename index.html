@@ -4402,27 +4402,57 @@ body.dark #map-panel .map-report-tools .map-report-button{
 
 
 <style id="coastwatch-intelligence-widget">
-#cwi-launch{position:fixed;right:18px;bottom:18px;z-index:1200;border:1px solid #62e5e7;border-radius:999px;padding:12px 18px;background:linear-gradient(135deg,#0d7887,#0d4b68);color:#f2ffff;font-weight:850;box-shadow:0 10px 30px #001b2c88;display:flex;align-items:center;gap:10px}
-#cwi-launch svg{width:27px;height:27px;flex:none}
-#cwi-panel{display:none;position:fixed;right:18px;bottom:82px;z-index:1201;width:min(430px,calc(100vw - 24px));height:min(650px,calc(100dvh - 110px));min-height:390px;background:#071a2b;color:#eaf7fb;border:1px solid #3a91a6;border-radius:20px;box-shadow:0 24px 75px #0009;overflow:hidden;flex-direction:column;font-family:system-ui,sans-serif}
-#cwi-panel.open{display:flex}
-.cwi-head{display:flex;align-items:center;gap:12px;padding:13px 15px;background:linear-gradient(120deg,#0c2c43,#0d5665);border-bottom:1px solid #387d8b}
-.cwi-bot{width:48px;height:48px;flex:none;filter:drop-shadow(0 0 10px #39d9e688)}
-.cwi-brand{min-width:0;flex:1}.cwi-brand strong{display:block;font-size:16px}.cwi-brand small{display:block;color:#b9d8e2;font-size:11px}
-.cwi-close{background:#145c6b;color:#fff;border:1px solid #65d9df;border-radius:9px;padding:8px 12px}
-.cwi-auth{padding:18px;display:grid;gap:10px;overflow:auto}.cwi-auth h3{margin:0}.cwi-auth p{margin:0;color:#c3d7e0;font-size:13px;line-height:1.5}.cwi-auth label{display:grid;gap:5px;font-size:12px;font-weight:700}.cwi-auth input{width:100%;padding:11px;border-radius:9px;border:1px solid #527387;background:#0b2436;color:#fff;box-sizing:border-box}
-.cwi-btn{background:#0e8792;color:#fff;border:1px solid #55cbd0;border-radius:10px;padding:11px 13px;font-weight:800}.cwi-link{background:none;color:#78e4e5;border:0;text-decoration:underline;padding:5px}
-.cwi-status{font-size:12px;line-height:1.45;color:#ffe0a8}.cwi-status:empty{display:none}
-.cwi-toolbar{display:flex;gap:7px;padding:8px 10px;border-bottom:1px solid #28465a}.cwi-toolbar select{flex:1;min-width:0;background:#0b2436;color:#eaf7fb;border:1px solid #45687c;border-radius:8px;padding:8px}.cwi-toolbar button{background:#16495b;color:#eaf7fb;border:1px solid #3d788b;border-radius:8px;padding:7px 10px;font-size:12px}
-.cwi-messages{flex:1;min-height:0;overflow:auto;padding:13px;display:flex;flex-direction:column;gap:10px}
-.cwi-msg{max-width:91%;padding:10px 12px;border-radius:13px;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
-.cwi-msg.user{align-self:flex-end;background:#087f8c;color:#fff;border-bottom-right-radius:4px}
-.cwi-msg.bot{align-self:flex-start;background:#122f43;border:1px solid #294d61;color:#e9f6fa;border-bottom-left-radius:4px}
-.cwi-msg.bot:before{content:"CWI • ";color:#6fe2df;font-weight:900}
-.cwi-sources{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;padding-top:7px;border-top:1px solid #315368}.cwi-sources a{color:#7be4e5;font-size:11px}
-.cwi-compose{display:flex;gap:8px;padding:10px;border-top:1px solid #28465a}.cwi-compose textarea{flex:1;min-width:0;resize:none;min-height:43px;max-height:100px;background:#0a2234;color:#fff;border:1px solid #42677c;border-radius:10px;padding:10px;font:inherit}.cwi-compose button{background:#087f8c;color:white;border:1px solid #55cbd0;border-radius:10px;padding:0 15px;font-weight:800}
-.cwi-foot{padding:0 12px 11px;color:#9db9c8;font-size:10px;line-height:1.4}
-@media(max-width:600px){#cwi-panel{right:8px;bottom:76px;width:calc(100vw - 16px);height:min(72dvh,620px);min-height:360px;border-radius:17px}#cwi-launch{right:12px;bottom:12px;padding:11px 15px}.cwi-head{padding:10px 12px}}
+/* Compact, Messenger-inspired conversation-first layout */
+#cwi-launch{position:fixed!important;right:18px!important;bottom:18px!important;z-index:1200!important;border:1px solid #62e5e7!important;border-radius:999px!important;padding:10px 15px!important;background:linear-gradient(135deg,#0d7887,#0d4b68)!important;color:#f2ffff!important;font-size:14px!important;font-weight:800!important;box-shadow:0 8px 24px #001b2c88!important;display:flex!important;align-items:center!important;gap:8px!important}
+#cwi-launch svg{width:24px!important;height:24px!important;flex:none!important}
+#cwi-panel{display:none!important;position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;z-index:1201!important;width:min(520px,calc(100vw - 32px))!important;height:min(720px,calc(100dvh - 48px))!important;min-height:0!important;max-height:calc(100dvh - 48px)!important;background:#071a2b!important;color:#eaf7fb!important;border:1px solid #326d83!important;border-radius:18px!important;box-shadow:0 24px 80px #000b!important;overflow:hidden!important;flex-direction:column!important;font-family:system-ui,sans-serif!important}
+#cwi-panel.open{display:flex!important}
+#cwi-panel .cwi-head{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:9px!important;padding:9px 12px!important;background:linear-gradient(120deg,#0c2c43,#0d5665)!important;border-bottom:1px solid #28566a!important;min-height:58px!important}
+#cwi-panel .cwi-bot{width:36px!important;height:36px!important;flex:none!important;filter:drop-shadow(0 0 7px #39d9e688)!important}
+#cwi-panel .cwi-brand{min-width:0!important;flex:1!important}
+#cwi-panel .cwi-brand strong{display:block!important;font-size:14px!important;line-height:1.25!important;margin:0!important}
+#cwi-panel .cwi-brand small{display:block!important;color:#b9d8e2!important;font-size:10px!important;line-height:1.25!important;margin-top:2px!important}
+#cwi-panel .cwi-close{background:#145c6b!important;color:#fff!important;border:1px solid #65d9df!important;border-radius:8px!important;padding:5px 9px!important;font-size:16px!important;min-height:32px!important}
+#cwi-panel .cwi-auth{padding:16px!important;display:grid!important;gap:9px!important;overflow:auto!important}
+#cwi-panel .cwi-auth h3{margin:0!important;font-size:18px!important}
+#cwi-panel .cwi-auth p{margin:0!important;color:#c3d7e0!important;font-size:12px!important;line-height:1.45!important}
+#cwi-panel .cwi-auth label{display:grid!important;gap:4px!important;font-size:11px!important;font-weight:700!important}
+#cwi-panel .cwi-auth input{width:100%!important;padding:9px!important;border-radius:8px!important;border:1px solid #527387!important;background:#0b2436!important;color:#fff!important;box-sizing:border-box!important;font-size:14px!important}
+#cwi-panel .cwi-btn{background:#0e8792!important;color:#fff!important;border:1px solid #55cbd0!important;border-radius:9px!important;padding:9px 12px!important;font-size:13px!important;font-weight:800!important}
+#cwi-panel .cwi-link{background:none!important;color:#78e4e5!important;border:0!important;text-decoration:underline!important;padding:4px!important;font-size:12px!important}
+#cwi-panel .cwi-status{font-size:11px!important;line-height:1.4!important;color:#ffe0a8!important}
+#cwi-panel .cwi-toolbar{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:6px!important;padding:6px 9px!important;border-bottom:1px solid #203e51!important;background:#0a2031!important}
+#cwi-panel .cwi-toolbar select{flex:1!important;width:1px!important;min-width:0!important;background:#0b2436!important;color:#eaf7fb!important;border:1px solid #34576a!important;border-radius:7px!important;padding:6px 7px!important;font-size:11px!important;height:32px!important}
+#cwi-panel .cwi-toolbar button{background:#16495b!important;color:#eaf7fb!important;border:1px solid #3d788b!important;border-radius:7px!important;padding:5px 8px!important;font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;min-height:30px!important}
+#cwi-panel .cwi-messages{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:14px 12px!important;display:flex!important;flex-direction:column!important;gap:9px!important;background:radial-gradient(ellipse at top,#0d2b40 0,#071a2b 68%)!important}
+#cwi-panel .cwi-msg{max-width:82%!important;width:fit-content!important;padding:9px 12px!important;border-radius:16px!important;font-size:13px!important;line-height:1.48!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;box-shadow:0 2px 5px #0002!important}
+#cwi-panel .cwi-msg.user{align-self:flex-end!important;background:linear-gradient(135deg,#087f8c,#096d7b)!important;color:#fff!important;border:0!important;border-bottom-right-radius:5px!important}
+#cwi-panel .cwi-msg.bot{align-self:flex-start!important;background:#153348!important;border:1px solid #294d61!important;color:#e9f6fa!important;border-bottom-left-radius:5px!important}
+#cwi-panel .cwi-msg.bot:before{content:"🤖 CoastWatch"!important;color:#70e3e4!important;font-size:10px!important;font-weight:800!important;display:block!important;margin-bottom:3px!important}
+#cwi-panel .cwi-sources{display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin-top:7px!important;padding-top:6px!important;border-top:1px solid #315368!important}
+#cwi-panel .cwi-sources a{color:#7be4e5!important;font-size:10px!important}
+#cwi-panel .cwi-compose{flex:0 0 auto!important;display:flex!important;align-items:flex-end!important;gap:7px!important;padding:9px 10px!important;border-top:1px solid #28465a!important;background:#091e2e!important}
+#cwi-panel .cwi-compose textarea{flex:1 1 auto!important;width:1px!important;min-width:0!important;resize:none!important;min-height:40px!important;height:40px!important;max-height:84px!important;background:#102a3d!important;color:#fff!important;border:1px solid #3b6278!important;border-radius:20px!important;padding:10px 14px!important;font:13px/1.4 system-ui,sans-serif!important;box-sizing:border-box!important;outline:none!important}
+#cwi-panel .cwi-compose textarea:focus{border-color:#54dce4!important;box-shadow:0 0 0 2px #54dce422!important}
+#cwi-panel .cwi-compose button{flex:0 0 auto!important;background:#087f8c!important;color:white!important;border:1px solid #55cbd0!important;border-radius:18px!important;padding:0 15px!important;height:40px!important;min-height:40px!important;font-size:12px!important;font-weight:800!important}
+#cwi-panel .cwi-foot{flex:0 0 auto!important;padding:0 12px 8px!important;color:#91aebe!important;font-size:9px!important;line-height:1.35!important;background:#091e2e!important}
+@media(max-width:600px){
+ #cwi-launch{right:12px!important;bottom:12px!important;padding:9px 13px!important;font-size:12px!important}
+ #cwi-panel{left:8px!important;top:8px!important;right:8px!important;bottom:8px!important;transform:none!important;width:auto!important;height:auto!important;max-height:none!important;min-height:0!important;border-radius:15px!important}
+ #cwi-panel .cwi-head{padding:8px 10px!important;min-height:52px!important}
+ #cwi-panel .cwi-bot{width:32px!important;height:32px!important}
+ #cwi-panel .cwi-brand strong{font-size:13px!important}
+ #cwi-panel .cwi-brand small{font-size:9px!important}
+ #cwi-panel .cwi-toolbar{gap:5px!important;padding:5px 7px!important}
+ #cwi-panel .cwi-toolbar select{font-size:10px!important;padding:5px!important}
+ #cwi-panel .cwi-toolbar button{font-size:9px!important;padding:5px 6px!important}
+ #cwi-panel .cwi-messages{padding:12px 9px!important;gap:8px!important}
+ #cwi-panel .cwi-msg{max-width:88%!important;font-size:12px!important;padding:8px 10px!important;line-height:1.45!important}
+ #cwi-panel .cwi-compose{padding:7px!important;gap:6px!important}
+ #cwi-panel .cwi-compose textarea{font-size:12px!important;height:38px!important;min-height:38px!important;padding:9px 12px!important}
+ #cwi-panel .cwi-compose button{height:38px!important;min-height:38px!important;padding:0 12px!important;font-size:11px!important}
+ #cwi-panel .cwi-foot{font-size:8px!important;padding:0 9px 7px!important}
+}
 </style>
 <button id="cwi-launch" type="button" aria-expanded="false" aria-controls="cwi-panel">
 <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="cwi-metal" x2="0" y2="1"><stop stop-color="#e7fbff"/><stop offset="1" stop-color="#6bb4c8"/></linearGradient></defs><path d="M32 4v8M28 4h8" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><rect x="9" y="13" width="46" height="40" rx="13" fill="url(#cwi-metal)" stroke="#65dce7" stroke-width="2"/><rect x="14" y="20" width="36" height="25" rx="8" fill="#09263c"/><ellipse cx="24" cy="32" rx="4" ry="5" fill="#65f4ff"/><ellipse cx="40" cy="32" rx="4" ry="5" fill="#65f4ff"/><path d="M25 39q7 5 14 0" fill="none" stroke="#65f4ff" stroke-width="2" stroke-linecap="round"/><path d="M4 28H9M55 28h5" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="57" r="3" fill="#46dce5"/><circle cx="42" cy="57" r="3" fill="#46dce5"/></svg>
