@@ -4509,7 +4509,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
    conversationId=data.conversationId||conversationId;
    appendMessage("assistant",data.answer||"I couldn't prepare an answer.",[...(data.sources||[]),...(data.officialSources||[])]);
    await loadConversations();$ai("cwai-history").value=conversationId||"";
-  }catch(err){pending.remove();appendMessage("assistant",err.message||"The assistant is temporarily unavailable. Please try again.");}
+  }catch(err){pending.remove();let message=err.message||"The assistant is temporarily unavailable. Please try again.";try{if(err.context&&typeof err.context.json==="function"){const payload=await err.context.json();if(payload?.error)message=payload.error;}}catch(_){}appendMessage("assistant",message);}
   finally{busy=false;$ai("cwai-send").disabled=false;input.focus();}
  }
  launch.addEventListener("click",()=>showPanel(!panel.classList.contains("open")));
