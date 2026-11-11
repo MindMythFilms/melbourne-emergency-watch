@@ -1864,12 +1864,11 @@ body.dark .mew-utility-card .mew-recovery-kicker{color:#ffda8c}
  </div>
  <section class="cw-ad-carousel" id="community-partner-ads" aria-label="CoastWatch FL business advertising">
   <div class="cw-ad-slides">
-    <article class="cw-ad-slide cw-ad-veterans is-active" aria-hidden="false"><img src="/assets/sponsors/coastwatch-veterans-flag.gif" alt="CoastWatch FL honors and thanks all who have served. Veterans Day, November 11, 2026." fetchpriority="high"></article>
-    <article class="cw-ad-slide cw-ad-one" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" loading="lazy"></picture></article>
+    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></picture></article>
     <article class="cw-ad-slide cw-ad-two" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-become-a-sponsor-mobile.svg"><img src="/assets/sponsors/coastwatch-become-a-sponsor.svg" alt="Become a CoastWatch FL sponsor — put your business in front of a prepared community" loading="lazy"></picture></article>
     <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-stronger-communities-mobile.svg"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></picture></article>
   </div>
-  <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Advertising space available <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i><i></i></span></div>
+  <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Advertising space available <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
 </section>
   <div class="cw-sponsor-top-cta"><a href="/sponsor.html">Become a Sponsor</a></div>
 </header>
@@ -4404,6 +4403,11 @@ body.dark #map-panel .map-report-tools .map-report-button{
 
 <style id="coastwatch-intelligence-widget">
 /* Compact, Messenger-inspired conversation-first layout */
+/* Comic-style invitation bubble; robot artwork and animation are unchanged. */
+#cwi-invite{position:fixed!important;right:184px!important;bottom:72px!important;z-index:1199!important;max-width:230px!important;padding:12px 16px!important;border:2px solid #0b5269!important;border-radius:22px 22px 22px 6px!important;background:#fff!important;color:#123047!important;box-shadow:0 5px 18px #001b2c44!important;font:700 14px/1.35 system-ui,sans-serif!important;text-align:center!important;pointer-events:none!important}
+#cwi-invite:after{content:"";position:absolute;right:-2px;bottom:-11px;width:18px;height:18px;background:#fff;border-right:2px solid #0b5269;border-bottom:2px solid #0b5269;transform:skew(0deg,35deg) rotate(18deg);clip-path:polygon(0 0,100% 0,100% 100%)}
+@media(max-width:650px){#cwi-invite{right:88px!important;bottom:26px!important;max-width:190px!important;padding:9px 12px!important;font-size:12px!important;border-radius:18px 18px 18px 5px!important}}
+
 #cwi-launch{position:fixed!important;right:24px!important;bottom:24px!important;z-index:1200!important;width:144px!important;height:144px!important;min-width:144px!important;min-height:144px!important;padding:3px!important;border:3px solid #72f4f0!important;border-radius:50%!important;background:radial-gradient(circle at 32% 22%,#1c9ba3,#07506d 72%)!important;color:#f2ffff!important;font-size:0!important;line-height:0!important;box-shadow:0 9px 30px #001b2c99,0 0 25px #35dce677!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important;isolation:isolate!important}
 #cwi-launch .cwi-launch-bot{display:block!important;width:138px!important;height:138px!important;max-width:none!important;object-fit:contain!important;flex:none!important;filter:drop-shadow(0 0 10px #42e8f0bb)!important;animation:cwi-bot-hover 2.4s ease-in-out infinite!important;will-change:transform!important}
 @media(max-width:650px){#cwi-launch{right:14px!important;bottom:14px!important;width:66px!important;height:66px!important;min-width:66px!important;min-height:66px!important;padding:0!important;border-width:2px!important}#cwi-launch .cwi-launch-bot{width:64px!important;height:64px!important;max-width:64px!important;animation:none!important;filter:drop-shadow(0 0 7px #42e8f0aa)!important}}
@@ -4470,6 +4474,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwi-panel .cwi-auth[hidden],
 #cwi-panel #cwi-chat[hidden]{display:none!important}
 </style>
+<div id="cwi-invite" aria-hidden="true">You can chat with me, I will help you!</div>
 <button id="cwi-launch" type="button" aria-label="Open CoastWatch Intelligence" aria-expanded="false" aria-controls="cwi-panel">
 <img class="cwi-launch-bot" src="/assets/coastwatch-robot-hover.gif" alt="" width="70" height="70">
 </button>
