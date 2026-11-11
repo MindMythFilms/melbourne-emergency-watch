@@ -4446,7 +4446,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 (()=>{
  const $ai=id=>document.getElementById(id);
  const launch=$ai("coastwatch-ai-launch"),panel=$ai("coastwatch-ai-panel"),authBox=$ai("cwai-auth"),chatBox=$ai("cwai-chat");
- if(!launch||!window.supabase||!window.db)return;
+ if(!launch||!window.supabase)return;
  const memberDb=window.supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  let session=null,conversationId=null,busy=false;
  function status(message){$ai("cwai-auth-status").textContent=message||"";}
