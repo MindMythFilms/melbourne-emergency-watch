@@ -4404,7 +4404,8 @@ body.dark #map-panel .map-report-tools .map-report-button{
 <style id="coastwatch-intelligence-widget">
 /* Compact, Messenger-inspired conversation-first layout */
 #cwi-launch{position:fixed!important;right:18px!important;bottom:18px!important;z-index:1200!important;border:1px solid #62e5e7!important;border-radius:999px!important;padding:10px 15px!important;background:linear-gradient(135deg,#0d7887,#0d4b68)!important;color:#f2ffff!important;font-size:14px!important;font-weight:800!important;box-shadow:0 8px 24px #001b2c88!important;display:flex!important;align-items:center!important;gap:8px!important}
-#cwi-launch svg{width:24px!important;height:24px!important;flex:none!important}
+#cwi-launch svg{width:52px!important;height:52px!important;flex:none!important}
+@media(max-width:650px){#cwi-launch{min-height:78px!important;padding:8px 17px!important;gap:10px!important}#cwi-launch svg{width:58px!important;height:58px!important}}
 #cwi-panel{display:none!important;position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;z-index:1201!important;width:min(520px,calc(100vw - 32px))!important;height:min(720px,calc(100dvh - 48px))!important;min-height:0!important;max-height:calc(100dvh - 48px)!important;background:#071a2b!important;color:#eaf7fb!important;border:1px solid #326d83!important;border-radius:18px!important;box-shadow:0 24px 80px #000b!important;overflow:hidden!important;flex-direction:column!important;font-family:system-ui,sans-serif!important}
 #cwi-panel.open{display:flex!important}
 #cwi-panel .cwi-head{position:relative!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;padding:14px 48px 12px!important;background:linear-gradient(120deg,#0c2c43,#0d5665)!important;border-bottom:1px solid #28566a!important;min-height:174px!important}
