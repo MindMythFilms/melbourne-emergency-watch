@@ -2176,8 +2176,8 @@ themeButton.addEventListener("click",()=>{const next=document.body.classList.con
 const categories=["flooding","coastal_flooding","storm_damage","tornado_damage","fire","road_hazard","road_closure","power_outage","erosion_washout","other_hazard"];
 const $=id=>document.getElementById(id);
 
-const mewReportPanel=document.getElementById("report-panel"),mewMapPanel=document.getElementById("map-panel"),mewMapElement=document.getElementById("map"),mewReportPlaceholder=document.getElementById("mewMobileReportPlacement"),mewHero=document.querySelector(".hero-visual"),mewLayout=document.querySelector(".layout"),mewMobileLayout=window.matchMedia("(max-width:650px)");
-function mewPlaceReportPanel(){if(!mewReportPanel||!mewMapPanel||!mewMapElement||!mewReportPlaceholder)return;mewMapPanel.insertAdjacentElement("afterend",mewReportPanel);}
+const mewReportPanel=document.getElementById("report-panel"),mewMapPanel=document.getElementById("map-panel"),mewMapElement=document.getElementById("map"),mewReportPlaceholder=document.getElementById("mewMobileReportPlacement"),mewMain=document.querySelector("main"),mewHero=document.querySelector(".hero-visual"),mewLayout=document.querySelector(".layout"),mewMobileLayout=window.matchMedia("(max-width:650px)");
+function mewPlaceReportPanel(){if(!mewReportPanel||!mewMapPanel||!mewMapElement||!mewMain)return;mewMain.appendChild(mewReportPanel);}
 function mewPlaceHero(){if(!mewHero||!mewMapPanel||!mewLayout)return;if(mewMobileLayout.matches){mewLayout.insertBefore(mewHero,mewMapPanel);}else{mewLayout.insertAdjacentElement("beforebegin",mewHero);}}
 mewPlaceReportPanel();mewPlaceHero();if(mewMobileLayout.addEventListener)mewMobileLayout.addEventListener("change",()=>{mewPlaceReportPanel();mewPlaceHero();setTimeout(()=>map.invalidateSize({pan:false}),150);});else mewMobileLayout.addListener(()=>{mewPlaceReportPanel();mewPlaceHero();setTimeout(()=>map.invalidateSize({pan:false}),150);});
 
