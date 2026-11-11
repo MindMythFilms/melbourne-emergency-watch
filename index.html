@@ -4400,4 +4400,80 @@ body.dark #map-panel .map-report-tools .map-report-button{
 })();
 </script>
 
+
+<style id="coastwatch-intelligence-widget">
+#cwi-launch{position:fixed;right:18px;bottom:18px;z-index:1200;border:1px solid #62e5e7;border-radius:999px;padding:12px 18px;background:linear-gradient(135deg,#0d7887,#0d4b68);color:#f2ffff;font-weight:850;box-shadow:0 10px 30px #001b2c88;display:flex;align-items:center;gap:10px}
+#cwi-launch svg{width:27px;height:27px;flex:none}
+#cwi-panel{display:none;position:fixed;right:18px;bottom:82px;z-index:1201;width:min(430px,calc(100vw - 24px));height:min(650px,calc(100dvh - 110px));min-height:390px;background:#071a2b;color:#eaf7fb;border:1px solid #3a91a6;border-radius:20px;box-shadow:0 24px 75px #0009;overflow:hidden;flex-direction:column;font-family:system-ui,sans-serif}
+#cwi-panel.open{display:flex}
+.cwi-head{display:flex;align-items:center;gap:12px;padding:13px 15px;background:linear-gradient(120deg,#0c2c43,#0d5665);border-bottom:1px solid #387d8b}
+.cwi-bot{width:48px;height:48px;flex:none;filter:drop-shadow(0 0 10px #39d9e688)}
+.cwi-brand{min-width:0;flex:1}.cwi-brand strong{display:block;font-size:16px}.cwi-brand small{display:block;color:#b9d8e2;font-size:11px}
+.cwi-close{background:#145c6b;color:#fff;border:1px solid #65d9df;border-radius:9px;padding:8px 12px}
+.cwi-auth{padding:18px;display:grid;gap:10px;overflow:auto}.cwi-auth h3{margin:0}.cwi-auth p{margin:0;color:#c3d7e0;font-size:13px;line-height:1.5}.cwi-auth label{display:grid;gap:5px;font-size:12px;font-weight:700}.cwi-auth input{width:100%;padding:11px;border-radius:9px;border:1px solid #527387;background:#0b2436;color:#fff;box-sizing:border-box}
+.cwi-btn{background:#0e8792;color:#fff;border:1px solid #55cbd0;border-radius:10px;padding:11px 13px;font-weight:800}.cwi-link{background:none;color:#78e4e5;border:0;text-decoration:underline;padding:5px}
+.cwi-status{font-size:12px;line-height:1.45;color:#ffe0a8}.cwi-status:empty{display:none}
+.cwi-toolbar{display:flex;gap:7px;padding:8px 10px;border-bottom:1px solid #28465a}.cwi-toolbar select{flex:1;min-width:0;background:#0b2436;color:#eaf7fb;border:1px solid #45687c;border-radius:8px;padding:8px}.cwi-toolbar button{background:#16495b;color:#eaf7fb;border:1px solid #3d788b;border-radius:8px;padding:7px 10px;font-size:12px}
+.cwi-messages{flex:1;min-height:0;overflow:auto;padding:13px;display:flex;flex-direction:column;gap:10px}
+.cwi-msg{max-width:91%;padding:10px 12px;border-radius:13px;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.cwi-msg.user{align-self:flex-end;background:#087f8c;color:#fff;border-bottom-right-radius:4px}
+.cwi-msg.bot{align-self:flex-start;background:#122f43;border:1px solid #294d61;color:#e9f6fa;border-bottom-left-radius:4px}
+.cwi-msg.bot:before{content:"CWI • ";color:#6fe2df;font-weight:900}
+.cwi-sources{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;padding-top:7px;border-top:1px solid #315368}.cwi-sources a{color:#7be4e5;font-size:11px}
+.cwi-compose{display:flex;gap:8px;padding:10px;border-top:1px solid #28465a}.cwi-compose textarea{flex:1;min-width:0;resize:none;min-height:43px;max-height:100px;background:#0a2234;color:#fff;border:1px solid #42677c;border-radius:10px;padding:10px;font:inherit}.cwi-compose button{background:#087f8c;color:white;border:1px solid #55cbd0;border-radius:10px;padding:0 15px;font-weight:800}
+.cwi-foot{padding:0 12px 11px;color:#9db9c8;font-size:10px;line-height:1.4}
+@media(max-width:600px){#cwi-panel{right:8px;bottom:76px;width:calc(100vw - 16px);height:min(72dvh,620px);min-height:360px;border-radius:17px}#cwi-launch{right:12px;bottom:12px;padding:11px 15px}.cwi-head{padding:10px 12px}}
+</style>
+<button id="cwi-launch" type="button" aria-expanded="false" aria-controls="cwi-panel">
+<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="cwi-metal" x2="0" y2="1"><stop stop-color="#e7fbff"/><stop offset="1" stop-color="#6bb4c8"/></linearGradient></defs><path d="M32 4v8M28 4h8" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><rect x="9" y="13" width="46" height="40" rx="13" fill="url(#cwi-metal)" stroke="#65dce7" stroke-width="2"/><rect x="14" y="20" width="36" height="25" rx="8" fill="#09263c"/><ellipse cx="24" cy="32" rx="4" ry="5" fill="#65f4ff"/><ellipse cx="40" cy="32" rx="4" ry="5" fill="#65f4ff"/><path d="M25 39q7 5 14 0" fill="none" stroke="#65f4ff" stroke-width="2" stroke-linecap="round"/><path d="M4 28H9M55 28h5" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="57" r="3" fill="#46dce5"/><circle cx="42" cy="57" r="3" fill="#46dce5"/></svg>
+CoastWatch Intelligence
+</button>
+<section id="cwi-panel" role="dialog" aria-label="CoastWatch Intelligence" aria-modal="false">
+ <div class="cwi-head">
+  <svg class="cwi-bot" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="cwi-head-metal" x2="0" y2="1"><stop stop-color="#f2fdff"/><stop offset="1" stop-color="#78b8cb"/></linearGradient></defs><path d="M32 3v8" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><rect x="8" y="12" width="48" height="43" rx="14" fill="url(#cwi-head-metal)" stroke="#6ee8f0" stroke-width="2"/><rect x="13" y="20" width="38" height="26" rx="9" fill="#09263c"/><ellipse cx="24" cy="32" rx="4" ry="5" fill="#62f4ff"/><ellipse cx="40" cy="32" rx="4" ry="5" fill="#62f4ff"/><path d="M25 39q7 5 14 0" fill="none" stroke="#62f4ff" stroke-width="2" stroke-linecap="round"/><path d="M3 29h5M56 29h5" stroke="#8ffcff" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="59" r="3" fill="#46dce5"/><circle cx="42" cy="59" r="3" fill="#46dce5"/></svg>
+  <div class="cwi-brand"><strong>CoastWatch Intelligence</strong><small>Your Brevard County information robot · English / Español</small></div>
+  <button id="cwi-close" class="cwi-close" type="button" aria-label="Close">✕</button>
+ </div>
+ <div id="cwi-auth" class="cwi-auth">
+  <h3>Meet your CoastWatch robot</h3>
+  <p>Sign in or create a free CoastWatch account to ask about local weather, alerts, community reports, map zones and News Desk updates. This assistant uses CoastWatch data and public feeds—no paid AI API.</p>
+  <label>Email<input id="cwi-email" type="email" autocomplete="email" maxlength="254"></label>
+  <label>Password<input id="cwi-password" type="password" autocomplete="current-password" minlength="8" maxlength="128"></label>
+  <div id="cwi-auth-status" class="cwi-status" role="status"></div>
+  <button id="cwi-signin" class="cwi-btn" type="button">Sign in</button>
+  <button id="cwi-signup" class="cwi-link" type="button">Create a free account</button>
+ </div>
+ <div id="cwi-chat" hidden style="display:none;flex:1;min-height:0;flex-direction:column">
+  <div class="cwi-toolbar"><select id="cwi-history" aria-label="Previous conversations"><option value="">Recent conversations</option></select><button id="cwi-new" type="button">New chat</button><button id="cwi-signout" type="button">Sign out</button></div>
+  <div id="cwi-messages" class="cwi-messages" aria-live="polite"><div class="cwi-msg bot">Hello! I'm your CoastWatch robot. Ask me about Brevard weather, active alerts, flooding, road hazards, outages, or the latest News Desk updates.</div></div>
+  <form id="cwi-form" class="cwi-compose"><textarea id="cwi-input" maxlength="3000" rows="2" placeholder="Ask CoastWatch Intelligence…" aria-label="Your question" required></textarea><button id="cwi-send" type="submit">Send</button></form>
+  <div class="cwi-foot">Data assistant, not a government agency or emergency service. Community reports may be unverified. For immediate danger call 911. Never enter floodwater.</div>
+ </div>
+</section>
+<script id="coastwatch-intelligence-client">
+(()=>{
+ const $=id=>document.getElementById(id),launch=$("cwi-launch"),panel=$("cwi-panel");
+ if(!launch||!window.supabase)return;
+ const client=window.supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ let session=null,conversationId=null,busy=false;
+ const status=m=>$("cwi-auth-status").textContent=m||"";
+ const mode=on=>{$("cwi-auth").hidden=on;$("cwi-auth").style.display=on?"none":"grid";$("cwi-chat").hidden=!on;$("cwi-chat").style.display=on?"flex":"none";};
+ function bubble(role,content,sources=[]){const el=document.createElement("div");el.className="cwi-msg "+(role==="user"?"user":"bot");el.textContent=content;if(sources.length){const wrap=document.createElement("div");wrap.className="cwi-sources";sources.forEach(src=>{if(!src?.url||!/^https?:\/\//i.test(src.url))return;const a=document.createElement("a");a.href=src.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=src.title||src.url;wrap.appendChild(a)});el.appendChild(wrap)}$("cwi-messages").appendChild(el);$("cwi-messages").scrollTop=$("cwi-messages").scrollHeight;}
+ function reset(){conversationId=null;$("cwi-messages").replaceChildren();bubble("bot","Hello! I'm your CoastWatch robot. Ask about local weather, NWS alerts, flooding, road hazards, power outages or News Desk updates.");}
+ async function history(){const sel=$("cwi-history");sel.replaceChildren(new Option("Recent conversations",""));const {data,error}=await client.from("coastwatch_ai_conversations").select("id,title").order("updated_at",{ascending:false}).limit(20);if(error){console.warn(error);return}(data||[]).forEach(c=>sel.add(new Option(c.title||"Conversation",c.id)));}
+ async function load(id){if(!id){reset();return}const {data,error}=await client.from("coastwatch_ai_messages").select("role,content").eq("conversation_id",id).order("created_at",{ascending:true}).limit(40);if(error){bubble("bot","I couldn't load that conversation.");return}conversationId=id;$("cwi-messages").replaceChildren();(data||[]).forEach(m=>bubble(m.role,m.content));}
+ async function refresh(){const {data}=await client.auth.getSession();session=data?.session||null;mode(!!session);if(session)await history();}
+ async function signin(){const email=$("cwi-email").value.trim(),password=$("cwi-password").value;if(!email||!password){status("Enter your email and password.");return}status("Signing in…");const {data,error}=await client.auth.signInWithPassword({email,password});if(error){status(error.message);return}session=data.session;mode(true);status("");reset();await history();}
+ async function signup(){const email=$("cwi-email").value.trim(),password=$("cwi-password").value;if(!email||password.length<8){status("Enter a valid email and password with at least 8 characters.");return}status("Creating account…");const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error){status(error.message);return}if(data.session){session=data.session;mode(true);status("");reset();await history()}else status("Account created. Check your email to confirm, then sign in.");}
+ async function send(e){e.preventDefault();if(busy||!session)return;const input=$("cwi-input"),message=input.value.trim();if(!message)return;busy=true;$("cwi-send").disabled=true;input.value="";bubble("user",message);const pending=document.createElement("div");pending.className="cwi-msg bot";pending.textContent="Checking CoastWatch data and official feeds…";$("cwi-messages").appendChild(pending);try{const {data,error}=await client.functions.invoke("coastwatch-ai",{body:{message,conversationId}});pending.remove();if(error)throw error;if(data?.error)throw new Error(data.error);conversationId=data.conversationId||conversationId;bubble("bot",data.answer||"I couldn't prepare an answer.",data.sources||[]);await history();$("cwi-history").value=conversationId||"";}catch(err){pending.remove();let msg=err?.message||"The assistant is temporarily unavailable.";try{if(err.context?.json){const p=await err.context.json();if(p.error)msg=p.error}}catch(_){}bubble("bot",msg)}finally{busy=false;$("cwi-send").disabled=false;input.focus();}}
+ launch.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);launch.setAttribute("aria-expanded",String(open));if(open)refresh()});
+ $("cwi-close").addEventListener("click",()=>{panel.classList.remove("open");launch.setAttribute("aria-expanded","false")});
+ $("cwi-signin").addEventListener("click",signin);$("cwi-signup").addEventListener("click",signup);
+ $("cwi-signout").addEventListener("click",async()=>{await client.auth.signOut();session=null;conversationId=null;mode(false);status("Signed out.")});
+ $("cwi-new").addEventListener("click",reset);$("cwi-history").addEventListener("change",e=>load(e.target.value));$("cwi-form").addEventListener("submit",send);
+ $("cwi-input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("cwi-form").requestSubmit()}});
+ client.auth.onAuthStateChange((_event,s)=>{session=s;mode(!!s);if(s)history()});mode(false);
+})();
+</script>
+
 </body></html>
