@@ -4468,15 +4468,6 @@ CoastWatch Intelligence
   <div class="cwi-brand"><strong>CoastWatch Intelligence</strong><small>Your Brevard County information robot · English / Español</small></div>
   <button id="cwi-close" class="cwi-close" type="button" aria-label="Close">✕</button>
  </div>
- <div id="cwi-auth" class="cwi-auth">
-  <h3>Meet your CoastWatch robot</h3>
-  <p>Sign in or create a free CoastWatch account to ask about local weather, alerts, community reports, map zones and News Desk updates. This assistant uses CoastWatch data and public feeds—no paid AI API.</p>
-  <label>Email<input id="cwi-email" type="email" autocomplete="email" maxlength="254"></label>
-  <label>Password<input id="cwi-password" type="password" autocomplete="current-password" minlength="8" maxlength="128"></label>
-  <div id="cwi-auth-status" class="cwi-status" role="status"></div>
-  <button id="cwi-signin" class="cwi-btn" type="button">Sign in</button>
-  <button id="cwi-signup" class="cwi-link" type="button">Create a free account</button>
- </div>
  <div id="cwi-chat" hidden style="display:none;flex:1;min-height:0;flex-direction:column">
   <div class="cwi-toolbar"><select id="cwi-history" aria-label="Previous conversations"><option value="">Recent conversations</option></select><button id="cwi-new" type="button">New chat</button><button id="cwi-signout" type="button">Sign out</button></div>
   <div id="cwi-messages" class="cwi-messages" aria-live="polite"><div class="cwi-msg bot">Hello! I'm your CoastWatch robot. Ask me about Brevard weather, active alerts, flooding, road hazards, outages, or the latest News Desk updates.</div></div>
@@ -4485,28 +4476,39 @@ CoastWatch Intelligence
  </div>
 </section>
 <script id="coastwatch-intelligence-client">
-(()=>{
+(()=> {
  const $=id=>document.getElementById(id),launch=$("cwi-launch"),panel=$("cwi-panel");
  if(!launch||!window.supabase)return;
  const client=window.supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
- let session=null,conversationId=null,busy=false;
- const status=m=>$("cwi-auth-status").textContent=m||"";
- const mode=on=>{$("cwi-auth").hidden=on;$("cwi-auth").style.display=on?"none":"grid";$("cwi-chat").hidden=!on;$("cwi-chat").style.display=on?"flex":"none";};
- function bubble(role,content,sources=[]){const el=document.createElement("div");el.className="cwi-msg "+(role==="user"?"user":"bot");el.textContent=content;if(sources.length){const wrap=document.createElement("div");wrap.className="cwi-sources";sources.forEach(src=>{if(!src?.url||!/^https?:\/\//i.test(src.url))return;const a=document.createElement("a");a.href=src.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=src.title||src.url;wrap.appendChild(a)});el.appendChild(wrap)}$("cwi-messages").appendChild(el);$("cwi-messages").scrollTop=$("cwi-messages").scrollHeight;}
- function reset(){conversationId=null;$("cwi-messages").replaceChildren();bubble("bot","Hello! I'm your CoastWatch robot. Ask about local weather, NWS alerts, flooding, road hazards, power outages or News Desk updates.");}
- async function history(){const sel=$("cwi-history");sel.replaceChildren(new Option("Recent conversations",""));const {data,error}=await client.from("coastwatch_ai_conversations").select("id,title").order("updated_at",{ascending:false}).limit(20);if(error){console.warn(error);return}(data||[]).forEach(c=>sel.add(new Option(c.title||"Conversation",c.id)));}
- async function load(id){if(!id){reset();return}const {data,error}=await client.from("coastwatch_ai_messages").select("role,content").eq("conversation_id",id).order("created_at",{ascending:true}).limit(40);if(error){bubble("bot","I couldn't load that conversation.");return}conversationId=id;$("cwi-messages").replaceChildren();(data||[]).forEach(m=>bubble(m.role,m.content));}
- async function refresh(){const {data}=await client.auth.getSession();session=data?.session||null;mode(!!session);if(session)await history();}
- async function signin(){const email=$("cwi-email").value.trim(),password=$("cwi-password").value;if(!email||!password){status("Enter your email and password.");return}status("Signing in…");const {data,error}=await client.auth.signInWithPassword({email,password});if(error){status(error.message);return}session=data.session;mode(true);status("");reset();await history();}
- async function signup(){const email=$("cwi-email").value.trim(),password=$("cwi-password").value;if(!email||password.length<8){status("Enter a valid email and password with at least 8 characters.");return}status("Creating account…");const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error){status(error.message);return}if(data.session){session=data.session;mode(true);status("");reset();await history()}else status("Account created. Check your email to confirm, then sign in.");}
- async function send(e){e.preventDefault();if(busy||!session)return;const input=$("cwi-input"),message=input.value.trim();if(!message)return;busy=true;$("cwi-send").disabled=true;input.value="";bubble("user",message);const pending=document.createElement("div");pending.className="cwi-msg bot";pending.textContent="Checking CoastWatch data and official feeds…";$("cwi-messages").appendChild(pending);try{const {data,error}=await client.functions.invoke("coastwatch-ai",{body:{message,conversationId}});pending.remove();if(error)throw error;if(data?.error)throw new Error(data.error);conversationId=data.conversationId||conversationId;bubble("bot",data.answer||"I couldn't prepare an answer.",data.sources||[]);await history();$("cwi-history").value=conversationId||"";}catch(err){pending.remove();let msg=err?.message||"The assistant is temporarily unavailable.";try{if(err.context?.json){const p=await err.context.json();if(p.error)msg=p.error}}catch(_){}bubble("bot",msg)}finally{busy=false;$("cwi-send").disabled=false;input.focus();}}
- launch.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);launch.setAttribute("aria-expanded",String(open));if(open)refresh()});
+ let session=null,conversationId=null,busy=false,starting=false;
+ const mode=on=>{$("cwi-chat").hidden=!on;$("cwi-chat").style.display=on?"flex":"none";};
+ function bubble(role,content,sources=[]){const el=document.createElement("div");el.className="cwi-msg "+(role==="user"?"user":"bot");el.textContent=content;if(sources.length){const wrap=document.createElement("div");wrap.className="cwi-sources";sources.forEach(src=>{if(!src?.url||!/^https?:\\/\\//i.test(src.url))return;const a=document.createElement("a");a.href=src.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=src.title||src.url;wrap.appendChild(a)});el.appendChild(wrap)}$("cwi-messages").appendChild(el);$("cwi-messages").scrollTop=$("cwi-messages").scrollHeight;}
+ function reset(){conversationId=null;$("cwi-messages").replaceChildren();bubble("bot","Hi! I'm CoastWatch Intelligence, your community information robot. Ask me about local weather, alerts, flooding, road hazards, power outages, shelters, or News Desk updates. You don't need an account to chat.");}
+ async function startGuestSession(){
+   if(starting)return;starting=true;mode(true);
+   const msg=$("cwi-messages");msg.replaceChildren();bubble("bot","Connecting to CoastWatch…");
+   try{
+     const current=await client.auth.getSession();
+     if(current.data?.session){session=current.data.session;}
+     else{
+       const {data,error}=await client.auth.signInAnonymously();
+       if(error)throw error;
+       session=data.session;
+     }
+     msg.replaceChildren();reset();
+   }catch(err){
+     msg.replaceChildren();
+     bubble("bot","I couldn't start a guest chat. Please try again in a moment. "+(err?.message||""));
+   }finally{starting=false;}
+ }
+ async function send(e){e.preventDefault();if(busy||!session)return;const input=$("cwi-input"),message=input.value.trim();if(!message)return;busy=true;$("cwi-send").disabled=true;input.value="";bubble("user",message);const pending=document.createElement("div");pending.className="cwi-msg bot";pending.textContent="Checking CoastWatch data and official feeds…";$("cwi-messages").appendChild(pending);try{const {data,error}=await client.functions.invoke("coastwatch-ai",{body:{message,conversationId}});pending.remove();if(error)throw error;if(data?.error)throw new Error(data.error);conversationId=data.conversationId||conversationId;bubble("bot",data.answer||"I couldn't prepare an answer.",data.sources||[]);}catch(err){pending.remove();let msg=err?.message||"The assistant is temporarily unavailable.";try{if(err.context?.json){const p=await err.context.json();if(p.error)msg=p.error}}catch(_){}bubble("bot",msg)}finally{busy=false;$("cwi-send").disabled=false;input.focus();}}
+ launch.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);launch.setAttribute("aria-expanded",String(open));if(open)startGuestSession()});
  $("cwi-close").addEventListener("click",()=>{panel.classList.remove("open");launch.setAttribute("aria-expanded","false")});
- $("cwi-signin").addEventListener("click",signin);$("cwi-signup").addEventListener("click",signup);
- $("cwi-signout").addEventListener("click",async()=>{await client.auth.signOut();session=null;conversationId=null;mode(false);status("Signed out.")});
- $("cwi-new").addEventListener("click",reset);$("cwi-history").addEventListener("change",e=>load(e.target.value));$("cwi-form").addEventListener("submit",send);
+ $("cwi-new").addEventListener("click",reset);
+ $("cwi-form").addEventListener("submit",send);
  $("cwi-input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("cwi-form").requestSubmit()}});
- client.auth.onAuthStateChange((_event,s)=>{session=s;mode(!!s);if(s)history()});mode(false);
+ client.auth.onAuthStateChange((_event,s)=>{session=s;});
+ mode(true);
 })();
 </script>
 
