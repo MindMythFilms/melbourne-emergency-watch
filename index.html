@@ -4404,8 +4404,8 @@ body.dark #map-panel .map-report-tools .map-report-button{
 <style id="coastwatch-intelligence-widget">
 /* Compact, Messenger-inspired conversation-first layout */
 #cwi-launch{position:fixed!important;right:18px!important;bottom:18px!important;z-index:1200!important;width:72px!important;height:72px!important;min-width:72px!important;min-height:72px!important;padding:5px!important;border:2px solid #72f4f0!important;border-radius:50%!important;background:radial-gradient(circle at 32% 22%,#1c9ba3,#07506d 72%)!important;color:#f2ffff!important;font-size:0!important;line-height:0!important;box-shadow:0 7px 24px #001b2c99,0 0 18px #35dce655!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important}
-#cwi-launch svg{width:66px!important;height:66px!important;flex:none!important;overflow:visible!important}
-@media(max-width:650px){#cwi-launch{right:14px!important;bottom:14px!important;width:66px!important;height:66px!important;min-width:66px!important;min-height:66px!important;padding:3px!important}#cwi-launch svg{width:60px!important;height:60px!important}}
+#cwi-launch .cwi-launch-bot{display:block!important;width:70px!important;height:70px!important;object-fit:contain!important;flex:none!important;filter:drop-shadow(0 0 7px #42e8f0aa)!important}
+@media(max-width:650px){#cwi-launch{right:14px!important;bottom:14px!important;width:66px!important;height:66px!important;min-width:66px!important;min-height:66px!important;padding:0!important}#cwi-launch .cwi-launch-bot{width:64px!important;height:64px!important}}
 #cwi-panel{display:none!important;position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;z-index:1201!important;width:min(520px,calc(100vw - 32px))!important;height:min(720px,calc(100dvh - 48px))!important;min-height:0!important;max-height:calc(100dvh - 48px)!important;background:#071a2b!important;color:#eaf7fb!important;border:1px solid #326d83!important;border-radius:18px!important;box-shadow:0 24px 80px #000b!important;overflow:hidden!important;flex-direction:column!important;font-family:system-ui,sans-serif!important}
 #cwi-panel.open{display:flex!important}
 #cwi-panel .cwi-head{position:relative!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;padding:14px 48px 12px!important;background:linear-gradient(120deg,#0c2c43,#0d5665)!important;border-bottom:1px solid #28566a!important;min-height:174px!important}
@@ -4458,10 +4458,10 @@ body.dark #map-panel .map-report-tools .map-report-button{
 /* Friendly robot motion: gentle hover, occasional blink and antenna pulse. */
 #cwi-launch .cwi-launch-bot{transform-origin:50% 55%;animation:cwi-bot-hover 3.2s ease-in-out infinite}\n#cwi-launch .cwi-thrust{transform-origin:50% 72%;animation:cwi-thrust-pulse .7s ease-in-out infinite alternate}\n@keyframes cwi-thrust-pulse{from{opacity:.65;transform:scaleY(.78)}to{opacity:1;transform:scaleY(1.12)}}
 #cwi-panel .cwi-bot{transform-origin:50% 55%;animation:cwi-bot-hover 3.8s ease-in-out infinite}
-#cwi-launch .cwi-eye,#cwi-panel .cwi-eye{transform-box:fill-box;transform-origin:center;animation:cwi-eye-blink 5.2s infinite}
-#cwi-launch .cwi-eye:nth-of-type(2),#cwi-panel .cwi-eye:nth-of-type(2){animation-delay:.12s}
-#cwi-launch .cwi-eye:nth-of-type(3),#cwi-panel .cwi-eye:nth-of-type(3){animation-delay:2.7s}
-#cwi-launch .cwi-launch-bot{filter:drop-shadow(0 0 5px #42e8f0aa)}
+#cwi-panel .cwi-eye{transform-box:fill-box;transform-origin:center;animation:cwi-eye-blink 5.2s infinite}
+#cwi-panel .cwi-eye:nth-of-type(2){animation-delay:.12s}
+#cwi-panel .cwi-eye:nth-of-type(3){animation-delay:2.7s}
+
 @keyframes cwi-bot-hover{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-3px) rotate(1deg)}}
 @keyframes cwi-eye-blink{0%,43%,47%,100%{transform:scaleY(1)}45%{transform:scaleY(.12)}}
 @media(prefers-reduced-motion:reduce){#cwi-launch .cwi-launch-bot,#cwi-panel .cwi-bot,#cwi-launch .cwi-eye,#cwi-panel .cwi-eye{animation:none!important}}
@@ -4470,30 +4470,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwi-panel #cwi-chat[hidden]{display:none!important}
 </style>
 <button id="cwi-launch" type="button" aria-label="Open CoastWatch Intelligence" aria-expanded="false" aria-controls="cwi-panel">
-<svg class="cwi-launch-bot" viewBox="0 0 100 100" aria-hidden="true">
-<defs>
- <linearGradient id="cwi-metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".48" stop-color="#b9dce8"/><stop offset="1" stop-color="#547f99"/></linearGradient>
- <linearGradient id="cwi-visor" x2="0" y2="1"><stop stop-color="#123b55"/><stop offset="1" stop-color="#031a2c"/></linearGradient>
- <linearGradient id="cwi-flame" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".35" stop-color="#70ffff"/><stop offset="1" stop-color="#00a9ff" stop-opacity="0"/></linearGradient>
-</defs>
-<!-- twin glowing thrusters -->
-<path d="M34 72l-5 21 10-12 4-9zm30 0 5 21-10-12-4-9z" fill="url(#cwi-flame)" class="cwi-thrust"/>
-<ellipse cx="36" cy="74" rx="7" ry="4" fill="#163c55" stroke="#8ffcff" stroke-width="2"/>
-<ellipse cx="64" cy="74" rx="7" ry="4" fill="#163c55" stroke="#8ffcff" stroke-width="2"/>
-<!-- antenna -->
-<path d="M50 13V7" stroke="#bafcff" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="6" r="4" fill="#7ffcff" stroke="#fff" stroke-width="1.5"/>
-<!-- compact space helmet -->
-<path d="M18 43c0-21 13-32 32-32s32 11 32 32v17c0 10-8 17-18 17H36c-10 0-18-7-18-17z" fill="url(#cwi-metal)" stroke="#e5ffff" stroke-width="2"/>
-<path d="M11 43c0-6 4-10 8-10v23c-4 0-8-4-8-13zm78 0c0-6-4-10-8-10v23c4 0 8-4 8-13z" fill="#287b98" stroke="#8ffcff" stroke-width="2"/>
-<rect x="23" y="30" width="54" height="34" rx="13" fill="url(#cwi-visor)" stroke="#63e8f1" stroke-width="2"/>
-<path d="M34 45q6-9 12 0" fill="none" stroke="#80ffff" stroke-width="4" stroke-linecap="round" class="cwi-eye"/>
-<path d="M54 45q6-9 12 0" fill="none" stroke="#80ffff" stroke-width="4" stroke-linecap="round" class="cwi-eye"/>
-<path d="M43 55q7 5 14 0" fill="none" stroke="#80ffff" stroke-width="2" stroke-linecap="round"/>
-<!-- chest plate and coastal insignia -->
-<path d="M31 67h38l7 13H24z" fill="#173d56" stroke="#8edce9" stroke-width="1.5"/>
-<path d="M39 76q11-7 22 0" fill="none" stroke="#5ffff1" stroke-width="2.5" stroke-linecap="round"/>
-<circle cx="50" cy="75" r="2" fill="#fff"/>
-</svg>
+<img class="cwi-launch-bot" src="/assets/coastwatch-robot-hover.gif" alt="" width="70" height="70">
 </button>
 <section id="cwi-panel" role="dialog" aria-label="CoastWatch Intelligence" aria-modal="false">
  <div class="cwi-head cwi-hero">
