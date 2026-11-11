@@ -4404,9 +4404,11 @@ body.dark #map-panel .map-report-tools .map-report-button{
 <style id="coastwatch-intelligence-widget">
 /* Compact, Messenger-inspired conversation-first layout */
 /* Comic-style invitation bubble; robot artwork and animation are unchanged. */
-#cwi-invite{position:fixed!important;right:184px!important;bottom:72px!important;z-index:1199!important;max-width:230px!important;padding:12px 16px!important;border:2px solid #0b5269!important;border-radius:22px 22px 22px 6px!important;background:#fff!important;color:#123047!important;box-shadow:0 5px 18px #001b2c44!important;font:700 14px/1.35 system-ui,sans-serif!important;text-align:center!important;pointer-events:none!important}
-#cwi-invite:after{content:"";position:absolute;right:-2px;bottom:-11px;width:18px;height:18px;background:#fff;border-right:2px solid #0b5269;border-bottom:2px solid #0b5269;transform:skew(0deg,35deg) rotate(18deg);clip-path:polygon(0 0,100% 0,100% 100%)}
-@media(max-width:650px){#cwi-invite{right:88px!important;bottom:26px!important;max-width:190px!important;padding:9px 12px!important;font-size:12px!important;border-radius:18px 18px 18px 5px!important}}
+#cwi-invite{position:fixed!important;right:30px!important;bottom:174px!important;z-index:1199!important;max-width:180px!important;padding:8px 11px!important;border:1.5px solid #0b5269!important;border-radius:15px 15px 4px 15px!important;background:#fff!important;color:#123047!important;box-shadow:0 4px 14px #001b2c33!important;font:650 12px/1.3 system-ui,sans-serif!important;text-align:center!important;pointer-events:none!important;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
+#cwi-invite:after{content:"";position:absolute;right:17px;bottom:-7px;width:12px;height:12px;background:#fff;border-right:1.5px solid #0b5269;border-bottom:1.5px solid #0b5269;transform:rotate(45deg)}
+#cwi-invite.cwi-invite-hidden{opacity:0!important;visibility:hidden!important}
+@media(max-width:650px){#cwi-invite{right:10px!important;bottom:84px!important;max-width:158px!important;padding:7px 9px!important;font-size:11px!important;border-radius:13px 13px 4px 13px!important}}
+@media(prefers-reduced-motion:reduce){#cwi-invite{transition:none!important}}
 
 #cwi-launch{position:fixed!important;right:24px!important;bottom:24px!important;z-index:1200!important;width:144px!important;height:144px!important;min-width:144px!important;min-height:144px!important;padding:3px!important;border:3px solid #72f4f0!important;border-radius:50%!important;background:radial-gradient(circle at 32% 22%,#1c9ba3,#07506d 72%)!important;color:#f2ffff!important;font-size:0!important;line-height:0!important;box-shadow:0 9px 30px #001b2c99,0 0 25px #35dce677!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important;isolation:isolate!important}
 #cwi-launch .cwi-launch-bot{display:block!important;width:138px!important;height:138px!important;max-width:none!important;object-fit:contain!important;flex:none!important;filter:drop-shadow(0 0 10px #42e8f0bb)!important;animation:cwi-launch-natural-float 3.8s ease-in-out infinite!important;will-change:transform!important}
@@ -4476,6 +4478,9 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwi-panel #cwi-chat[hidden]{display:none!important}
 </style>
 <div id="cwi-invite" aria-hidden="true">You can chat with me, I will help you!</div>
+<script>
+(()=>{const invite=document.getElementById("cwi-invite");if(invite)window.setTimeout(()=>invite.classList.add("cwi-invite-hidden"),60000)})();
+</script>
 <button id="cwi-launch" type="button" aria-label="Open CoastWatch Intelligence" aria-expanded="false" aria-controls="cwi-panel">
 <img class="cwi-launch-bot" src="/assets/coastwatch-robot-hover.gif" alt="" width="70" height="70">
 </button>
