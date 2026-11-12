@@ -209,7 +209,7 @@ body:before{
 }
 
 /* Editorial review workspace */
-.admin-tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.admin-tabs{grid-template-columns:repeat(6,minmax(0,1fr))!important}
 .editorial-panel .pad{padding:22px}
 .editorial-heading,.editorial-queue-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .editorial-heading h2{margin:4px 0;font:800 23px Manrope,sans-serif;color:#f2fbff}
@@ -241,8 +241,8 @@ body:before{
 .editorial-item .actions{margin-top:12px}
 .editorial-item .actions button{font-size:12px}
 .editorial-readonly{color:#a9c3d1;font-size:12px;margin-top:8px}
-@media(max-width:900px){.admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-@media(max-width:600px){.editorial-panel .pad{padding:13px}.editorial-form-grid,.editorial-item-grid{grid-template-columns:1fr}.editorial-wide,.editorial-item-grid .wide{grid-column:auto}.editorial-stats{gap:7px}.editorial-stats>div{padding:10px}.editorial-stats b{font-size:21px}.editorial-composer{padding:12px}.editorial-item{padding:12px}.editorial-queue-head select{width:100%}}
+@media(max-width:1100px){.admin-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:600px){.admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.editorial-panel .pad{padding:13px}.editorial-form-grid,.editorial-item-grid{grid-template-columns:1fr}.editorial-wide,.editorial-item-grid .wide{grid-column:auto}.editorial-stats{gap:7px}.editorial-stats>div{padding:10px}.editorial-stats b{font-size:21px}.editorial-composer{padding:12px}.editorial-item{padding:12px}.editorial-queue-head select{width:100%}}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
@@ -252,6 +252,7 @@ body:before{
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="learning">AI Learning <span id="tabLearningCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="map">Map operations</button>
 </nav>
 <div class="admin-tab-panel active" id="adminTabReports" role="tabpanel"><div class="stats report-stats"><div class="stat"><b id="total">0</b><span>All reports</span></div><div class="stat"><b id="open">0</b><span>Still open</span></div><div class="stat"><b id="pending">0</b><span>Unverified</span></div><div class="stat"><b id="published">0</b><span>Confirmed</span></div><div class="stat"><b id="resolved">0</b><span>Resolved</span></div><div class="stat"><b id="rejected">0</b><span>Rejected</span></div></div></div>
@@ -278,6 +279,19 @@ body:before{
    </form>
    <div class="editorial-queue-head"><div><h3>Review queue</h3><span class="meta">Edit the copy, verify the source, then publish or reject.</span></div><select id="editorialFilter" aria-label="Filter updates"><option value="pending">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="all">All updates</option></select></div>
    <div id="editorialQueue" aria-live="polite"><div class="empty">Loading editorial updates…</div></div>
+  </div>
+ </section>
+</div>
+<div class="admin-tab-panel" id="adminTabLearning" role="tabpanel" hidden>
+ <section class="panel editorial-panel">
+  <div class="pad">
+   <div class="editorial-heading"><div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Adaptive Learning Center</h2><p>Review questions the assistant could not answer. Approve only accurate, useful information. Visitor messages are suggestions, not verified facts.</p></div><button type="button" class="gray" id="refreshLearning">Refresh learning queue</button></div>
+   <div class="editorial-stats"><div><b id="learningPendingCount">0</b><span>Questions to review</span></div><div><b id="learningApprovedCount">0</b><span>Approved knowledge</span></div><div><b id="learningRejectedCount">0</b><span>Rejected questions</span></div></div>
+   <div id="learningMsg" class="msg hidden" role="status" aria-live="polite"></div>
+   <div class="editorial-queue-head"><div><h3>Unanswered questions</h3><span class="meta">Repeated questions rise to the top. Approving a response makes it available to everyone.</span></div><select id="learningFilter" aria-label="Filter learning questions"><option value="pending">Awaiting review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All questions</option></select></div>
+   <div id="learningQueue" aria-live="polite"><div class="empty">Loading learning questions…</div></div>
+   <div class="editorial-queue-head"><div><h3>Published knowledge</h3><span class="meta">Edit or deactivate answers already available to CoastWatch Intelligence.</span></div></div>
+   <div id="learningKnowledge" aria-live="polite"><div class="empty">Loading approved knowledge…</div></div>
   </div>
  </section>
 </div>
@@ -376,7 +390,7 @@ let role=null,rows=[],map=L.map("map").setView([28.0836,-80.6081],11),markers=[]
  original.remove();
  const tabs=[...document.querySelectorAll("[data-admin-tab]")];
  function activate(name){tabs.forEach(t=>{const on=t.dataset.adminTab===name;t.classList.toggle("active",on);t.setAttribute("aria-selected",String(on));});document.querySelectorAll(".admin-tab-panel").forEach(p=>{const on=p.id==="adminTab"+name.charAt(0).toUpperCase()+name.slice(1);p.hidden=!on;p.classList.toggle("active",on);});if(name==="map"){requestAnimationFrame(()=>{map.invalidateSize({pan:true,debounceMoveend:true});const bounds=map.getBounds();if(!bounds.isValid()||Math.abs(map.getCenter().lat)>60||map.getZoom()<5){map.setView([28.0836,-80.6081],11,{animate:false});}map.eachLayer(layer=>{if(layer instanceof L.TileLayer)layer.redraw();});});setTimeout(()=>{map.invalidateSize({pan:true});if(markers.length){const valid=markers.filter(m=>m.getLatLng&&Number.isFinite(m.getLatLng().lat));if(valid.length)map.fitBounds(L.featureGroup(valid).getBounds().pad(.18),{maxZoom:13,animate:false});}else{map.setView([28.0836,-80.6081],11,{animate:false});}},180);setTimeout(()=>map.invalidateSize({pan:true}),500);}}
- tabs.forEach(t=>t.addEventListener("click",()=>activate(t.dataset.adminTab)));
+ tabs.forEach(t=>t.addEventListener("click",()=>{activate(t.dataset.adminTab);if(t.dataset.adminTab==="learning"&&window.loadCoastWatchLearning)window.loadCoastWatchLearning()}));
  window.mewAdminActivateTab=activate;
 })();
 const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19});streets.addTo(map);
@@ -391,7 +405,7 @@ function sessionId(){let v=sessionStorage.getItem("mew_admin_session");if(!v){v=
 // Terms consent is handled by the isolated script above.
 function setAuth(on){$("login").classList.toggle("hidden",on);$("dashboard").classList.toggle("hidden",!on);$("signout").classList.toggle("hidden",!on);$("role").classList.toggle("hidden",!on);if(on){$("role").textContent=role;$("editorialComposer").classList.toggle("hidden",!["owner","admin"].includes(role));refreshAdminMapSize();setTimeout(refreshAdminMapSize,180);setTimeout(refreshAdminMapSize,650)}}
 $("loginForm").onsubmit=async e=>{e.preventDefault();const {data,error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginMsg").textContent=error.message;$("loginMsg").classList.remove("hidden");return}await checkSession()};
-async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue()}
+async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadLearningQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
 let reportLoadVersion=0;async function load(){const version=++reportLoadVersion;try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;if(version!==reportLoadVersion)return;rows=data||[];render();await loadMap();if(version!==reportLoadVersion)return;await loadPhotos();if(version!==reportLoadVersion)return;await loadFlags();if(version!==reportLoadVersion)return;await loadClearanceQueue()}catch(e){if(version===reportLoadVersion)msg("Could not load reports: "+e.message,"error")}}
@@ -646,6 +660,80 @@ $("editorialQueue").addEventListener("click",async e=>{
   editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":editingPublished?"Published copy edited and returned to the private review queue for re-approval.":"Edits saved.","good");
   await loadEditorialQueue();
  }catch(error){button.disabled=false;editorialMsg("Could not update editorial item: "+error.message,"error");}
+});
+
+
+// CoastWatch Intelligence learning review workspace.
+let learningRows=[],knowledgeRows=[];
+function learningMsg(text,kind=""){const el=$("learningMsg");el.textContent=text;el.className="msg "+kind;}
+function learningCard(item){
+ const canEdit=["owner","admin"].includes(role);
+ const status=esc(item.status);
+ return '<article class="editorial-item" data-learning-id="'+esc(item.id)+'">'+
+  '<div class="editorial-item-head"><div><h4>'+esc(item.normalized_question)+'</h4><span class="editorial-status '+status+'">'+status+'</span> <span class="meta">'+esc(item.language.toUpperCase())+' · Seen '+Number(item.occurrences||1)+' time(s) · Last seen '+esc(new Date(item.last_seen_at).toLocaleString())+'</span></div></div>'+
+  (item.status==="pending"&&canEdit?
+   '<div class="editorial-item-grid"><div class="wide"><label>Trigger phrases (comma-separated)</label><input data-learning-triggers value="'+esc(item.normalized_question)+'"></div><div class="wide"><label>Approved answer · English</label><textarea data-learning-en rows="3" placeholder="Write a verified, useful answer"></textarea></div><div class="wide"><label>Approved answer · Spanish (optional)</label><textarea data-learning-es rows="3" placeholder="Escribe una respuesta en español"></textarea></div><div><label>Category</label><select data-learning-category><option value="general">General information</option><option value="weather">Weather</option><option value="roads">Roads</option><option value="community">Community information</option><option value="safety">Safety information</option></select></div><div><label>Source name (optional)</label><input data-learning-source-name placeholder="Official source or organization"></div><div class="wide"><label>Source URL (optional, HTTPS only)</label><input data-learning-source-url type="url" placeholder="https://..."></div><label class="wide"><input type="checkbox" data-learning-official> Requires official verification before it can be used</label></div><div class="actions"><button type="button" class="green" data-learning-approve>Approve &amp; publish knowledge</button><button type="button" class="red" data-learning-reject>Reject question</button></div>'
+   :'<div class="editorial-readonly">'+(canEdit?"This question has been reviewed.":"Read-only access. An owner or administrator must approve or edit knowledge.")+'</div>')+
+ '</article>';
+}
+async function loadLearningQueue(){
+ const host=$("learningQueue");if(!host)return;
+ const [{data:questions,error:qError},{data:knowledge,error:kError}]=await Promise.all([
+  db.from("coastwatch_ai_learning_queue").select("id,normalized_question,language,occurrences,status,first_seen_at,last_seen_at").order("occurrences",{ascending:false}).order("last_seen_at",{ascending:false}).limit(150),
+  db.from("coastwatch_ai_knowledge").select("id,trigger_phrases,answer_en,answer_es,category,source_name,source_url,requires_official_verification,active,created_at,updated_at").order("updated_at",{ascending:false}).limit(150)
+ ]);
+ if(qError){host.innerHTML='<div class="empty">Could not load learning queue: '+esc(qError.message)+'</div>';return;}
+ if(kError){$("learningKnowledge").innerHTML='<div class="empty">Could not load approved knowledge: '+esc(kError.message)+'</div>';return;}
+ learningRows=questions||[];knowledgeRows=knowledge||[];
+ const counts={pending:0,approved:0,rejected:0};learningRows.forEach(x=>counts[x.status]=(counts[x.status]||0)+1);
+ $("learningPendingCount").textContent=counts.pending;$("learningApprovedCount").textContent=counts.approved;$("learningRejectedCount").textContent=counts.rejected;$("tabLearningCount").textContent=counts.pending;
+ const filter=$("learningFilter").value;const visible=learningRows.filter(x=>filter==="all"||x.status===filter);
+ host.innerHTML=visible.map(learningCard).join("")||'<div class="empty">No questions in this filter.</div>';
+ $("learningKnowledge").innerHTML=knowledgeRows.map(k=>'<article class="editorial-item" data-knowledge-id="'+esc(k.id)+'"><div class="editorial-item-head"><div><h4>'+esc((k.trigger_phrases||[]).join(", "))+'</h4><span class="editorial-status '+(k.active?"published":"rejected")+'">'+(k.active?"active":"inactive")+'</span> <span class="meta">'+esc(k.category)+'</span></div></div>'+
+  (["owner","admin"].includes(role)?'<div class="editorial-item-grid"><div class="wide"><label>Trigger phrases</label><input data-k-triggers value="'+esc((k.trigger_phrases||[]).join(", "))+'"></div><div class="wide"><label>English answer</label><textarea data-k-en rows="3">'+esc(k.answer_en)+'</textarea></div><div class="wide"><label>Spanish answer</label><textarea data-k-es rows="3">'+esc(k.answer_es||"")+'</textarea></div><div><label>Category</label><input data-k-category value="'+esc(k.category)+'"></div><div><label>Source name</label><input data-k-source-name value="'+esc(k.source_name||"")+'"></div><div class="wide"><label>Source URL</label><input data-k-source-url type="url" value="'+esc(k.source_url||"")+'"></div><label class="wide"><input type="checkbox" data-k-official '+(k.requires_official_verification?"checked":"")+'> Requires official verification (excluded from chatbot answers)</label><label class="wide"><input type="checkbox" data-k-active '+(k.active?"checked":"")+'> Active and available to chatbot</label></div><div class="actions"><button type="button" class="green" data-k-save>Save knowledge</button></div>'
+  :'<p>'+esc(k.answer_en)+'</p><div class="editorial-readonly">Read-only knowledge entry.</div>')+'</article>').join("")||'<div class="empty">No approved knowledge yet.</div>';
+}
+window.loadCoastWatchLearning=loadLearningQueue;
+$("refreshLearning").addEventListener("click",loadLearningQueue);
+$("learningFilter").addEventListener("change",loadLearningQueue);
+$("learningQueue").addEventListener("click",async e=>{
+ const button=e.target.closest("[data-learning-approve],[data-learning-reject]");if(!button)return;
+ if(!["owner","admin"].includes(role)){learningMsg("Only an owner or administrator can approve learning.","error");return;}
+ const card=button.closest("[data-learning-id]");const item=learningRows.find(x=>x.id===card?.dataset.learningId);if(!item)return;
+ button.disabled=true;
+ try{
+  const {data:{user}}=await db.auth.getUser();
+  if(button.hasAttribute("data-learning-reject")){
+   const {error}=await db.from("coastwatch_ai_learning_queue").update({status:"rejected",reviewed_at:new Date().toISOString(),reviewed_by:user?.id||null}).eq("id",item.id);if(error)throw error;
+   learningMsg("Question rejected. It will not become chatbot knowledge.","good");
+  }else{
+   const phrases=card.querySelector("[data-learning-triggers]").value.split(",").map(x=>x.trim()).filter(Boolean);
+   const answerEn=card.querySelector("[data-learning-en]").value.trim(),answerEs=card.querySelector("[data-learning-es]").value.trim();
+   const sourceUrl=card.querySelector("[data-learning-source-url]").value.trim();
+   const official=card.querySelector("[data-learning-official]").checked;
+   if(!phrases.length||!answerEn)throw new Error("Add at least one trigger phrase and an English answer.");
+   if(sourceUrl&&!sourceUrl.startsWith("https://"))throw new Error("Source URL must begin with https://.");
+   if(official)throw new Error("This item requires official verification. Verify it first, then uncheck this box before publishing.");
+   const {error:insertError}=await db.from("coastwatch_ai_knowledge").insert({trigger_phrases:phrases,answer_en:answerEn,answer_es:answerEs||null,category:card.querySelector("[data-learning-category]").value,source_name:card.querySelector("[data-learning-source-name]").value.trim()||null,source_url:sourceUrl||null,requires_official_verification:false,active:true});
+   if(insertError)throw insertError;
+   const {error:updateError}=await db.from("coastwatch_ai_learning_queue").update({status:"approved",reviewed_at:new Date().toISOString(),reviewed_by:user?.id||null}).eq("id",item.id);if(updateError)throw updateError;
+   learningMsg("Approved and published. CoastWatch Intelligence can now use this answer.","good");
+  }
+  await loadLearningQueue();
+ }catch(error){button.disabled=false;learningMsg("Could not review question: "+error.message,"error");}
+});
+$("learningKnowledge").addEventListener("click",async e=>{
+ const button=e.target.closest("[data-k-save]");if(!button)return;
+ if(!["owner","admin"].includes(role)){learningMsg("Only an owner or administrator can edit knowledge.","error");return;}
+ const card=button.closest("[data-knowledge-id]");button.disabled=true;
+ try{
+  const phrases=card.querySelector("[data-k-triggers]").value.split(",").map(x=>x.trim()).filter(Boolean);
+  const answerEn=card.querySelector("[data-k-en]").value.trim();const sourceUrl=card.querySelector("[data-k-source-url]").value.trim();
+  if(!phrases.length||!answerEn)throw new Error("At least one trigger phrase and an English answer are required.");
+  if(sourceUrl&&!sourceUrl.startsWith("https://"))throw new Error("Source URL must begin with https://.");
+  const {error}=await db.from("coastwatch_ai_knowledge").update({trigger_phrases:phrases,answer_en:answerEn,answer_es:card.querySelector("[data-k-es]").value.trim()||null,category:card.querySelector("[data-k-category]").value.trim()||"general",source_name:card.querySelector("[data-k-source-name]").value.trim()||null,source_url:sourceUrl||null,requires_official_verification:card.querySelector("[data-k-official]").checked,active:card.querySelector("[data-k-active]").checked,updated_at:new Date().toISOString()}).eq("id",card.dataset.knowledgeId);
+  if(error)throw error;learningMsg("Knowledge entry updated.","good");await loadLearningQueue();
+ }catch(error){button.disabled=false;learningMsg("Could not save knowledge: "+error.message,"error");}
 });
 
 db.auth.onAuthStateChange(()=>setTimeout(checkSession,0));checkSession();setInterval(()=>{if(role&&!window.mewZoneDrawActive&&$("zoneForm").classList.contains("hidden")&&!(zoneEditControl&&zoneEditControl._toolbars&&zoneEditControl._toolbars.edit&&zoneEditControl._toolbars.edit.handler.enabled())&&!$("adminTabNews").contains(document.activeElement))load()},30000);
