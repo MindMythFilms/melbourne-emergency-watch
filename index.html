@@ -4505,7 +4505,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
  const client=window.supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  let session=null,conversationId=null,busy=false,starting=false,profanityWarningIssued=false,chatLocked=false;
  const profanityTerms=["fuck","fucking","fucked","fucker","motherfucker","shit","shitty","bullshit","bitch","bitches","bitching","asshole","assholes","arsehole","bastard","bastards","dickhead","dick","dicks","pussy","pussies","cunt","cunts","motherfucking","jackass","dumbass","dipshit","horseshit","crap","damn","puta","puto","putas","putos","mierda","mierdas","joder","jodido","jodida","coño","cojones","cabron","cabrona","cabrones","pendejo","pendeja","pendejos","pinche","chingar","chingada","chingado","chingados","verga","vergas","culero","culera","maricon","maricón"];
- const profanityPattern=new RegExp("(^|[^\\p{L}\\p{N}_])(?:"+profanityTerms.map(w=>w.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\let session=null,conversationId=null,busy=false,starting=false;")).join("|")+")(?![\\p{L}\\p{N}_])","iu");
+ const profanityPattern=new RegExp("(^|[^\\p{L}\\p{N}_])(?:"+profanityTerms.join("|")+")(?![\\p{L}\\p{N}_])","iu");
  const containsProfanity=text=>profanityPattern.test(String(text||""));
  function lockChat(){
    chatLocked=true;
