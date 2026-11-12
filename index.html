@@ -4477,9 +4477,9 @@ body.dark #map-panel .map-report-tools .map-report-button{
 #cwi-panel .cwi-auth[hidden],
 #cwi-panel #cwi-chat[hidden]{display:none!important}
 </style>
-<div id="cwi-invite" aria-hidden="true">You can chat with me, I will help you!</div>
+<div id="cwi-invite" class="cwi-invite-hidden" aria-hidden="true">You can chat with me, I will help you!</div>
 <script>
-(()=>{const invite=document.getElementById("cwi-invite");if(!invite)return;const spanish=/^es(?:-|$)/i.test(navigator.language||"en");invite.textContent=spanish?"¡Puedes chatear conmigo, te ayudaré!":"You can chat with me, I will help you!";window.setTimeout(()=>invite.classList.add("cwi-invite-hidden"),60000)})();
+(()=>{const invites=document.querySelectorAll("#cwi-invite");if(!invites.length)return;const spanish=/^es(?:-|$)/i.test(navigator.language||"en");invites.forEach(invite=>{invite.textContent=spanish?"¡Puedes chatear conmigo, te ayudaré!":"You can chat with me, I will help you!";window.setTimeout(()=>{invite.classList.remove("cwi-invite-hidden");window.setTimeout(()=>invite.classList.add("cwi-invite-hidden"),40000)},4000)})})();
 </script>
 <button id="cwi-launch" type="button" aria-label="Open CoastWatch Intelligence" aria-expanded="false" aria-controls="cwi-panel">
 <img class="cwi-launch-bot" src="/assets/coastwatch-robot-hover.gif" alt="" width="70" height="70">
