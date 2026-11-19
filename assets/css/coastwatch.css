@@ -3347,3 +3347,146 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     filter: brightness(1.06) !important;
   }
 }
+
+
+/* Unified desktop sponsor showcase: large partner creative with actions alongside.
+   At mobile/tablet widths the wrapper disappears from layout and the existing layout is preserved. */
+@media (min-width: 901px) {
+  header > .cw-sponsor-showcase {
+    display: grid !important;
+    grid-template-columns: minmax(0, 2.25fr) minmax(285px, .95fr) !important;
+    align-items: stretch !important;
+    gap: 18px !important;
+    width: min(calc(100% - 64px), 1380px) !important;
+    margin: 18px auto 20px !important;
+  }
+  header > .cw-sponsor-showcase > #community-partner-ads {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 224px !important;
+    min-height: 224px !important;
+    margin: 0 !important;
+    border: 1px solid rgba(224, 190, 119, .58) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    background: #071a2a !important;
+    box-shadow: 0 13px 34px rgba(0, 8, 18, .28), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  }
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slides,
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide,
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide picture,
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide picture img,
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide > img {
+    height: 224px !important;
+    min-height: 224px !important;
+    max-height: 224px !important;
+  }
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide picture img,
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-slide > img {
+    width: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  header > .cw-sponsor-showcase > #community-partner-ads .cw-ad-caption {
+    position: absolute !important;
+    inset: auto 0 0 !important;
+    z-index: 8 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 27px !important;
+    padding: 5px 14px !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(90deg,rgba(3,16,27,.88),rgba(3,16,27,.58)) !important;
+    color: #f3e5c6 !important;
+    font-size: 9px !important;
+    font-weight: 850 !important;
+    letter-spacing: .13em !important;
+    text-transform: uppercase !important;
+  }
+  header > .cw-sponsor-showcase > .cw-sponsor-actions {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 13px !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 224px !important;
+    margin: 0 !important;
+    padding: 22px 24px !important;
+    border: 1px solid rgba(215, 183, 116, .4) !important;
+    border-radius: 18px !important;
+    background: radial-gradient(ellipse at top right,rgba(173,132,56,.16),transparent 58%),linear-gradient(145deg,#0a2639,#071a2a 72%) !important;
+    box-shadow: 0 13px 34px rgba(0,8,18,.23),inset 0 1px 0 rgba(255,255,255,.07) !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-cta-copy {
+    display: block !important;
+    margin-bottom: 3px !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-kicker {
+    display: block !important;
+    margin-bottom: 10px !important;
+    color: #e4c783 !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    letter-spacing: .16em !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-cta-copy strong {
+    display: block !important;
+    color: #fff !important;
+    font: 800 clamp(17px,1.5vw,22px)/1.2 Manrope,sans-serif !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-cta-copy p {
+    margin: 8px 0 0 !important;
+    color: #c2d6e2 !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-top-cta,
+  header > .cw-sponsor-showcase .cw-sponsor-directory-cta {
+    display: flex !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-top-cta a,
+  header > .cw-sponsor-showcase .cw-sponsor-directory-cta a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 42px !important;
+    box-sizing: border-box !important;
+    padding: 10px 14px !important;
+    border: 1px solid rgba(245,220,164,.9) !important;
+    border-radius: 11px !important;
+    background: linear-gradient(135deg,#f5dfa9,#d6ae5c) !important;
+    color: #30230e !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: 0 4px 13px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.58) !important;
+    transition: transform .18s ease,filter .18s ease !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-directory-cta a {
+    border-color: rgba(159,198,210,.5) !important;
+    background: rgba(18,62,79,.72) !important;
+    color: #e5f4f7 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+  }
+  header > .cw-sponsor-showcase .cw-sponsor-top-cta a:hover,
+  header > .cw-sponsor-showcase .cw-sponsor-directory-cta a:hover {
+    transform: translateY(-2px) !important;
+    filter: brightness(1.08) !important;
+  }
+}
+@media (max-width: 900px) {
+  header > .cw-sponsor-showcase { display: contents !important; }
+  header > .cw-sponsor-showcase .cw-sponsor-cta-copy { display: none !important; }
+}
