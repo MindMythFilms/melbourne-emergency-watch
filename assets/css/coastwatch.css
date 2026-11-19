@@ -3010,3 +3010,6 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
  #community-partner-ads .cw-home-sponsor-overlay strong{font-size:18px}
  #community-partner-ads .cw-home-sponsor-overlay>span{font-size:11px}
 }
+
+#community-partner-ads[data-sponsor-loading="true"] .cw-ad-slides{visibility:hidden!important}
+#community-partner-ads[data-sponsor-loading="false"] .cw-ad-slides{visibility:visible!important}
