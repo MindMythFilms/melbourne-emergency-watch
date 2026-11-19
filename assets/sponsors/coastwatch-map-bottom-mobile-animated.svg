@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="title desc">
+<title id="title">CoastWatch FL — Become a community sponsor</title>
+<desc id="desc">Animated CoastWatch FL sponsorship banner supporting local hazard awareness and community information.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#061a36"/><stop offset=".55" stop-color="#104267"/><stop offset="1" stop-color="#061a2d"/></linearGradient>
+ <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#087da5"/><stop offset=".5" stop-color="#17d4df"/><stop offset="1" stop-color="#087da5"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#d99a2d"/><stop offset=".5" stop-color="#fff0ad"/><stop offset="1" stop-color="#e3ad43"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1200" height="480" rx="24" fill="url(#bg)"/>
+<rect x="8" y="8" width="1184" height="464" rx="20" fill="none" stroke="#19c7d4" stroke-opacity=".55" stroke-width="3"/>
+<circle cx="1050" cy="205" r="145" fill="#0aa9c2" opacity=".08"><animate attributeName="r" values="132;154;132" dur="5s" repeatCount="indefinite"/></circle>
+<path d="M0 330 Q150 285 300 330 T600 330 T900 330 T1200 315 V480 H0Z" fill="#052c4a" opacity=".85"/>
+<path d="M0 350 Q150 300 300 350 T600 350 T900 350 T1200 335" fill="none" stroke="url(#aqua)" stroke-width="9" opacity=".9"><animate attributeName="d" values="M0 350 Q150 300 300 350 T600 350 T900 350 T1200 335;M0 350 Q150 390 300 340 T600 365 T900 325 T1200 350;M0 350 Q150 300 300 350 T600 350 T900 350 T1200 335" dur="7s" repeatCount="indefinite"/></path>
+<g font-family="Arial,sans-serif">
+ <text x="72" y="82" fill="#ffffff" font-size="34" font-weight="900" letter-spacing="3">COASTWATCH <tspan fill="#20d8e5">FL</tspan></text>
+ <text x="72" y="174" fill="#ffffff" font-size="62" font-weight="900">SUPPORT LOCAL SAFETY.</text>
+ <text x="74" y="232" fill="#c9e7f2" font-size="31" font-weight="600">Help keep Brevard communities informed and prepared.</text>
+ <text x="74" y="282" fill="#8edce4" font-size="25">Your sponsorship supports free local hazard and weather information.</text>
+ <rect x="72" y="376" width="390" height="68" rx="34" fill="url(#gold)" stroke="#fff0bd" stroke-width="3" filter="url(#glow)">
+  <animate attributeName="opacity" values="1;.86;1" dur="2.6s" repeatCount="indefinite"/>
+ </rect>
+ <text x="267" y="420" fill="#102d43" text-anchor="middle" font-size="28" font-weight="900">BECOME A SPONSOR »</text>
+ <g transform="translate(1010 235)">
+  <circle r="95" fill="#0b7596" opacity=".28" stroke="#18d3df" stroke-width="4"/>
+  <path d="M-60 20 Q0 -18 60 20" fill="none" stroke="#19c7d4" stroke-width="5" stroke-linecap="round"/>
+  <path d="M-48 44 Q0 12 48 44" fill="none" stroke="#19c7d4" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="-28" cy="-22" r="7" fill="#ffe5a0"><animate attributeName="opacity" values=".45;1;.45" dur="2s" repeatCount="indefinite"/></circle>
+  <circle cx="28" cy="-22" r="7" fill="#ffe5a0"><animate attributeName="opacity" values="1;.45;1" dur="2s" repeatCount="indefinite"/></circle>
+  <text x="0" y="78" fill="#d8f7fb" text-anchor="middle" font-size="18" font-weight="800" letter-spacing="2">BREVARD COUNTY</text>
+ </g>
+</g>
+</svg>
