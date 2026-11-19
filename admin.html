@@ -512,7 +512,8 @@ function sponsorMsg(text,kind="good"){const el=$("sponsorAdminMsg");if(!el)retur
 function sponsorSlug(value){return String(value||"business").toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,70)||"business";}
 function sponsorAppCard(app){
  const safe=esc(app.business_name),tier=esc(app.sponsorship_tier||"unspecified");
- const logo=app.logo_path?'<div class="meta">Logo uploaded privately: '+esc(app.logo_path)+'</div>':"";
+ const asset=(label,url)=>url?'<div class="sponsor-submitted-asset"><b>'+label+'</b><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(url)+'" alt="'+label+' preview" style="display:block;max-width:100%;max-height:150px;object-fit:contain;margin-top:7px;border-radius:9px;background:#102a3d"></a></div>':"";
+ const logo=asset("Business logo",app.logo_path_preview)+asset("Homepage banner",app.homepage_banner_path_preview)+asset("News Desk banner",app.news_desk_banner_path_preview)+asset("Directory featured banner",app.directory_banner_path_preview);
  const actions=app.status==="pending"&&["owner","admin"].includes(role)?'<div class="actions"><button type="button" data-sponsor-approve="'+app.id+'">Approve &amp; create draft profile</button><button type="button" class="red" data-sponsor-reject="'+app.id+'">Reject application</button></div>':"";
  return '<article class="sponsor-admin-card"><h4>'+safe+'</h4><div class="meta">'+esc(app.created_at?new Date(app.created_at).toLocaleString():"")+' · '+tier+' · '+esc(app.status)+'</div><p>'+esc(app.description||"")+'</p><p><b>Services:</b> '+esc(app.services||"")+'</p><p><b>Contact:</b> '+esc(app.contact_name)+' · '+esc(app.email)+(app.phone?" · "+esc(app.phone):"")+'</p><p><b>Website:</b> '+(app.website?'<a href="'+esc(app.website)+'" target="_blank" rel="noopener noreferrer">'+esc(app.website)+'</a>':"Not supplied")+' · <b>Area:</b> '+esc([app.city,app.service_area].filter(Boolean).join(" / ")||"Not supplied")+'</p>'+logo+actions+'</article>';
 }
@@ -528,6 +529,11 @@ async function loadSponsorCenter(){
  ]);
  if(apps.error||profiles.error||campaigns.error){sponsorMsg("Could not load sponsor data: "+(apps.error||profiles.error||campaigns.error).message,"error");return;}
  sponsorApplications=apps.data||[];sponsorProfiles=profiles.data||[];sponsorCampaigns=campaigns.data||[];
+ for(const app of sponsorApplications){
+  for(const field of ["logo_path","homepage_banner_path","news_desk_banner_path","directory_banner_path"]){
+   if(app[field]){const signed=await db.storage.from("sponsor-logos").createSignedUrl(app[field],3600);app[field+"_preview"]=signed.data?.signedUrl||null;}
+  }
+ }
  const pending=sponsorApplications.filter(x=>x.status==="pending").length;
  $("sponsorPendingCount").textContent=pending;$("sponsorActiveCount").textContent=sponsorProfiles.filter(x=>x.is_active).length;$("sponsorCampaignCount").textContent=sponsorCampaigns.filter(x=>x.status==="active").length;$("tabSponsorCount").textContent=pending;
  const filter=$("sponsorApplicationFilter").value;
