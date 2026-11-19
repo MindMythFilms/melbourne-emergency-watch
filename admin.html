@@ -539,14 +539,14 @@ async function loadSponsorCenter(){
    const {data:logoFile,error:downloadError}=await db.storage.from("sponsor-logos").download(profile.logo_path);
    if(downloadError||!logoFile)throw downloadError||new Error("Submitted logo unavailable");
    const ext=(profile.logo_path.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"")||"png";
-   const publicPath="sponsor-logos/"+profile.id+"."+ext;
-   const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(publicPath,logoFile,{upsert:true,contentType:logoFile.type||"image/"+ext,cacheControl:"3600"});
+   const publicPath="sponsor-logos/"+profile.id+"-"+Date.now()+"."+ext;
+   const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(publicPath,logoFile,{upsert:false,contentType:logoFile.type||"image/"+ext,cacheControl:"3600"});
    if(uploadError)throw uploadError;
    const {data:publicLogo}=db.storage.from("sponsor-creatives").getPublicUrl(publicPath);
    const {error:updateError}=await db.from("sponsor_profiles").update({logo_path:publicLogo.publicUrl,updated_at:new Date().toISOString()}).eq("id",profile.id);
    if(updateError)throw updateError;
    profile.logo_path=publicLogo.publicUrl;
-  }catch(logoError){console.warn("Sponsor logo publishing failed:",logoError.message);}
+  }catch(logoError){console.error("Sponsor logo publishing failed:",logoError);sponsorMsg("Could not publish logo for "+(profile.display_name||profile.business_name)+": "+logoError.message,"error");}
  }
 
  for(const app of sponsorApplications){
