@@ -2933,3 +2933,7 @@ body.dark #map-panel .map-report-tools .map-report-button{
 /* Editorial freshness labels */
 .cw-editorial-expiry{display:block;margin-top:4px;color:#8a5a14;font-size:11px;font-weight:700}
 body.dark .cw-editorial-expiry{color:#ffd58a}
+
+
+/* Ensure expired notices stay hidden even when component styles set display values. */
+[data-expires-at][hidden]{display:none!important}
