@@ -48,6 +48,7 @@ const mobileLegendButton=$("mobileLegendToggle"),mobileLegend=$("nwsLegend");if(
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function message(text,kind=""){const e=$("formMessage");e.textContent=text;e.className="status "+kind}
 let map=L.map("map",{scrollWheelZoom:false,dragging:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,fadeAnimation:false,markerZoomAnimation:false,preferCanvas:true}).setView([28.0836,-80.6081],11),markers=[],photoBubbleMarkers=[];
+const mewCompassControl=L.control({position:"topright"});mewCompassControl.onAdd=()=>{const el=L.DomUtil.create("div","mew-map-compass");el.setAttribute("role","img");el.setAttribute("aria-label","Map compass: north is up, east is right, south is down, west is left");el.title="North is up · East is right · South is down · West is left";el.innerHTML='<span class="mew-compass-n">N</span><span class="mew-compass-e">E</span><span class="mew-compass-s">S</span><span class="mew-compass-w">W</span><span class="mew-compass-needle"></span><span class="mew-compass-center"></span>';L.DomEvent.disableClickPropagation(el);L.DomEvent.disableScrollPropagation(el);return el;};mewCompassControl.addTo(map);
 let mewNearbyLocation=null;
 function mewUpdateNearbyStatus(){
  const target=document.querySelector('#mew-emergency-status-strip [data-status="nearby"] strong');
