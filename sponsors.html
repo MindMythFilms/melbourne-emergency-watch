@@ -43,14 +43,22 @@ header.cws-top{position:relative;top:auto;z-index:1;display:flex;flex-direction:
  const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  try{
-  const {data,error}=await db.from("sponsor_profiles").select("id,business_name,display_name,logo_path,website,city,service_area,description,services").eq("is_active",true).order("business_name");
+  const [{data,error},{data:campaigns,error:campaignError}]=await Promise.all([
+   db.from("sponsor_profiles").select("id,business_name,display_name,logo_path,website,city,service_area,description,services").eq("is_active",true).order("business_name"),
+   db.from("sponsor_campaigns").select("sponsor_id,destination_url").eq("status","active").eq("placement","directory_feature")
+  ]);
   if(error)throw error;
   if(!data||!data.length){host.innerHTML='<div class="cws-empty" style="grid-column:1/-1"><strong>No public sponsors yet.</strong><br>We are building our local business partner network. Interested businesses can apply to become a CoastWatch FL sponsor.</div>';return;}
+  if(campaignError)console.warn("Sponsor directory campaign links:",campaignError);
+  const campaignBySponsor=new Map((campaigns||[]).map(c=>[c.sponsor_id,c.destination_url]));
   host.innerHTML=data.map(p=>{
-   const website=p.website&&p.website.startsWith("https://")?'<a href="'+esc(p.website)+'" target="_blank" rel="noopener noreferrer">Business website ↗</a>':"";
-   const logo=p.logo_path&&p.logo_path.startsWith("https://")?'<img class="cws-logo" src="'+esc(p.logo_path)+'" alt="'+esc(p.display_name||p.business_name)+' logo" loading="lazy">':'<div class="cws-logo" aria-hidden="true" style="display:grid;place-items:center;color:#82dcd7;font-weight:900">COASTWATCH FL PARTNER</div>';
+   const website=(p.website&&/^https:\/\//i.test(p.website)?p.website:campaignBySponsor.get(p.id))||"";
+   const destination=website&&/^https:\/\//i.test(website)?website:"";
+   const name=esc(p.display_name||p.business_name);
+   const logo=p.logo_path&&/^https:\/\//i.test(p.logo_path)?'<img class="cws-logo" src="'+esc(p.logo_path)+'" alt="'+name+' logo" loading="lazy">':'<div class="cws-logo cws-logo-fallback" aria-hidden="true">'+name+'</div>';
    const area=[p.city,p.service_area].filter(Boolean).join(" · ");
-   return '<article class="cws-card">'+logo+'<h2>'+esc(p.display_name||p.business_name)+'</h2>'+(area?'<div class="cws-area">'+esc(area)+'</div>':"")+'<p>'+esc(p.description||"")+'</p><p>'+esc(p.services||"")+'</p><div class="cws-links">'+website+'</div></article>';
+   const details='<div class="cws-card-copy"><h2>'+name+'</h2>'+(area?'<div class="cws-area">'+esc(area)+'</div>':"")+'<p>'+esc(p.description||"")+'</p>'+(p.services?'<p>'+esc(p.services)+'</p>':"")+'</div>';
+   return destination?'<a class="cws-card cws-card-link" href="'+esc(destination)+'" target="_blank" rel="noopener noreferrer">'+logo+details+'<span class="cws-card-visit">Visit website ↗</span></a>':'<article class="cws-card">'+logo+details+'</article>';
   }).join("");
  }catch(error){host.innerHTML='<div class="cws-empty" style="grid-column:1/-1">Sponsor directory is temporarily unavailable. Please try again later.</div>';console.error("Sponsor directory:",error);}
 })();
