@@ -95,7 +95,7 @@ body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 <label>Areas you serve<input name="service_area" maxlength="200" placeholder="e.g. Brevard County, Central Florida"></label>
 <label>Preferred sponsorship level <span>*</span><select name="sponsorship_tier" required><option value="community_100">$100/month — Community Founding Sponsor</option><option value="local_250">$250/month — Local Founding Partner</option><option value="regional_500">$500/month — Regional Founding Partner</option><option value="presenting_1000_plus">$1,000+/month — Presenting Founding Partner</option><option value="custom">I'd like to discuss a custom partnership</option></select></label>
 <label class="cw-form-full">Business logo <small>Upload your logo · PNG, JPG or WebP · maximum 2 MB</small><input name="logo" type="file" accept="image/png,image/jpeg,image/webp" required></label>
-<label class="cw-form-full">Left map sponsor artwork <small>Required exact dimensions: 274 × 480 pixels (portrait). GIF, PNG, JPG or WebP · maximum 5 MB. This fills the desktop sponsor rail.</small><input name="homepage_banner" type="file" accept="image/gif,image/png,image/jpeg,image/webp" required></label>
+<label class="cw-form-full">Left map sponsor artwork <small>Required exact dimensions: 270 × 480 pixels (portrait). GIF, PNG, JPG or WebP · maximum 5 MB. This fills the desktop sponsor rail.</small><input name="homepage_banner" type="file" accept="image/gif,image/png,image/jpeg,image/webp" required></label>
 <label class="cw-form-full">Map bottom advertising banner <small>Optional exact dimensions: 1200 × 140 pixels (wide banner). GIF, PNG, JPG or WebP · maximum 5 MB.</small><input name="map_bottom_banner" type="file" accept="image/gif,image/png,image/jpeg,image/webp"></label>
 <label class="cw-form-full">News Desk advertising banner <small>Optional separate artwork for the News Desk placement · PNG, JPG or WebP · maximum 5 MB</small><input name="news_desk_banner" type="file" accept="image/png,image/jpeg,image/webp"></label>
 <label class="cw-form-full">Featured sponsor directory banner <small>Optional separate artwork for the featured placement on the Sponsors directory · PNG, JPG or WebP · maximum 5 MB</small><input name="directory_banner" type="file" accept="image/png,image/jpeg,image/webp"></label>
@@ -139,9 +139,9 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:f
     if(key==="homepage_banner"||key==="map_bottom_banner"){
      let dimensions;
      try{dimensions=await createImageBitmap(uploadFile);}catch{throw new Error("We couldn't read your homepage image. Please upload a valid PNG, JPG or WebP.");}
-     const correctSize=key==="homepage_banner"?(dimensions.width===274&&dimensions.height===480):(dimensions.width===1200&&dimensions.height===140);
+     const correctSize=key==="homepage_banner"?(dimensions.width===270&&dimensions.height===480):(dimensions.width===1200&&dimensions.height===140);
      dimensions.close?.();
-     if(!correctSize)throw new Error(key==="homepage_banner"?"Your left map sponsor artwork must be exactly 274 × 480 pixels.":"Your map bottom banner must be exactly 1200 × 140 pixels.");
+     if(!correctSize)throw new Error(key==="homepage_banner"?"Your left map sponsor artwork must be exactly 270 × 480 pixels.":"Your map bottom banner must be exactly 1200 × 140 pixels.");
     }
     const ext=uploadFile.type==="image/gif"?"gif":uploadFile.type==="image/png"?"png":uploadFile.type==="image/webp"?"webp":"jpg";
     const path="applications/"+crypto.randomUUID()+"-"+key+"."+ext;
