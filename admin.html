@@ -243,6 +243,13 @@ body:before{
 .editorial-readonly{color:#a9c3d1;font-size:12px;margin-top:8px}
 @media(max-width:1100px){.admin-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:600px){.admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.editorial-panel .pad{padding:13px}.editorial-form-grid,.editorial-item-grid{grid-template-columns:1fr}.editorial-wide,.editorial-item-grid .wide{grid-column:auto}.editorial-stats{gap:7px}.editorial-stats>div{padding:10px}.editorial-stats b{font-size:21px}.editorial-composer{padding:12px}.editorial-item{padding:12px}.editorial-queue-head select{width:100%}}
+ 
+.research-card{border:1px solid var(--line);border-radius:12px;padding:15px;margin:12px 0;background:rgba(20,34,53,.45)}
+.research-card h3{margin:0 0 5px}.research-card .research-meta{font-size:12px;color:var(--muted);margin:5px 0 10px}
+.research-card .research-draft{white-space:pre-wrap;line-height:1.55;background:rgba(127,145,165,.10);border-radius:9px;padding:12px;margin:10px 0}
+.research-card .research-source{overflow-wrap:anywhere}.research-confidence{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:800;background:#dff5e8;color:#17613f}
+#runResearchScan{min-width:190px}
+@media(max-width:600px){#runResearchScan{width:100%}.research-card{padding:12px}}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
@@ -252,6 +259,7 @@ body:before{
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="research">Research Scan <span id="tabResearchCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="learning">AI Learning <span id="tabLearningCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="moderation" id="moderationTab">AI Moderation <span id="tabModerationCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="map">Map operations</button>
@@ -281,6 +289,25 @@ body:before{
    </form>
    <div class="editorial-queue-head"><div><h3>Review queue</h3><span class="meta">Edit the copy, verify the source, then publish or reject.</span></div><select id="editorialFilter" aria-label="Filter updates"><option value="pending">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="archived">Archived</option><option value="all">All updates</option></select></div>
    <div id="editorialQueue" aria-live="polite"><div class="empty">Loading editorial updates…</div></div>
+  </div>
+ </section>
+</div>
+<div class="admin-tab-panel" id="adminTabResearch" role="tabpanel" hidden>
+ <section class="panel editorial-panel">
+  <div class="pad">
+   <div class="editorial-heading">
+    <div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Research Center</h2><p>Scan official Brevard County weather alerts and automatically prepare private CoastWatch drafts. Nothing is published without your approval.</p></div>
+    <button type="button" class="green" id="runResearchScan">Run Research Scan</button>
+   </div>
+   <div class="editorial-stats">
+    <div><b id="researchPendingCount">0</b><span>Drafts awaiting review</span></div>
+    <div><b id="researchAlertCount">0</b><span>Official alerts found</span></div>
+    <div><b id="researchLastScan">Never</b><span>Last scan</span></div>
+   </div>
+   <div id="researchMsg" class="msg hidden" role="status" aria-live="polite"></div>
+   <div class="msg">Current source: National Weather Service active alerts for Florida, filtered to Brevard County. Drafts are automatically written from the official alert details. This first release does not scrape FOX 35 or other publishers.</div>
+   <div class="editorial-queue-head"><div><h3>Research results</h3><span class="meta">Review the source, generated draft, timing and confidence before publishing.</span></div><button type="button" class="gray" id="refreshResearch">Refresh results</button></div>
+   <div id="researchQueue" aria-live="polite"><div class="empty">Research results will appear here after a scan.</div></div>
   </div>
  </section>
 </div>
@@ -426,7 +453,7 @@ window.loadCoastWatchModeration=loadModerationQueue;
 $("refreshModeration").addEventListener("click",loadModerationQueue);
 $("moderationQueue").addEventListener("click",async e=>{const button=e.target.closest("[data-clear-moderation]");if(!button||!["owner","admin"].includes(role))return;const userId=button.dataset.clearModeration;if(!confirm("Clear this account's AI-chat warning and suspension? The audit history will be retained."))return;button.disabled=true;try{const {data:{user}}=await db.auth.getUser();const {error:updateError}=await db.from("coastwatch_ai_moderation_state").update({offense_count:0,warned_at:null,suspended_until:null,updated_at:new Date().toISOString()}).eq("user_id",userId);if(updateError)throw updateError;const {error:eventError}=await db.from("coastwatch_ai_moderation_events").insert({user_id:userId,event_type:"cleared",actor_user_id:user.id,details:{reason:"Admin cleared warning and suspension"}});if(eventError)throw eventError;$("moderationMsg").textContent="Moderation state cleared. The audit history was retained.";$("moderationMsg").className="msg good";await loadModerationQueue();}catch(error){button.disabled=false;$("moderationMsg").textContent="Could not clear moderation state: "+error.message;$("moderationMsg").className="msg error";}});
 
-async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadLearningQueue();if(["owner","admin"].includes(role))await loadModerationQueue()}
+async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadLearningQueue();if(["owner","admin"].includes(role))await loadModerationQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
 let reportLoadVersion=0;async function load(){const version=++reportLoadVersion;try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;if(version!==reportLoadVersion)return;rows=data||[];render();await loadMap();if(version!==reportLoadVersion)return;await loadPhotos();if(version!==reportLoadVersion)return;await loadFlags();if(version!==reportLoadVersion)return;await loadClearanceQueue()}catch(e){if(version===reportLoadVersion)msg("Could not load reports: "+e.message,"error")}}
@@ -653,6 +680,61 @@ function editorialCard(item){
  '</article>';
 }
 let editorialRows=[];
+
+// CoastWatch FL Research Center: official-alert scan and admin-controlled publishing.
+function researchMessage(message,type="good"){const el=$("researchMsg");el.textContent=message;el.className="msg "+(type==="error"?"error":"good");}
+async function loadResearchQueue(){
+ const host=$("researchQueue");if(!host)return;
+ const {data,error}=await db.from("research_scan_items").select("id,source_name,source_url,title,summary,body,category,confidence,source_published_at,event_start,event_end,area,status,scanned_at").order("scanned_at",{ascending:false}).limit(60);
+ if(error){host.innerHTML='<div class="empty">Could not load research results: '+esc(error.message)+'</div>';return;}
+ const items=data||[],pending=items.filter(x=>x.status==="pending");
+ $("researchPendingCount").textContent=pending.length;
+ $("researchAlertCount").textContent=items.length;
+ $("tabResearchCount").textContent=pending.length;
+ $("researchLastScan").textContent=items[0]?.scanned_at?new Date(items[0].scanned_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"Never";
+ host.innerHTML=items.map(item=>{
+  const confidence=item.confidence==="official_alert"?"Official alert":item.confidence==="verified_multiple"?"Verified by multiple sources":item.confidence==="outdated"?"Outdated":"Unverified";
+  const canPublish=["owner","admin"].includes(role)&&item.status==="pending";
+  return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original NWS alert ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Approve &amp; Publish</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
+ }).join("")||'<div class="empty">No research results yet. Run a scan to check active NWS alerts for Brevard County.</div>';
+}
+$("refreshResearch").addEventListener("click",loadResearchQueue);
+$("runResearchScan").addEventListener("click",async()=>{
+ const button=$("runResearchScan");button.disabled=true;button.textContent="Scanning official sources…";
+ try{
+  const {data,error}=await db.functions.invoke("coastwatch-research-scan",{body:{}});
+  if(error)throw error;
+  if(!data?.ok)throw new Error(data?.error||"The research scan did not complete.");
+  researchMessage("Scan complete. Checked "+data.checked+" active Florida NWS alerts; found "+data.brevard_matches+" Brevard match(es), added "+data.added+" new draft(s), refreshed "+data.refreshed+". "+data.note);
+  await loadResearchQueue();
+ }catch(error){researchMessage("Research scan failed: "+(error.message||"Unknown error"),"error");}
+ finally{button.disabled=false;button.textContent="Run Research Scan";}
+});
+$("researchQueue").addEventListener("click",async e=>{
+ const card=e.target.closest("[data-research-id]");if(!card)return;
+ const id=card.dataset.researchId;
+ if(e.target.closest("[data-research-dismiss]")){
+  const {error}=await db.from("research_scan_items").update({status:"dismissed"}).eq("id",id);
+  if(error){researchMessage("Could not dismiss item: "+error.message,"error");return;}
+  await loadResearchQueue();return;
+ }
+ if(e.target.closest("[data-research-publish]")){
+  if(!["owner","admin"].includes(role)){researchMessage("Only an owner or administrator can publish research drafts.","error");return;}
+  const button=e.target.closest("button");button.disabled=true;
+  try{
+   const {data:item,error:readError}=await db.from("research_scan_items").select("*").eq("id",id).single();if(readError)throw readError;
+   if(item.status!=="pending")throw new Error("This research item is no longer awaiting review.");
+   const {data:{user}}=await db.auth.getUser();
+   const expiry=item.event_end&&new Date(item.event_end)>new Date()?item.event_end:new Date(Date.now()+12*60*60*1000).toISOString();
+   const {data:editorial,error:insertError}=await db.from("editorial_updates").insert({title:item.title,summary:item.summary,body:item.body,category:item.category,source_name:item.source_name,source_url:item.source_url,source_published_at:item.source_published_at,expires_at:expiry,status:"pending",created_by:user?.id||null,updated_by:user?.id||null}).select("id").single();
+   if(insertError)throw insertError;
+   const {error:updateError}=await db.from("research_scan_items").update({status:"published",editorial_update_id:editorial.id}).eq("id",id);if(updateError)throw updateError;
+   researchMessage("Draft moved into News & Updates as a private pending item. It is not public until you approve it there.");
+   await loadResearchQueue();await loadEditorialQueue();
+  }catch(error){researchMessage("Could not prepare publication: "+error.message,"error");button.disabled=false;}
+ }
+});
+
 async function loadEditorialQueue(){
  const host=$("editorialQueue");if(!host)return;
  const {data,error}=await db.from("editorial_updates").select("id,title,summary,body,category,source_name,source_url,source_published_at,expires_at,status,created_at,published_at,rejection_reason").order("created_at",{ascending:false}).limit(100);
