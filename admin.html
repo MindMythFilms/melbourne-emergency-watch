@@ -251,6 +251,20 @@ body:before{
 .research-card .research-source{overflow-wrap:anywhere}.research-confidence{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:800;background:#dff5e8;color:#17613f}
 #runResearchScan{min-width:190px}
 @media(max-width:600px){#runResearchScan{width:100%}.research-card{padding:12px}}
+
+/* Sponsor Center */
+#adminTabSponsors .editorial-composer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:16px;border:1px solid #174a63;border-radius:14px;background:#071f32}
+#adminTabSponsors .editorial-composer .field{margin:0;min-width:0}
+#adminTabSponsors .editorial-composer .field label{display:block;font-weight:800;margin-bottom:5px;color:#dff5fa}
+#adminTabSponsors .editorial-composer input,#adminTabSponsors .editorial-composer select{width:100%;min-width:0}
+#adminTabSponsors .editorial-composer button{grid-column:1/-1;justify-self:start}
+.sponsor-admin-card{padding:16px 18px;border-bottom:1px solid #19445b}
+.sponsor-admin-card h4{margin:0 0 5px;font:800 15px Manrope,sans-serif;color:#f2faff}
+.sponsor-admin-card p{margin:7px 0;color:#c1d5df;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.sponsor-admin-card .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sponsor-admin-card .actions select{min-width:180px}
+.sponsor-admin-card .sponsor-logo-preview{width:88px;height:64px;object-fit:contain;border:1px solid #31566c;border-radius:8px;background:#061a2b;padding:5px}
+@media(max-width:650px){#adminTabSponsors .editorial-composer{grid-template-columns:1fr}#adminTabSponsors .editorial-composer button{grid-column:auto}.sponsor-admin-card .actions>*{flex:1 1 100%}}
 </style></head><body>
 <header><div class="brand admin-brand"><a href="/" aria-label="CoastWatch FL home"><img src="/coastwatch-logo-hq.webp" alt="CoastWatch FL logo"></a><div><strong>CoastWatch FL · Administration</strong><small>Community reports · Local awareness</small></div></div><div class="row"><button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">🌙 Dark mode</button><span id="role" class="tag owner-badge hidden"></span><button id="signout" class="signout-button hidden">Sign out</button></div></header>
 <div class="wrap">
@@ -260,6 +274,7 @@ body:before{
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="sponsors">Sponsor Center <span id="tabSponsorCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="research">Official Sources <span id="tabResearchCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="learning">AI Learning <span id="tabLearningCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="moderation" id="moderationTab">AI Moderation <span id="tabModerationCount">0</span></button>
@@ -292,6 +307,37 @@ body:before{
    <div id="editorialQueue" aria-live="polite"><div class="empty">Loading editorial updates…</div></div>
   </div>
  </section>
+</div>
+
+<div class="admin-tab-panel" id="adminTabSponsors" role="tabpanel" hidden>
+ <section class="panel editorial-panel"><div class="pad">
+  <div class="editorial-heading"><div><span class="editorial-kicker">BUSINESS PARTNERSHIPS</span><h2>Sponsor Center</h2><p>Review applications, activate approved business profiles, and manage sponsored placements. Sponsors never influence public-safety information.</p></div><button type="button" class="gray" id="refreshSponsors">Refresh sponsor data</button></div>
+  <div class="editorial-stats">
+   <div><b id="sponsorPendingCount">0</b><span>Applications pending</span></div>
+   <div><b id="sponsorActiveCount">0</b><span>Active profiles</span></div>
+   <div><b id="sponsorCampaignCount">0</b><span>Active campaigns</span></div>
+   <div><b id="sponsorImpressionCount">0</b><span>Tracked impressions</span></div>
+   <div><b id="sponsorClickCount">0</b><span>Tracked clicks</span></div>
+  </div>
+  <div id="sponsorAdminMsg" class="msg hidden" role="status" aria-live="polite"></div>
+  <div class="editorial-queue-head"><div><h3>Business applications</h3><span class="meta">Approve to create a draft sponsor profile. The profile remains unpublished until activated.</span></div><select id="sponsorApplicationFilter"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All applications</option></select></div>
+  <div id="sponsorApplicationQueue" aria-live="polite"><div class="empty">Loading sponsor applications…</div></div>
+  <div class="editorial-queue-head"><div><h3>Approved sponsor profiles</h3><span class="meta">Only active profiles are visible in the public sponsor directory.</span></div></div>
+  <div id="sponsorProfileQueue" aria-live="polite"><div class="empty">No sponsor profiles yet.</div></div>
+  <div class="editorial-queue-head"><div><h3>Create an advertising campaign</h3><span class="meta">Use an HTTPS image URL for the creative. Campaigns are saved as drafts until activated.</span></div></div>
+  <form id="sponsorCampaignForm" class="editorial-composer">
+   <div class="field"><label for="sponsorCampaignSponsor">Sponsor</label><select id="sponsorCampaignSponsor" required><option value="">Choose an approved sponsor</option></select></div>
+   <div class="field"><label for="sponsorCampaignTitle">Campaign title</label><input id="sponsorCampaignTitle" required maxlength="140" placeholder="Summer community campaign"></div>
+   <div class="field"><label for="sponsorCampaignImage">Creative image URL (HTTPS)</label><input id="sponsorCampaignImage" type="url" required maxlength="1000" placeholder="https://example.com/banner.webp"></div>
+   <div class="field"><label for="sponsorCampaignDestination">Destination URL (HTTPS)</label><input id="sponsorCampaignDestination" type="url" required maxlength="1000" placeholder="https://business.com/"></div>
+   <div class="field"><label for="sponsorCampaignPlacement">Placement</label><select id="sponsorCampaignPlacement"><option value="homepage_banner">Homepage banner</option><option value="news_desk">News Desk sponsored placement</option><option value="directory_feature">Featured directory placement</option></select></div>
+   <div class="field"><label for="sponsorCampaignStart">Start date (optional)</label><input id="sponsorCampaignStart" type="datetime-local"></div>
+   <div class="field"><label for="sponsorCampaignEnd">End date (optional)</label><input id="sponsorCampaignEnd" type="datetime-local"></div>
+   <button type="submit" id="createSponsorCampaign">Save campaign as draft</button>
+  </form>
+  <div class="editorial-queue-head"><div><h3>Campaign performance</h3><span class="meta">Impressions and clicks recorded by the public website once placements are integrated.</span></div></div>
+  <div id="sponsorCampaignQueue" aria-live="polite"><div class="empty">No campaigns yet.</div></div>
+ </div></section>
 </div>
 <div class="admin-tab-panel" id="adminTabResearch" role="tabpanel" hidden>
  <section class="panel editorial-panel">
@@ -426,7 +472,7 @@ let role=null,rows=[],map=L.map("map").setView([28.0836,-80.6081],11),markers=[]
  original.remove();
  const tabs=[...document.querySelectorAll("[data-admin-tab]")];
  function activate(name){tabs.forEach(t=>{const on=t.dataset.adminTab===name;t.classList.toggle("active",on);t.setAttribute("aria-selected",String(on));});document.querySelectorAll(".admin-tab-panel").forEach(p=>{const on=p.id==="adminTab"+name.charAt(0).toUpperCase()+name.slice(1);p.hidden=!on;p.classList.toggle("active",on);});if(name==="map"){requestAnimationFrame(()=>{map.invalidateSize({pan:true,debounceMoveend:true});const bounds=map.getBounds();if(!bounds.isValid()||Math.abs(map.getCenter().lat)>60||map.getZoom()<5){map.setView([28.0836,-80.6081],11,{animate:false});}map.eachLayer(layer=>{if(layer instanceof L.TileLayer)layer.redraw();});});setTimeout(()=>{map.invalidateSize({pan:true});if(markers.length){const valid=markers.filter(m=>m.getLatLng&&Number.isFinite(m.getLatLng().lat));if(valid.length)map.fitBounds(L.featureGroup(valid).getBounds().pad(.18),{maxZoom:13,animate:false});}else{map.setView([28.0836,-80.6081],11,{animate:false});}},180);setTimeout(()=>map.invalidateSize({pan:true}),500);}}
- tabs.forEach(t=>t.addEventListener("click",()=>{activate(t.dataset.adminTab);if(t.dataset.adminTab==="learning"&&window.loadCoastWatchLearning)window.loadCoastWatchLearning();if(t.dataset.adminTab==="moderation"&&window.loadCoastWatchModeration)window.loadCoastWatchModeration()}));
+ tabs.forEach(t=>t.addEventListener("click",()=>{activate(t.dataset.adminTab);if(t.dataset.adminTab==="learning"&&window.loadCoastWatchLearning)window.loadCoastWatchLearning();if(t.dataset.adminTab==="moderation"&&window.loadCoastWatchModeration)window.loadCoastWatchModeration();if(t.dataset.adminTab==="sponsors")loadSponsorCenter()}));
  window.mewAdminActivateTab=activate;
 })();
 const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19});streets.addTo(map);
@@ -459,7 +505,85 @@ window.loadCoastWatchModeration=loadModerationQueue;
 $("refreshModeration").addEventListener("click",loadModerationQueue);
 $("moderationQueue").addEventListener("click",async e=>{const button=e.target.closest("[data-clear-moderation]");if(!button||!["owner","admin"].includes(role))return;const userId=button.dataset.clearModeration;if(!confirm("Clear this account's AI-chat warning and suspension? The audit history will be retained."))return;button.disabled=true;try{const {data:{user}}=await db.auth.getUser();const {error:updateError}=await db.from("coastwatch_ai_moderation_state").update({offense_count:0,warned_at:null,suspended_until:null,updated_at:new Date().toISOString()}).eq("user_id",userId);if(updateError)throw updateError;const {error:eventError}=await db.from("coastwatch_ai_moderation_events").insert({user_id:userId,event_type:"cleared",actor_user_id:user.id,details:{reason:"Admin cleared warning and suspension"}});if(eventError)throw eventError;$("moderationMsg").textContent="Moderation state cleared. The audit history was retained.";$("moderationMsg").className="msg good";await loadModerationQueue();}catch(error){button.disabled=false;$("moderationMsg").textContent="Could not clear moderation state: "+error.message;$("moderationMsg").className="msg error";}});
 
-async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadScanHealth();await loadLearningQueue();if(["owner","admin"].includes(role))await loadModerationQueue()}
+
+/* Sponsor Center administration */
+let sponsorApplications=[],sponsorProfiles=[],sponsorCampaigns=[];
+function sponsorMsg(text,kind="good"){const el=$("sponsorAdminMsg");if(!el)return;el.textContent=text;el.className="msg "+kind;}
+function sponsorSlug(value){return String(value||"business").toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,70)||"business";}
+function sponsorAppCard(app){
+ const safe=esc(app.business_name),tier=esc(app.sponsorship_tier||"unspecified");
+ const logo=app.logo_path?'<div class="meta">Logo uploaded privately: '+esc(app.logo_path)+'</div>':"";
+ const actions=app.status==="pending"&&["owner","admin"].includes(role)?'<div class="actions"><button type="button" data-sponsor-approve="'+app.id+'">Approve &amp; create draft profile</button><button type="button" class="red" data-sponsor-reject="'+app.id+'">Reject application</button></div>':"";
+ return '<article class="sponsor-admin-card"><h4>'+safe+'</h4><div class="meta">'+esc(app.created_at?new Date(app.created_at).toLocaleString():"")+' · '+tier+' · '+esc(app.status)+'</div><p>'+esc(app.description||"")+'</p><p><b>Services:</b> '+esc(app.services||"")+'</p><p><b>Contact:</b> '+esc(app.contact_name)+' · '+esc(app.email)+(app.phone?" · "+esc(app.phone):"")+'</p><p><b>Website:</b> '+(app.website?'<a href="'+esc(app.website)+'" target="_blank" rel="noopener noreferrer">'+esc(app.website)+'</a>':"Not supplied")+' · <b>Area:</b> '+esc([app.city,app.service_area].filter(Boolean).join(" / ")||"Not supplied")+'</p>'+logo+actions+'</article>';
+}
+function sponsorProfileCard(profile){
+ return '<article class="sponsor-admin-card"><h4>'+esc(profile.display_name||profile.business_name)+'</h4><div class="meta">'+esc(profile.tier)+' · '+(profile.is_active?"Public and active":"Draft / hidden")+' · '+esc(profile.slug)+'</div><p>'+esc(profile.description||"")+'</p><div class="actions">'+(profile.is_active?'<button class="gray" type="button" data-sponsor-toggle="'+profile.id+'" data-active="false">Pause public profile</button>':'<button type="button" data-sponsor-toggle="'+profile.id+'" data-active="true">Activate public profile</button>')+'</div></article>';
+}
+async function loadSponsorCenter(){
+ if(!["owner","admin","moderator"].includes(role))return;
+ const [apps,profiles,campaigns]=await Promise.all([
+  db.from("sponsor_applications").select("*").order("created_at",{ascending:false}).limit(100),
+  db.from("sponsor_profiles").select("*").order("created_at",{ascending:false}).limit(100),
+  db.from("sponsor_campaigns").select("*").order("created_at",{ascending:false}).limit(100)
+ ]);
+ if(apps.error||profiles.error||campaigns.error){sponsorMsg("Could not load sponsor data: "+(apps.error||profiles.error||campaigns.error).message,"error");return;}
+ sponsorApplications=apps.data||[];sponsorProfiles=profiles.data||[];sponsorCampaigns=campaigns.data||[];
+ const pending=sponsorApplications.filter(x=>x.status==="pending").length;
+ $("sponsorPendingCount").textContent=pending;$("sponsorActiveCount").textContent=sponsorProfiles.filter(x=>x.is_active).length;$("sponsorCampaignCount").textContent=sponsorCampaigns.filter(x=>x.status==="active").length;$("tabSponsorCount").textContent=pending;
+ const filter=$("sponsorApplicationFilter").value;
+ const visible=sponsorApplications.filter(x=>filter==="all"||x.status===filter);
+ $("sponsorApplicationQueue").innerHTML=visible.map(sponsorAppCard).join("")||'<div class="empty">No '+esc(filter==="all"?"applications":filter+" applications")+' found.</div>';
+ $("sponsorProfileQueue").innerHTML=sponsorProfiles.map(sponsorProfileCard).join("")||'<div class="empty">No sponsor profiles have been approved yet.</div>';
+ $("sponsorCampaignSponsor").innerHTML='<option value="">Choose an approved sponsor</option>'+sponsorProfiles.map(p=>'<option value="'+p.id+'">'+esc(p.display_name||p.business_name)+'</option>').join("");
+ $("sponsorCampaignQueue").innerHTML=sponsorCampaigns.map(c=>{
+  const p=sponsorProfiles.find(x=>x.id===c.sponsor_id);
+  return '<article class="sponsor-admin-card"><h4>'+esc(c.title)+'</h4><div class="meta">'+esc(p?p.business_name:"Sponsor")+' · '+esc(c.placement)+' · '+esc(c.status)+'</div><p>'+esc(c.starts_at||"No start date")+' → '+esc(c.ends_at||"No end date")+'</p><div class="actions">'+(c.status==="draft"?'<button type="button" data-campaign-activate="'+c.id+'">Activate campaign</button>':'<button type="button" class="gray" data-campaign-pause="'+c.id+'">Pause campaign</button>')+'</div></article>';
+ }).join("")||'<div class="empty">No advertising campaigns created.</div>';
+ const ids=sponsorCampaigns.map(x=>x.id);
+ if(ids.length){
+  const events=await db.from("sponsor_ad_events").select("campaign_id,event_type").in("campaign_id",ids).limit(10000);
+  if(events.error){$("sponsorImpressionCount").textContent="—";$("sponsorClickCount").textContent="—";}
+  else{$("sponsorImpressionCount").textContent=events.data.filter(x=>x.event_type==="impression").length;$("sponsorClickCount").textContent=events.data.filter(x=>x.event_type==="click").length;}
+ }else{$("sponsorImpressionCount").textContent="0";$("sponsorClickCount").textContent="0";}
+}
+$("refreshSponsors").addEventListener("click",loadSponsorCenter);
+$("sponsorApplicationFilter").addEventListener("change",loadSponsorCenter);
+$("sponsorApplicationQueue").addEventListener("click",async event=>{
+ const approve=event.target.closest("[data-sponsor-approve]"),reject=event.target.closest("[data-sponsor-reject]");
+ if(!approve&&!reject)return;
+ if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can approve or reject sponsor applications.","error");return;}
+ const id=(approve||reject).dataset[approve?"sponsorApprove":"sponsorReject"],app=sponsorApplications.find(x=>x.id===id);if(!app)return;
+ try{
+  if(reject){
+   const {error}=await db.from("sponsor_applications").update({status:"rejected",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;
+   sponsorMsg("Application rejected. The record was retained.");await loadSponsorCenter();return;
+  }
+  const slug=sponsorSlug(app.preferred_display_name||app.business_name)+"-"+id.slice(0,6);
+  const {error}=await db.from("sponsor_applications").update({status:"approved",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;
+  const {error:profileError}=await db.from("sponsor_profiles").insert({application_id:id,business_name:app.business_name,display_name:app.preferred_display_name||app.business_name,slug,logo_path:app.logo_path,website:app.website,city:app.city,service_area:app.service_area,description:app.description,services:app.services,social_links:app.social_links,tier:app.sponsorship_tier,is_active:false});
+  if(profileError)throw profileError;
+  sponsorMsg("Application approved. A draft profile was created and remains hidden until you activate it.");await loadSponsorCenter();
+ }catch(error){sponsorMsg("Sponsor review failed: "+error.message,"error");}
+});
+$("sponsorProfileQueue").addEventListener("click",async event=>{
+ const button=event.target.closest("[data-sponsor-toggle]");if(!button)return;
+ if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can change public sponsor visibility.","error");return;}
+ try{const {error}=await db.from("sponsor_profiles").update({is_active:button.dataset.active==="true",updated_at:new Date().toISOString(),approved_at:button.dataset.active==="true"?new Date().toISOString():null}).eq("id",button.dataset.sponsorToggle);if(error)throw error;sponsorMsg(button.dataset.active==="true"?"Sponsor profile is now public.":"Sponsor profile paused.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not update sponsor profile: "+error.message,"error");}
+});
+$("sponsorCampaignForm").addEventListener("submit",async event=>{
+ event.preventDefault();if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can create campaigns.","error");return;}
+ const image=$("sponsorCampaignImage").value.trim(),destination=$("sponsorCampaignDestination").value.trim();
+ if(!image.startsWith("https://")||!destination.startsWith("https://")){sponsorMsg("Creative and destination URLs must both use HTTPS.","error");return;}
+ const button=$("createSponsorCampaign");button.disabled=true;
+ try{const {error}=await db.from("sponsor_campaigns").insert({sponsor_id:$("sponsorCampaignSponsor").value,title:$("sponsorCampaignTitle").value.trim(),creative_image_path:image,destination_url:destination,placement:$("sponsorCampaignPlacement").value,status:"draft",starts_at:$("sponsorCampaignStart").value?new Date($("sponsorCampaignStart").value).toISOString():null,ends_at:$("sponsorCampaignEnd").value?new Date($("sponsorCampaignEnd").value).toISOString():null});if(error)throw error;$("sponsorCampaignForm").reset();sponsorMsg("Campaign saved as a draft. It is not public until activated.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not save campaign: "+error.message,"error");}finally{button.disabled=false;}
+});
+$("sponsorCampaignQueue").addEventListener("click",async event=>{
+ const activate=event.target.closest("[data-campaign-activate]"),pause=event.target.closest("[data-campaign-pause]");if(!activate&&!pause)return;
+ if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can change campaigns.","error");return;}
+ const id=(activate||pause).dataset[activate?"campaignActivate":"campaignPause"];
+ try{const {error}=await db.from("sponsor_campaigns").update({status:activate?"active":"paused",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;sponsorMsg(activate?"Campaign activated.":"Campaign paused.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not update campaign: "+error.message,"error");}
+});
+async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadScanHealth();await loadLearningQueue();await loadSponsorCenter();if(["owner","admin"].includes(role))await loadModerationQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
 let reportLoadVersion=0;async function load(){const version=++reportLoadVersion;try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;if(version!==reportLoadVersion)return;rows=data||[];render();await loadMap();if(version!==reportLoadVersion)return;await loadPhotos();if(version!==reportLoadVersion)return;await loadFlags();if(version!==reportLoadVersion)return;await loadClearanceQueue()}catch(e){if(version===reportLoadVersion)msg("Could not load reports: "+e.message,"error")}}
