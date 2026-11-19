@@ -4189,3 +4189,7 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     bottom:16px !important;
   }
 }
+
+
+/* Fixed north-up compass rose for the public map. */
+.mew-map-compass{position:relative;width:62px;height:62px;margin:10px 10px 0 0;border:1px solid rgba(255,255,255,.62);border-radius:50%;background:rgba(8,27,43,.88);box-shadow:0 2px 12px rgba(0,0,0,.32);color:#f8fafc;font:700 10px/1 system-ui,sans-serif;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);pointer-events:auto}.mew-map-compass span{position:absolute;z-index:2}.mew-compass-n{top:5px;left:50%;transform:translateX(-50%);color:#f87171}.mew-compass-s{bottom:5px;left:50%;transform:translateX(-50%)}.mew-compass-e{right:6px;top:50%;transform:translateY(-50%)}.mew-compass-w{left:6px;top:50%;transform:translateY(-50%)}.mew-compass-needle{z-index:1!important;left:50%;top:17px;width:0;height:0;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:20px solid #ef4444;filter:drop-shadow(0 1px 1px #000)}.mew-compass-center{left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:#f8fafc;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #334155}@media(max-width:650px){.mew-map-compass{width:54px;height:54px;margin:8px 8px 0 0}.mew-compass-needle{top:15px;border-left-width:6px;border-right-width:6px;border-bottom-width:17px}}
