@@ -303,6 +303,12 @@ body:before{
     <div><b id="researchAlertCount">0</b><span>Research items found</span></div>
     <div><b id="researchLastScan">Never</b><span>Last scan</span></div>
    </div>
+   <section class="editorial-composer" aria-labelledby="scanHealthTitle">
+    <div class="editorial-heading"><div><span class="editorial-kicker">AUTOMATION MONITOR</span><h3 id="scanHealthTitle">Live Data Health</h3><p>Recent automatic and administrator-triggered checks. A failed source is flagged separately from a successful scan.</p></div><button type="button" class="gray" id="refreshScanHealth">Refresh health</button></div>
+    <div class="editorial-stats"><div><b id="scanHealthSchedule">Every 30 min</b><span>Configured schedule</span></div><div><b id="scanHealthLast">Checking…</b><span>Most recent scan</span></div><div><b id="scanHealthStatus">—</b><span>Latest result</span></div></div>
+    <div id="scanHealthSources" aria-live="polite"><div class="empty">Loading source health…</div></div>
+    <p class="meta" id="scanHealthNote">The schedule is configured in Supabase. This panel reports scan results recorded by the backend; it does not independently guarantee the next run time.</p>
+   </section>
    <div id="researchMsg" class="msg hidden" role="status" aria-live="polite"></div>
    <div class="msg">Approved automated sources: National Weather Service alerts, USGS government-produced water observations, and NOAA Tides &amp; Currents observations. Results are prepared as private drafts. USGS and NOAA readings are measurements, not flood warnings, and preliminary or provisional data may be revised. Nothing is published without administrator review and approval.</div>
    <div class="editorial-queue-head"><div><h3>Research results</h3><span class="meta">Automatically collected source records. Review before sending any item to News &amp; Updates.</span></div><button type="button" class="gray" id="refreshResearch">Refresh results</button></div>
@@ -452,7 +458,7 @@ window.loadCoastWatchModeration=loadModerationQueue;
 $("refreshModeration").addEventListener("click",loadModerationQueue);
 $("moderationQueue").addEventListener("click",async e=>{const button=e.target.closest("[data-clear-moderation]");if(!button||!["owner","admin"].includes(role))return;const userId=button.dataset.clearModeration;if(!confirm("Clear this account's AI-chat warning and suspension? The audit history will be retained."))return;button.disabled=true;try{const {data:{user}}=await db.auth.getUser();const {error:updateError}=await db.from("coastwatch_ai_moderation_state").update({offense_count:0,warned_at:null,suspended_until:null,updated_at:new Date().toISOString()}).eq("user_id",userId);if(updateError)throw updateError;const {error:eventError}=await db.from("coastwatch_ai_moderation_events").insert({user_id:userId,event_type:"cleared",actor_user_id:user.id,details:{reason:"Admin cleared warning and suspension"}});if(eventError)throw eventError;$("moderationMsg").textContent="Moderation state cleared. The audit history was retained.";$("moderationMsg").className="msg good";await loadModerationQueue();}catch(error){button.disabled=false;$("moderationMsg").textContent="Could not clear moderation state: "+error.message;$("moderationMsg").className="msg error";}});
 
-async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadLearningQueue();if(["owner","admin"].includes(role))await loadModerationQueue()}
+async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadScanHealth();await loadLearningQueue();if(["owner","admin"].includes(role))await loadModerationQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
 let reportLoadVersion=0;async function load(){const version=++reportLoadVersion;try{const {data,error}=await db.from("incidents").select("id,category,title,description,latitude,longitude,address,severity,status,display_name,anonymous,created_at,expires_at").in("category",cats).order("created_at",{ascending:false}).limit(300);if(error)throw error;if(version!==reportLoadVersion)return;rows=data||[];render();await loadMap();if(version!==reportLoadVersion)return;await loadPhotos();if(version!==reportLoadVersion)return;await loadFlags();if(version!==reportLoadVersion)return;await loadClearanceQueue()}catch(e){if(version===reportLoadVersion)msg("Could not load reports: "+e.message,"error")}}
@@ -682,6 +688,20 @@ let editorialRows=[];
 
 // CoastWatch FL Research Center: approved government data feeds and admin-controlled publishing.
 function researchMessage(message,type="good"){const el=$("researchMsg");el.textContent=message;el.className="msg "+(type==="error"?"error":"good");}
+async function loadScanHealth(){
+ const host=$("scanHealthSources");if(!host)return;
+ const {data,error}=await db.from("coastwatch_scan_runs").select("id,scanned_at,ok,sources,totals,trigger").order("scanned_at",{ascending:false}).limit(12);
+ if(error){host.innerHTML='<div class="msg error">Could not load scan health: '+esc(error.message)+'</div>';return;}
+ const runs=data||[],latest=runs[0];
+ $("scanHealthLast").textContent=latest?new Date(latest.scanned_at).toLocaleString():"No logged scan yet";
+ $("scanHealthStatus").textContent=latest?(latest.ok?"All sources OK":"Source issue"):"Awaiting first logged run";
+ $("scanHealthStatus").style.color=latest?(latest.ok?"#36d8b2":"#ff8795"):"";
+ if(!latest){host.innerHTML='<div class="empty">No scan history has been recorded yet. It will appear after the next backend scan.</div>';return;}
+ const sourceRows=(latest.sources||[]).map(s=>'<div class="editorial-item"><div class="editorial-item-head"><div><h4>'+esc(s.source||"Unknown source")+'</h4><span class="editorial-status '+(s.ok?"published":"rejected")+'">'+(s.ok?"Operational":"Failed")+'</span></div><span class="meta">Checked: '+Number(s.checked||0)+' · Drafts queued: '+Number(s.queued||0)+'</span></div>'+(s.error?'<p class="meta">'+esc(s.error)+'</p>':'')+'</div>').join("");
+ const history=runs.slice(0,8).map(r=>'<div class="meta" style="padding:7px 0;border-bottom:1px solid #19445b">'+esc(new Date(r.scanned_at).toLocaleString())+' · '+(r.ok?"All sources OK":"One or more source checks failed")+' · '+esc(r.trigger||"unknown")+'</div>').join("");
+ host.innerHTML='<h4>Latest source checks</h4>'+sourceRows+'<h4 style="margin-top:18px">Recent scan history</h4>'+history;
+}
+$("refreshScanHealth")?.addEventListener("click",loadScanHealth);
 async function loadResearchQueue(){
  const host=$("researchQueue");if(!host)return;
  const {data,error}=await db.from("research_scan_items").select("id,source_name,source_url,title,summary,body,category,confidence,source_published_at,event_start,event_end,area,status,scanned_at").order("scanned_at",{ascending:false}).limit(60);
