@@ -3067,3 +3067,39 @@ body.dark .mew-map-safety-note{background:#332b1d;border-color:#80602d;border-le
 body.dark .mew-map-safety-note strong{color:#ffd38a}
 body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
 @media(max-width:700px){.mew-map-safety-note{gap:9px;margin-bottom:9px;padding:10px 11px;border-radius:9px;font-size:12px;line-height:1.45}.mew-map-safety-icon{flex-basis:23px;width:23px;height:23px}}
+
+
+/* Desktop-only refinement for the persistent road-safety notice.
+   Mobile sizing and layout remain governed by the existing mobile rule above. */
+@media (min-width: 901px) {
+  #map-panel .mew-map-safety-note {
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 16px;
+    padding: 17px 22px;
+    border-radius: 13px;
+    border-width: 1px 1px 1px 6px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .16);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  #map-panel .mew-map-safety-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 19px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .16);
+  }
+  #map-panel .mew-map-safety-note p {
+    max-width: 1500px;
+    font-size: 14px;
+    letter-spacing: .005em;
+  }
+  #map-panel .mew-map-safety-note p strong:first-child {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 14px;
+    font-weight: 850;
+  }
+}
