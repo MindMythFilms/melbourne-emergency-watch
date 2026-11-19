@@ -4229,3 +4229,42 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     grid-row: 3 !important;
   }
 }
+
+
+/* COASTWATCH_BOTTOM_SPONSOR_FIT_V2
+   Preserve the full 1200x140 animated sponsor artwork at every viewport width.
+   The former fixed-height + object-fit:cover rules cropped the left/right content. */
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor > a {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  line-height:0 !important;
+}
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  aspect-ratio:1200 / 140 !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+@media (max-width:900px) {
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    order:3 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+  }
+}
