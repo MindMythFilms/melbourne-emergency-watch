@@ -3231,3 +3231,119 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     display: contents;
   }
 }
+
+
+/* Premium desktop sponsor presentation: one refined spotlight, compact calls to action. */
+@media (min-width: 901px) {
+  header > #community-partner-ads {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: min(calc(100% - 64px), 1080px) !important;
+    max-width: 1080px !important;
+    height: 148px !important;
+    min-height: 148px !important;
+    margin: 14px auto 0 !important;
+    border: 1px solid rgba(222, 190, 119, .46) !important;
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    background: linear-gradient(115deg, #071a2a, #103448 58%, #071b2b) !important;
+    box-shadow: 0 12px 30px rgba(0, 8, 18, .28), inset 0 1px 0 rgba(255,255,255,.09) !important;
+  }
+  header > #community-partner-ads .cw-ad-slides {
+    position: relative !important;
+    height: 148px !important;
+    min-height: 148px !important;
+    overflow: hidden !important;
+    border-radius: 14px !important;
+  }
+  header > #community-partner-ads .cw-ad-slide {
+    height: 148px !important;
+    min-height: 148px !important;
+  }
+  header > #community-partner-ads .cw-ad-slide picture,
+  header > #community-partner-ads .cw-ad-slide picture img,
+  header > #community-partner-ads .cw-ad-slide > img {
+    display: block !important;
+    width: 100% !important;
+    height: 148px !important;
+    min-height: 148px !important;
+    max-height: 148px !important;
+    object-fit: cover !important;
+    object-position: center 48% !important;
+  }
+  header > #community-partner-ads .cw-ad-caption {
+    position: absolute !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 25px !important;
+    box-sizing: border-box !important;
+    padding: 4px 13px !important;
+    border-top: 1px solid rgba(255,255,255,.1) !important;
+    background: linear-gradient(90deg, rgba(3,16,27,.88), rgba(3,16,27,.62)) !important;
+    color: #f1dfb7 !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: .13em !important;
+    text-transform: uppercase !important;
+  }
+  header > #community-partner-ads .cw-ad-progress i {
+    width: 6px !important;
+    height: 6px !important;
+    margin-left: 5px !important;
+  }
+  header > .cw-sponsor-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: fit-content !important;
+    max-width: calc(100% - 64px) !important;
+    margin: 9px auto 14px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  header > .cw-sponsor-actions > .cw-sponsor-top-cta,
+  header > .cw-sponsor-actions > .cw-sponsor-directory-cta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  header > .cw-sponsor-actions > .cw-sponsor-top-cta a,
+  header > .cw-sponsor-actions > .cw-sponsor-directory-cta a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 38px !important;
+    padding: 9px 20px !important;
+    border: 1px solid rgba(230, 199, 133, .72) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #f3dfb0 0%, #d8b66d 100%) !important;
+    color: #2c2415 !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    letter-spacing: .025em !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255,255,255,.58) !important;
+    transition: transform .18s ease, filter .18s ease !important;
+  }
+  header > .cw-sponsor-actions > .cw-sponsor-top-cta a:hover,
+  header > .cw-sponsor-actions > .cw-sponsor-directory-cta a:hover {
+    transform: translateY(-1px) !important;
+    filter: brightness(1.06) !important;
+  }
+}
