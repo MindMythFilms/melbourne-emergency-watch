@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071b2d">
+<title>Local Business Sponsors | CoastWatch FL</title><meta name="description" content="Meet the local businesses supporting CoastWatch FL and community preparedness across Brevard County, Florida.">
+<link rel="stylesheet" href="/assets/css/coastwatch.css?v=20261119-sponsor-network">
+<style>
+.cws-page{max-width:1180px;width:calc(100% - 32px);margin:0 auto;padding:22px 0 60px;color:#eaf6fb}.cws-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 20px;border-bottom:1px solid #ffffff20}.cws-top a{color:#dff8fb;text-decoration:none;font-weight:800}.cws-hero{text-align:center;padding:45px 10px 30px}.cws-kicker{color:#79e0d8;font-size:11px;font-weight:900;letter-spacing:.18em}.cws-hero h1{font:800 clamp(30px,5vw,48px) Manrope,sans-serif;color:#fff;margin:10px 0}.cws-hero p{max-width:720px;margin:0 auto;color:#bdd4df;line-height:1.7}.cws-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.cws-card{min-width:0;padding:20px;border:1px solid #1c5268;border-radius:17px;background:linear-gradient(145deg,#0b2b41,#071c2d);box-shadow:0 15px 35px #0003}.cws-logo{width:100%;height:125px;object-fit:contain;background:#061a29;border-radius:11px;padding:12px}.cws-card h2{font:800 18px Manrope,sans-serif;margin:15px 0 6px;color:#fff}.cws-card p{color:#bfd3de;font-size:13px;line-height:1.65;overflow-wrap:anywhere}.cws-area{color:#80dcd5;font-size:11px;font-weight:800}.cws-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.cws-links a{color:#8fe8e1;font-size:12px;font-weight:800;text-decoration:none}.cws-empty{text-align:center;padding:34px 18px;border:1px dashed #316176;border-radius:16px;color:#c2d9e3;line-height:1.7}.cws-footer{text-align:center;color:#8eabb9;font-size:11px;line-height:1.7;margin-top:35px}@media(max-width:850px){.cws-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.cws-grid{grid-template-columns:1fr}.cws-page{width:calc(100% - 22px)}.cws-hero{padding-top:32px}}
+</style></head><body><main class="cws-page">
+<header class="cws-top"><a href="/">← CoastWatch FL</a><a href="/sponsor.html">Become a sponsor</a></header>
+<section class="cws-hero"><span class="cws-kicker">LOCAL PARTNERS · STRONGER COMMUNITIES</span><h1>Meet Our Sponsors</h1><p>These businesses help support CoastWatch FL and its community information resources. Sponsored partnerships do not influence hazard reports, official alerts, moderation, or editorial decisions.</p></section>
+<div id="cwsDirectory" class="cws-grid" aria-live="polite"><div class="cws-empty">Loading local sponsors…</div></div>
+<footer class="cws-footer">CoastWatch FL is a community information initiative, not an emergency service. Sponsor participation is not a government endorsement.</footer></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+(async()=>{
+ const host=document.getElementById("cwsDirectory");
+ const db=supabase.createClient("https://lqzxzlaxvfjuklyzxbex.supabase.co","sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ try{
+  const {data,error}=await db.from("sponsor_profiles").select("id,business_name,display_name,logo_path,website,city,service_area,description,services").eq("is_active",true).order("business_name");
+  if(error)throw error;
+  if(!data||!data.length){host.innerHTML='<div class="cws-empty" style="grid-column:1/-1"><strong>No public sponsors yet.</strong><br>We are building our local business partner network. Interested businesses can apply to become a CoastWatch FL sponsor.</div>';return;}
+  host.innerHTML=data.map(p=>{
+   const website=p.website&&p.website.startsWith("https://")?'<a href="'+esc(p.website)+'" target="_blank" rel="noopener noreferrer">Business website ↗</a>':"";
+   const logo=p.logo_path&&p.logo_path.startsWith("https://")?'<img class="cws-logo" src="'+esc(p.logo_path)+'" alt="'+esc(p.display_name||p.business_name)+' logo" loading="lazy">':'<div class="cws-logo" aria-hidden="true" style="display:grid;place-items:center;color:#82dcd7;font-weight:900">COASTWATCH FL PARTNER</div>';
+   const area=[p.city,p.service_area].filter(Boolean).join(" · ");
+   return '<article class="cws-card">'+logo+'<h2>'+esc(p.display_name||p.business_name)+'</h2>'+(area?'<div class="cws-area">'+esc(area)+'</div>':"")+'<p>'+esc(p.description||"")+'</p><p>'+esc(p.services||"")+'</p><div class="cws-links">'+website+'</div></article>';
+  }).join("");
+ }catch(error){host.innerHTML='<div class="cws-empty" style="grid-column:1/-1">Sponsor directory is temporarily unavailable. Please try again later.</div>';console.error("Sponsor directory:",error);}
+})();
+</script></body></html>
