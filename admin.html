@@ -328,7 +328,7 @@ body:before{
   <form id="sponsorCampaignForm" class="editorial-composer">
    <div class="field"><label for="sponsorCampaignSponsor">Sponsor</label><select id="sponsorCampaignSponsor" required><option value="">Choose an approved sponsor</option></select></div>
    <div class="field"><label for="sponsorCampaignTitle">Campaign title</label><input id="sponsorCampaignTitle" required maxlength="140" placeholder="Summer community campaign"></div>
-   <div class="field"><label for="sponsorCampaignImage">Upload sponsor advertisement image</label><input id="sponsorCampaignImage" type="file" accept="image/png,image/jpeg,image/webp" required><small class="meta">Choose an image from your device. PNG, JPG or WebP · maximum 5 MB. No image URL needed.</small></div>
+   <div class="field"><label for="sponsorCampaignImage">Select artwork from this sponsor application</label><select id="sponsorCampaignImage" required><option value="">Choose an uploaded sponsor image</option></select><small class="meta">Images uploaded with the sponsor application appear here automatically. No re-upload needed.</small><div id="sponsorCampaignImagePreview" class="sponsor-submitted-asset" style="margin-top:10px"></div></div>
    <div class="field"><label for="sponsorCampaignDestination">Destination URL (HTTPS)</label><input id="sponsorCampaignDestination" type="url" required maxlength="1000" placeholder="https://business.com/"></div>
    <div class="field"><label for="sponsorCampaignPlacement">Placement</label><select id="sponsorCampaignPlacement"><option value="homepage_banner">Homepage banner</option><option value="news_desk">News Desk sponsored placement</option><option value="directory_feature">Featured directory placement</option></select></div>
    <div class="field"><label for="sponsorCampaignStart">Start date (optional)</label><input id="sponsorCampaignStart" type="datetime-local"></div>
@@ -541,6 +541,7 @@ async function loadSponsorCenter(){
  $("sponsorApplicationQueue").innerHTML=visible.map(sponsorAppCard).join("")||'<div class="empty">No '+esc(filter==="all"?"applications":filter+" applications")+' found.</div>';
  $("sponsorProfileQueue").innerHTML=sponsorProfiles.map(sponsorProfileCard).join("")||'<div class="empty">No sponsor profiles have been approved yet.</div>';
  $("sponsorCampaignSponsor").innerHTML='<option value="">Choose an approved sponsor</option>'+sponsorProfiles.map(p=>'<option value="'+p.id+'">'+esc(p.display_name||p.business_name)+'</option>').join("");
+ populateSponsorArtworkOptions();
  $("sponsorCampaignQueue").innerHTML=sponsorCampaigns.map(c=>{
   const p=sponsorProfiles.find(x=>x.id===c.sponsor_id);
   return '<article class="sponsor-admin-card"><h4>'+esc(c.title)+'</h4><div class="meta">'+esc(p?p.business_name:"Sponsor")+' · '+esc(c.placement)+' · '+esc(c.status)+'</div><p>'+esc(c.starts_at||"No start date")+' → '+esc(c.ends_at||"No end date")+'</p><div class="actions">'+(c.status==="draft"?'<button type="button" data-campaign-activate="'+c.id+'">Activate campaign</button>':'<button type="button" class="gray" data-campaign-pause="'+c.id+'">Pause campaign</button>')+'</div></article>';
@@ -554,6 +555,30 @@ async function loadSponsorCenter(){
 }
 $("refreshSponsors").addEventListener("click",loadSponsorCenter);
 $("sponsorApplicationFilter").addEventListener("change",loadSponsorCenter);
+function populateSponsorArtworkOptions(){
+ const sponsorId=$("sponsorCampaignSponsor").value,profile=sponsorProfiles.find(p=>p.id===sponsorId);
+ const app=profile&&sponsorApplications.find(a=>a.id===profile.application_id);
+ const select=$("sponsorCampaignImage"),preview=$("sponsorCampaignImagePreview");
+ const labels={logo_path:"Business logo",homepage_banner_path:"Homepage banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
+ const options=app?Object.entries(labels).filter(([field])=>app[field]).map(([field,label])=>({path:app[field],label})): [];
+ select.innerHTML='<option value="">Choose an uploaded sponsor image</option>'+options.map(item=>'<option value="'+esc(item.path)+'">'+esc(item.label)+'</option>').join("");
+ preview.innerHTML="";
+ if(!options.length){preview.innerHTML='<p class="meta">No uploaded artwork was found for this sponsor application.</p>';return;}
+ select.value=options.find(x=>x.label==="Homepage banner")?.path||options[0].path;
+ showSelectedSponsorArtwork();
+}
+function showSelectedSponsorArtwork(){
+ const select=$("sponsorCampaignImage"),preview=$("sponsorCampaignImagePreview");
+ const profile=sponsorProfiles.find(p=>p.id===$("sponsorCampaignSponsor").value);
+ const app=profile&&sponsorApplications.find(a=>a.id===profile.application_id);
+ const labels={logo_path:"Business logo",homepage_banner_path:"Homepage banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
+ const field=Object.entries(labels).find(([key])=>app&&app[key]===select.value);
+ const url=field&&app[field[0]+"_preview"];
+ preview.innerHTML=url?'<b>'+esc(field[1])+'</b><img src="'+esc(url)+'" alt="Selected sponsor artwork preview" style="display:block;max-width:100%;max-height:180px;object-fit:contain;margin-top:7px;border-radius:9px;background:#102a3d">':'';
+}
+$("sponsorCampaignSponsor").addEventListener("change",populateSponsorArtworkOptions);
+$("sponsorCampaignImage").addEventListener("change",showSelectedSponsorArtwork);
+
 $("sponsorApplicationQueue").addEventListener("click",async event=>{
  const approve=event.target.closest("[data-sponsor-approve]"),reject=event.target.closest("[data-sponsor-reject]");
  if(!approve&&!reject)return;
@@ -578,22 +603,26 @@ $("sponsorProfileQueue").addEventListener("click",async event=>{
 });
 $("sponsorCampaignForm").addEventListener("submit",async event=>{
  event.preventDefault();if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can create campaigns.","error");return;}
- const file=$("sponsorCampaignImage").files[0],destination=$("sponsorCampaignDestination").value.trim();
- if(!file){sponsorMsg("Please choose the sponsor advertisement image from your device.","error");return;}
- const allowed=["image/png","image/jpeg","image/webp"];
- if(!allowed.includes(file.type)||file.size>5*1024*1024){sponsorMsg("Use a PNG, JPG or WebP image no larger than 5 MB.","error");return;}
+ const sponsorId=$("sponsorCampaignSponsor").value,sourcePath=$("sponsorCampaignImage").value,destination=$("sponsorCampaignDestination").value.trim();
+ if(!sponsorId||!sourcePath){sponsorMsg("Choose a sponsor and one of its uploaded application images.","error");return;}
  if(!destination.startsWith("https://")){sponsorMsg("The business destination URL must use HTTPS.","error");return;}
  const button=$("createSponsorCampaign");button.disabled=true;
  try{
-  const ext=({ "image/png":"png","image/jpeg":"jpg","image/webp":"webp" })[file.type];
-  const path="campaigns/"+$("sponsorCampaignSponsor").value+"/"+crypto.randomUUID()+"."+ext;
-  const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+  const selectedApp=sponsorApplications.find(a=>a.id===sponsorProfiles.find(p=>p.id===sponsorId)?.application_id);
+  const allowedPaths=[selectedApp?.logo_path,selectedApp?.homepage_banner_path,selectedApp?.news_desk_banner_path,selectedApp?.directory_banner_path].filter(Boolean);
+  if(!allowedPaths.includes(sourcePath))throw new Error("That image does not belong to the selected sponsor application. Refresh the Sponsor Center and try again.");
+  const {data:file,error:downloadError}=await db.storage.from("sponsor-logos").download(sourcePath);
+  if(downloadError)throw downloadError;
+  if(!file||file.size>5*1024*1024)throw new Error("The selected artwork is missing or exceeds the 5 MB campaign limit.");
+  const mime=file.type||"image/jpeg",ext=mime==="image/png"?"png":mime==="image/webp"?"webp":"jpg";
+  const path="campaigns/"+sponsorId+"/"+crypto.randomUUID()+"."+ext;
+  const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(path,file,{cacheControl:"3600",upsert:false,contentType:mime});
   if(uploadError)throw uploadError;
   const {data:publicImage}=db.storage.from("sponsor-creatives").getPublicUrl(path);
   if(!publicImage?.publicUrl)throw new Error("Could not create a public image URL.");
-  const {error}=await db.from("sponsor_campaigns").insert({sponsor_id:$("sponsorCampaignSponsor").value,title:$("sponsorCampaignTitle").value.trim(),creative_image_path:publicImage.publicUrl,destination_url:destination,placement:$("sponsorCampaignPlacement").value,status:"draft",starts_at:$("sponsorCampaignStart").value?new Date($("sponsorCampaignStart").value).toISOString():null,ends_at:$("sponsorCampaignEnd").value?new Date($("sponsorCampaignEnd").value).toISOString():null});
+  const {error}=await db.from("sponsor_campaigns").insert({sponsor_id:sponsorId,title:$("sponsorCampaignTitle").value.trim(),creative_image_path:publicImage.publicUrl,destination_url:destination,placement:$("sponsorCampaignPlacement").value,status:"draft",starts_at:$("sponsorCampaignStart").value?new Date($("sponsorCampaignStart").value).toISOString():null,ends_at:$("sponsorCampaignEnd").value?new Date($("sponsorCampaignEnd").value).toISOString():null});
   if(error)throw error;
-  $("sponsorCampaignForm").reset();sponsorMsg("Image uploaded and campaign saved as a draft. Activate it in the campaign queue when ready.");await loadSponsorCenter();
+  $("sponsorCampaignForm").reset();$("sponsorCampaignImagePreview").innerHTML="";sponsorMsg("Selected application artwork copied into campaign storage and saved as a draft. Activate it when ready.");await loadSponsorCenter();
  }catch(error){sponsorMsg("Could not save campaign: "+error.message,"error");}finally{button.disabled=false;}
 });
 $("sponsorCampaignQueue").addEventListener("click",async event=>{
