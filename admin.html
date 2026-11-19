@@ -328,7 +328,7 @@ body:before{
   <form id="sponsorCampaignForm" class="editorial-composer">
    <div class="field"><label for="sponsorCampaignSponsor">Sponsor</label><select id="sponsorCampaignSponsor" required><option value="">Choose an approved sponsor</option></select></div>
    <div class="field"><label for="sponsorCampaignTitle">Campaign title</label><input id="sponsorCampaignTitle" required maxlength="140" placeholder="Summer community campaign"></div>
-   <div class="field"><label for="sponsorCampaignImage">Creative image URL (HTTPS)</label><input id="sponsorCampaignImage" type="url" required maxlength="1000" placeholder="https://example.com/banner.webp"></div>
+   <div class="field"><label for="sponsorCampaignImage">Upload sponsor advertisement image</label><input id="sponsorCampaignImage" type="file" accept="image/png,image/jpeg,image/webp" required><small class="meta">Choose an image from your device. PNG, JPG or WebP · maximum 5 MB. No image URL needed.</small></div>
    <div class="field"><label for="sponsorCampaignDestination">Destination URL (HTTPS)</label><input id="sponsorCampaignDestination" type="url" required maxlength="1000" placeholder="https://business.com/"></div>
    <div class="field"><label for="sponsorCampaignPlacement">Placement</label><select id="sponsorCampaignPlacement"><option value="homepage_banner">Homepage banner</option><option value="news_desk">News Desk sponsored placement</option><option value="directory_feature">Featured directory placement</option></select></div>
    <div class="field"><label for="sponsorCampaignStart">Start date (optional)</label><input id="sponsorCampaignStart" type="datetime-local"></div>
@@ -572,10 +572,23 @@ $("sponsorProfileQueue").addEventListener("click",async event=>{
 });
 $("sponsorCampaignForm").addEventListener("submit",async event=>{
  event.preventDefault();if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can create campaigns.","error");return;}
- const image=$("sponsorCampaignImage").value.trim(),destination=$("sponsorCampaignDestination").value.trim();
- if(!image.startsWith("https://")||!destination.startsWith("https://")){sponsorMsg("Creative and destination URLs must both use HTTPS.","error");return;}
+ const file=$("sponsorCampaignImage").files[0],destination=$("sponsorCampaignDestination").value.trim();
+ if(!file){sponsorMsg("Please choose the sponsor advertisement image from your device.","error");return;}
+ const allowed=["image/png","image/jpeg","image/webp"];
+ if(!allowed.includes(file.type)||file.size>5*1024*1024){sponsorMsg("Use a PNG, JPG or WebP image no larger than 5 MB.","error");return;}
+ if(!destination.startsWith("https://")){sponsorMsg("The business destination URL must use HTTPS.","error");return;}
  const button=$("createSponsorCampaign");button.disabled=true;
- try{const {error}=await db.from("sponsor_campaigns").insert({sponsor_id:$("sponsorCampaignSponsor").value,title:$("sponsorCampaignTitle").value.trim(),creative_image_path:image,destination_url:destination,placement:$("sponsorCampaignPlacement").value,status:"draft",starts_at:$("sponsorCampaignStart").value?new Date($("sponsorCampaignStart").value).toISOString():null,ends_at:$("sponsorCampaignEnd").value?new Date($("sponsorCampaignEnd").value).toISOString():null});if(error)throw error;$("sponsorCampaignForm").reset();sponsorMsg("Campaign saved as a draft. It is not public until activated.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not save campaign: "+error.message,"error");}finally{button.disabled=false;}
+ try{
+  const ext=({ "image/png":"png","image/jpeg":"jpg","image/webp":"webp" })[file.type];
+  const path="campaigns/"+$("sponsorCampaignSponsor").value+"/"+crypto.randomUUID()+"."+ext;
+  const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+  if(uploadError)throw uploadError;
+  const {data:publicImage}=db.storage.from("sponsor-creatives").getPublicUrl(path);
+  if(!publicImage?.publicUrl)throw new Error("Could not create a public image URL.");
+  const {error}=await db.from("sponsor_campaigns").insert({sponsor_id:$("sponsorCampaignSponsor").value,title:$("sponsorCampaignTitle").value.trim(),creative_image_path:publicImage.publicUrl,destination_url:destination,placement:$("sponsorCampaignPlacement").value,status:"draft",starts_at:$("sponsorCampaignStart").value?new Date($("sponsorCampaignStart").value).toISOString():null,ends_at:$("sponsorCampaignEnd").value?new Date($("sponsorCampaignEnd").value).toISOString():null});
+  if(error)throw error;
+  $("sponsorCampaignForm").reset();sponsorMsg("Image uploaded and campaign saved as a draft. Activate it in the campaign queue when ready.");await loadSponsorCenter();
+ }catch(error){sponsorMsg("Could not save campaign: "+error.message,"error");}finally{button.disabled=false;}
 });
 $("sponsorCampaignQueue").addEventListener("click",async event=>{
  const activate=event.target.closest("[data-campaign-activate]"),pause=event.target.closest("[data-campaign-pause]");if(!activate&&!pause)return;
