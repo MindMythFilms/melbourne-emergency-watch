@@ -601,14 +601,14 @@ function populateSponsorArtworkOptions(){
  select.innerHTML='<option value="">Choose an uploaded sponsor image</option>'+options.map(item=>'<option value="'+esc(item.path)+'">'+esc(item.label)+'</option>').join("");
  preview.innerHTML="";
  if(!options.length){preview.innerHTML='<p class="meta">No uploaded artwork was found for this sponsor application.</p>';return;}
- select.value=options.find(x=>x.label==="Homepage banner")?.path||options[0].path;
+ select.value=options.find(x=>x.label==="Left map sponsor artwork")?.path||options[0].path;
  showSelectedSponsorArtwork();
 }
 function showSelectedSponsorArtwork(){
  const select=$("sponsorCampaignImage"),preview=$("sponsorCampaignImagePreview");
  const profile=sponsorProfiles.find(p=>p.id===$("sponsorCampaignSponsor").value);
  const app=profile&&sponsorApplications.find(a=>a.id===profile.application_id);
- const labels={logo_path:"Business logo",homepage_banner_path:"Homepage banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
+ const labels={logo_path:"Business logo",homepage_banner_path:"Left map sponsor artwork",map_bottom_banner_path:"Map bottom banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
  const field=Object.entries(labels).find(([key])=>app&&app[key]===select.value);
  const url=field&&app[field[0]+"_preview"];
  preview.innerHTML=url?'<b>'+esc(field[1])+'</b><img src="'+esc(url)+'" alt="Selected sponsor artwork preview" style="display:block;max-width:100%;max-height:180px;object-fit:contain;margin-top:7px;border-radius:9px;background:#102a3d">':'';
