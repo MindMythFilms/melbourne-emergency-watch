@@ -296,7 +296,7 @@ body:before{
  <section class="panel editorial-panel">
   <div class="pad">
    <div class="editorial-heading">
-    <div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Research Center</h2><p>Scan official Brevard County weather alerts and automatically prepare private CoastWatch drafts. Nothing is published without your approval.</p></div>
+    <div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Research Center</h2><p>Scan approved NWS alerts, USGS water observations, and NOAA coastal water levels. Automatically prepare private CoastWatch drafts. Nothing is published without your approval.</p></div>
     <button type="button" class="green" id="runResearchScan">Run Research Scan</button>
    </div>
    <div class="editorial-stats">
@@ -715,7 +715,7 @@ $("runResearchScan").addEventListener("click",async()=>{
    throw new Error(detail);
   }
   if(!data?.ok)throw new Error(data?.error||"The research scan did not complete.");
-  researchMessage("Scan complete. "+(data.sources||[]).map(s=>s.source+": "+(s.ok?(s.checked+" checked, "+s.queued+" queued"):"not available ("+s.error+")")).join(" · ")+". Added "+(data.totals?.added||0)+", refreshed "+(data.totals?.refreshed||0)+". "+data.note);
+  researchMessage("Scan complete. "+(data.sources||[]).map(s=>s.source+": "+(s.ok?(s.checked+" checked, "+s.queued+" queued"):"not available ("+(typeof s.error==="string"?s.error:JSON.stringify(s.error)) +")")).join(" · ")+". Added "+(data.totals?.added||0)+", refreshed "+(data.totals?.refreshed||0)+". "+data.note);
   await loadResearchQueue();
  }catch(error){researchMessage("Research scan failed: "+(error.message||"Unknown error"),"error");}
  finally{button.disabled=false;button.textContent="Run Research Scan";}
