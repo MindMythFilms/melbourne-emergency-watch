@@ -6,7 +6,7 @@
  const track=(id,type)=>db.from("sponsor_ad_events").insert({campaign_id:id,event_type:type,page_path:location.pathname}).then(({error})=>{if(error)console.warn("Sponsor event not recorded:",error.message)});
  async function load(){
   try{
-   const {data,error}=await db.from("sponsor_campaigns").select("id,title,creative_image_path,destination_url,placement,sponsor_profiles(business_name,display_name)").eq("status","active").eq("placement","homepage_banner").or("starts_at.is.null,starts_at.lte."+new Date().toISOString()).order("created_at",{ascending:false}).limit(1);
+   const {data,error}=await db.from("sponsor_campaigns").select("id,title,creative_image_path,destination_url,placement,starts_at,ends_at,sponsor_profiles(business_name,display_name)").eq("status","active").eq("placement","homepage_banner").or("starts_at.is.null,starts_at.lte."+new Date().toISOString()).order("created_at",{ascending:false}).limit(8);
    if(error)throw error;
    const campaign=(data||[]).find(x=>(!x.starts_at||new Date(x.starts_at)<=new Date())&&(!x.ends_at||new Date(x.ends_at)>new Date()));
    if(!campaign||!campaign.creative_image_path||!campaign.creative_image_path.startsWith("https://")||!campaign.destination_url||!campaign.destination_url.startsWith("https://"))return;
