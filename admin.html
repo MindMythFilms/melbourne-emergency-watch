@@ -639,9 +639,11 @@ $("sponsorApplicationQueue").addEventListener("click",async event=>{
   const {data:logoFile,error:logoDownloadError}=await db.storage.from("sponsor-logos").download(app.logo_path);
   if(logoDownloadError||!logoFile)throw logoDownloadError||new Error("The submitted company logo could not be read.");
   const logoExt=(app.logo_path.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"")||"png";
-  const publicLogoPath="sponsor-logos/"+id+"."+logoExt;
-  const {error:logoUploadError}=await db.storage.from("sponsor-creatives").upload(publicLogoPath,logoFile,{upsert:true,contentType:logoFile.type||"image/"+logoExt,cacheControl:"3600"});
-  if(logoUploadError)throw new Error("Could not publish the sponsor logo: "+logoUploadError.message);
+  // Use a unique public object key for every attempt. Reusing a fixed key with
+  // upsert requires UPDATE permission and can fail even when INSERT is allowed.
+  const publicLogoPath="sponsor-logos/"+id+"-"+crypto.randomUUID()+"."+logoExt;
+  const {error:logoUploadError}=await db.storage.from("sponsor-creatives").upload(publicLogoPath,logoFile,{upsert:false,contentType:logoFile.type||"image/"+logoExt,cacheControl:"3600"});
+  if(logoUploadError)throw new Error("Could not publish the sponsor logo to public storage ("+logoUploadError.statusCode+"): "+logoUploadError.message);
   const {data:publicLogo}=db.storage.from("sponsor-creatives").getPublicUrl(publicLogoPath);
   if(!publicLogo?.publicUrl)throw new Error("Could not create a public logo URL.");
   const slug=sponsorSlug(app.preferred_display_name||app.business_name)+"-"+id.slice(0,6);
