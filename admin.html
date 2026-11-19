@@ -809,28 +809,56 @@ async function searchRoadGeometry(road){
  const tokenPattern=words.map(w=>aliases[w.toLowerCase()]||w.replace(/[|\\{}()[\]^$+*?.]/g,"\\$&")).join("\\s+");
  const direction="(?:(?:north|south|east|west|n|s|e|w)\\s+)?";
  const suffix="(?:\\s+(?:north|south|east|west|n|s|e|w))?";
- const pattern="^"+direction+tokenPattern+suffix+"$";
- const query='[out:json][timeout:25];way["highway"]["name"~"'+pattern.replace(/"/g,'\\"')+'",i](27.7,-81.0,28.8,-80.3);out geom;';
+ const normalized=clean.replace(/\b(?:boulevard|blvd)\b/ig,"").replace(/\b(?:street|st)\b/ig,"").replace(/\b(?:road|rd)\b/ig,"").replace(/\b(?:avenue|ave)\b/ig,"").replace(/\b(?:highway|hwy)\b/ig,"").replace(/[^\w]/g,"").toLowerCase();
+ const routeMatch=clean.match(/\b(?:us|u\.s\.|sr|state route|cr|county road|i)\s*[-#]?\s*(\d+[a-z]?)\b/i);
+ const routeRef=routeMatch?routeMatch[1]:null;
+ const patterns=[new RegExp("^"+direction+tokenPattern+suffix+"$","i")];
+ if(routeRef)patterns.push(new RegExp("(^|[^0-9])"+routeRef+"([a-z]?)([^0-9]|$)","i"));
+ const queries=[];
+ for(const pattern of patterns){
+  const rx=pattern.source.replace(/"/g,'\\"');
+  queries.push('[out:json][timeout:25];way["highway"]["name"~"'+rx+'",i](27.7,-81.0,28.8,-80.3);out geom;');
+  if(routeRef)queries.push('[out:json][timeout:25];way["highway"]["ref"~"'+routeRef+'",i](27.7,-81.0,28.8,-80.3);out geom;');
+ }
+ const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter","https://overpass.private.coffee/api/interpreter"];
  let geometries=[];
- try{
-  const response=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)});
-  if(response.ok){const data=await response.json();geometries=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry&&el.geometry.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));}
- }catch(error){}
+ for(const query of queries){
+  for(const endpoint of endpoints){
+   try{
+    const response=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)});
+    if(!response.ok)continue;
+    const data=await response.json();
+    const found=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry&&el.geometry.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));
+    if(found.length){geometries=found;break;}
+   }catch(error){}
+  }
+  if(geometries.length)break;
+ }
  if(!geometries.length){
-  const queries=[clean+", Brevard County, Florida, USA"];
-  if(/\bboulevard\b/i.test(clean))queries.push(clean.replace(/\bboulevard\b/i,"Blvd")+", Brevard County, Florida, USA");
-  if(/\bblvd\b/i.test(clean))queries.push(clean.replace(/\bblvd\b/i,"Boulevard")+", Brevard County, Florida, USA");
-  if(!/\b(north|south|east|west|n|s|e|w)\b/i.test(clean))queries.push("South "+clean+", Brevard County, Florida, USA");
-  for(const qtext of queries){
-   const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+encodeURIComponent(qtext);
-   const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
-   if(!res.ok)continue;
-   const fc=await res.json();
-   geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+  const variants=new Set([clean]);
+  const addVariant=value=>{if(value)variants.add(value.trim());};
+  addVariant(clean.replace(/\bblvd\b/ig,"Boulevard").replace(/\bboulevard\b/ig,"Blvd"));
+  addVariant(clean.replace(/\bst\b/ig,"Street").replace(/\bstreet\b/ig,"St"));
+  addVariant(clean.replace(/\brd\b/ig,"Road").replace(/\broad\b/ig,"Rd"));
+  addVariant(clean.replace(/\bave\b/ig,"Avenue").replace(/\bavenue\b/ig,"Ave"));
+  addVariant(clean.replace(/\bn\b/ig,"North").replace(/\bs\b/ig,"South").replace(/\be\b/ig,"East").replace(/\bw\b/ig,"West"));
+  if(!/\b(north|south|east|west|n|s|e|w)\b/i.test(clean))addVariant("South "+clean);
+  if(routeRef){addVariant("State Road "+routeRef);addVariant("State Route "+routeRef);addVariant("US Highway "+routeRef);addVariant("U.S. Highway "+routeRef);addVariant("County Road "+routeRef);}
+  for(const name of variants){
+   for(const qtext of [name+", West Melbourne, Florida, USA",name+", Brevard County, Florida, USA"]){
+    try{
+     const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+encodeURIComponent(qtext);
+     const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
+     if(!res.ok)continue;
+     const fc=await res.json();
+     const found=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+     if(found.length){geometries=found;break;}
+    }catch(error){}
+   }
    if(geometries.length)break;
   }
  }
- if(!geometries.length)throw new Error('Could not find mapped road geometry for "'+clean+'". Try "South John Rodes Boulevard" or the abbreviated map label.');
+ if(!geometries.length)throw new Error('Could not find mapped road geometry for "'+clean+'". Try a nearby cross street, route number, or map label.');
  return {geometry:{type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry}))},segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
