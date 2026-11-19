@@ -506,13 +506,17 @@ async function loadNwsAlerts(){
   // Include Brevard County and all four Brevard coastal/mainland forecast zones.
   // County-only alerts omit coastal rip-current products.
   const nwsZones=["FLC009","FLZ141","FLZ154","FLZ159","FLZ164","FLZ247","FLZ347","FLZ447","FLZ647","FLZ747"];
-  const zoneResponses=await Promise.all(nwsZones.map(async zone=>{
+  // A single unavailable forecast zone must never suppress every other NWS alert.
+  const zoneResults=await Promise.allSettled(nwsZones.map(async zone=>{
    const response=await fetch("https://api.weather.gov/alerts/active?zone="+encodeURIComponent(zone),{headers:{Accept:"application/geo+json"},cache:"no-store"});
    if(!response.ok)throw new Error("NWS API returned HTTP "+response.status+" for "+zone);
-   return response.json();
+   return {zone,body:await response.json()};
   }));
+  const successfulZones=zoneResults.filter(result=>result.status==="fulfilled").map(result=>result.value);
+  const failedZones=zoneResults.filter(result=>result.status==="rejected");
+  if(!successfulZones.length)throw new Error("All Brevard NWS zone requests failed: "+failedZones.map(result=>result.reason?.message||"unknown error").join("; "));
   const uniqueFeatures=new Map();
-  zoneResponses.forEach(body=>(body.features||[]).forEach(feature=>{
+  successfulZones.forEach(({body})=>(body.features||[]).forEach(feature=>{
    const p=feature&&feature.properties||{};
    if(p.status!=="Test"&&p.messageType!=="Cancel"&&p.status!=="Expired"){
     uniqueFeatures.set(feature.id||p.id||[p.event,p.effective,p.areaDesc].join("|"),feature);
@@ -537,7 +541,7 @@ async function loadNwsAlerts(){
   });
   updateRipCurrentNotice(features);
    renderNwsAlertList(features);
-  if(status)status.textContent="Official NWS alerts: "+features.length+" active for Brevard County · refreshed "+new Date().toLocaleTimeString()+".";
+  if(status)status.textContent="Official NWS alerts: "+features.length+" active for Brevard County · "+successfulZones.length+"/"+nwsZones.length+" forecast areas checked"+(failedZones.length?" · partial feed":"")+" · refreshed "+new Date().toLocaleTimeString()+".";
  }catch(error){
   console.warn("CoastWatch NWS feed unavailable:",error);
   if(status)status.textContent="Official NWS feed temporarily unavailable. Community reports are unaffected. Check weather.gov for current alerts.";
