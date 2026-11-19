@@ -3130,3 +3130,31 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     box-shadow: 0 3px 10px rgba(0, 0, 0, .16) !important;
   }
 }
+
+
+/* Desktop-only sponsor CTAs: warm gold, larger targets, and a little more breathing room. */
+@media (min-width: 901px) {
+  header > .cw-sponsor-top-cta,
+  header > .cw-sponsor-directory-cta {
+    margin: 10px 6px 10px !important;
+  }
+  header > .cw-sponsor-top-cta a,
+  header > .cw-sponsor-directory-cta a {
+    min-height: 42px !important;
+    padding: 11px 23px !important;
+    border: 1px solid rgba(255, 224, 153, .9) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #f8d98a 0%, #d9a83e 52%, #b98224 100%) !important;
+    color: #2b210e !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1.25 !important;
+    letter-spacing: .015em !important;
+    box-shadow: 0 5px 15px rgba(190, 139, 42, .24), inset 0 1px 0 rgba(255,255,255,.55) !important;
+  }
+  header > .cw-sponsor-top-cta a:hover,
+  header > .cw-sponsor-directory-cta a:hover {
+    filter: brightness(1.07) !important;
+    transform: translateY(-1px);
+  }
+}
