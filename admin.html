@@ -217,6 +217,7 @@ body:before{
 .editorial-kicker{font-size:10px;letter-spacing:.16em;font-weight:900;color:#62d8ce}
 .editorial-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
 .editorial-stats>div{padding:13px 15px;border:1px solid #174a63;border-radius:12px;background:#0b2b43}
+.editorial-stats>div{min-width:0;overflow:hidden}.editorial-stats b{min-width:0;overflow-wrap:anywhere;word-break:normal;line-height:1.2;font-size:clamp(15px,3.6vw,25px)}
 .editorial-stats b{display:block;font:800 25px Manrope,sans-serif;color:#6be0d6}
 .editorial-stats span{font-size:11px;color:#a9c3d1}
 .editorial-composer{margin:18px 0 22px;padding:17px;border:1px solid #1c6170;border-radius:14px;background:#08283b}
@@ -693,7 +694,7 @@ async function loadScanHealth(){
  const {data,error}=await db.from("coastwatch_scan_runs").select("id,scanned_at,ok,sources,totals,trigger").order("scanned_at",{ascending:false}).limit(12);
  if(error){host.innerHTML='<div class="msg error">Could not load scan health: '+esc(error.message)+'</div>';return;}
  const runs=data||[],latest=runs[0];
- $("scanHealthLast").textContent=latest?new Date(latest.scanned_at).toLocaleString():"No logged scan yet";
+ $("scanHealthLast").textContent=latest?new Date(latest.scanned_at).toLocaleString("en-US",{month:"numeric",day:"numeric",hour:"numeric",minute:"2-digit"}):"No logged scan yet";
  $("scanHealthStatus").textContent=latest?(latest.ok?"All sources OK":"Source issue"):"Awaiting first logged run";
  $("scanHealthStatus").style.color=latest?(latest.ok?"#36d8b2":"#ff8795"):"";
  if(!latest){host.innerHTML='<div class="empty">No scan history has been recorded yet. It will appear after the next backend scan.</div>';return;}
