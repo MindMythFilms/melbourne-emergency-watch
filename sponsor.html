@@ -132,18 +132,29 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:f
   try{
    const files={logo:data.get("logo"),homepage_banner:data.get("homepage_banner"),map_bottom_banner:data.get("map_bottom_banner"),mobile_banner:data.get("mobile_banner"),news_desk_banner:data.get("news_desk_banner"),directory_banner:data.get("directory_banner")};
    const limits={logo:2*1024*1024,homepage_banner:5*1024*1024,map_bottom_banner:5*1024*1024,mobile_banner:5*1024*1024,news_desk_banner:5*1024*1024,directory_banner:5*1024*1024};
+   // Validate every selected asset before uploading anything. This prevents orphaned
+   // logo files when a later banner has the wrong dimensions.
+   const expectedDimensions={
+    homepage_banner:{width:640,height:1800,label:"PC left-side sponsor banner"},
+    map_bottom_banner:{width:1200,height:240,label:"PC bottom-of-map sponsor banner"},
+    mobile_banner:{width:1200,height:480,label:"Mobile sponsor banner"}
+   };
+   for(const [key,uploadFile] of Object.entries(files)){
+    if(!uploadFile||!uploadFile.size){if(key==="logo"||key==="homepage_banner")throw new Error("Please upload your business logo and PC left-side sponsor banner.");continue;}
+    if(!["image/gif","image/png","image/jpeg","image/webp"].includes(uploadFile.type))throw new Error("Use GIF, PNG, JPG or WebP files for all sponsor artwork.");
+    if(uploadFile.size>limits[key])throw new Error((key==="logo"?"Logo":key==="homepage_banner"?"PC left-side banner":key==="map_bottom_banner"?"PC bottom banner":key==="mobile_banner"?"Mobile banner":"Sponsor banner")+" exceeds its "+(key==="logo"?"2 MB":"5 MB")+" file-size limit.");
+    const expected=expectedDimensions[key];
+    if(expected){
+     let dimensions;
+     try{dimensions=await createImageBitmap(uploadFile);}catch{throw new Error("We couldn't read the "+expected.label+". Please upload a valid image file.");}
+     const actualWidth=dimensions.width,actualHeight=dimensions.height;
+     dimensions.close?.();
+     if(actualWidth!==expected.width||actualHeight!==expected.height)throw new Error(expected.label+" must be exactly "+expected.width+" × "+expected.height+" pixels. Your selected file is "+actualWidth+" × "+actualHeight+" pixels.");
+    }
+   }
    const paths={};
    for(const [key,uploadFile] of Object.entries(files)){
-    if(!uploadFile||!uploadFile.size){if(key==="logo"||key==="homepage_banner")throw new Error("Please upload your business logo and homepage advertising image.");continue;}
-    if(!["image/gif","image/png","image/jpeg","image/webp"].includes(uploadFile.type))throw new Error("Use GIF, PNG, JPG or WebP files for all sponsor artwork.");
-    if(uploadFile.size>limits[key])throw new Error((key==="logo"?"Logo":"Banner")+" exceeds its file-size limit.");
-    if(key==="homepage_banner"||key==="map_bottom_banner"){
-     let dimensions;
-     try{dimensions=await createImageBitmap(uploadFile);}catch{throw new Error("We couldn't read your homepage image. Please upload a valid PNG, JPG or WebP.");}
-     const correctSize=key==="homepage_banner"?(dimensions.width===640&&dimensions.height===1800):key==="map_bottom_banner"?(dimensions.width===1200&&dimensions.height===240):(dimensions.width===1200&&dimensions.height===480);
-     dimensions.close?.();
-     if(!correctSize)throw new Error(key==="homepage_banner"?"Your PC left-side sponsor banner must be exactly 640 × 1800 pixels.":key==="map_bottom_banner"?"Your PC bottom-of-map banner must be exactly 1200 × 240 pixels.":"Your mobile sponsor banner must be exactly 1200 × 480 pixels.");
-    }
+    if(!uploadFile||!uploadFile.size)continue;
     const ext=uploadFile.type==="image/gif"?"gif":uploadFile.type==="image/png"?"png":uploadFile.type==="image/webp"?"webp":"jpg";
     const path="applications/"+crypto.randomUUID()+"-"+key+"."+ext;
     const upload=await db.storage.from("sponsor-logos").upload(path,uploadFile,{contentType:uploadFile.type,upsert:false});
@@ -153,7 +164,7 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:f
    const row={business_name:String(data.get("business_name")).trim(),contact_name:String(data.get("contact_name")).trim(),email:String(data.get("email")).trim(),phone:String(data.get("phone")||"").trim()||null,website:String(data.get("website")||"").trim()||null,city:String(data.get("city")||"").trim()||null,service_area:String(data.get("service_area")||"").trim()||null,logo_path:paths.logo,homepage_banner_path:paths.homepage_banner,map_bottom_banner_path:paths.map_bottom_banner||null,mobile_banner_path:paths.mobile_banner||null,news_desk_banner_path:paths.news_desk_banner||null,directory_banner_path:paths.directory_banner||null,description:String(data.get("description")).trim(),services:String(data.get("services")).trim(),social_links:String(data.get("social_links")||"").trim()||null,sponsorship_tier:String(data.get("sponsorship_tier")),preferred_display_name:String(data.get("preferred_display_name")||"").trim()||null,custom_partnership:data.get("custom_partnership")==="true"};
    const result=await db.from("sponsor_applications").insert(row);if(result.error)throw result.error;
    form.reset();show("Thank you! Your application has been received. CoastWatch FL will review it and contact you about next steps. Please do not send payment until your application is approved.","success");
-  }catch(error){console.error("CoastWatch sponsor application error:",error);show("We couldn't submit your application right now. Please try again later or contact CoastWatch FL.","error");}
+  }catch(error){console.error("CoastWatch sponsor application error:",error);const detail=String(error?.message||error||"Unknown submission error");show(detail.length>260?detail.slice(0,257)+"…":detail,"error");}
   finally{button.disabled=false;button.textContent="Submit sponsor application";}
  });
 })();
