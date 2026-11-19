@@ -529,6 +529,26 @@ async function loadSponsorCenter(){
  ]);
  if(apps.error||profiles.error||campaigns.error){sponsorMsg("Could not load sponsor data: "+(apps.error||profiles.error||campaigns.error).message,"error");return;}
  sponsorApplications=apps.data||[];sponsorProfiles=profiles.data||[];sponsorCampaigns=campaigns.data||[];
+ // Publish approved sponsor logos to the public creative bucket so directory cards
+ // can display stable logo URLs without exposing private application storage.
+ for(const profile of sponsorProfiles){
+  if(!profile.logo_path||/^https:\/\//i.test(profile.logo_path))continue;
+  const application=sponsorApplications.find(item=>item.id===profile.application_id);
+  if(!application||application.logo_path!==profile.logo_path)continue;
+  try{
+   const {data:logoFile,error:downloadError}=await db.storage.from("sponsor-logos").download(profile.logo_path);
+   if(downloadError||!logoFile)throw downloadError||new Error("Submitted logo unavailable");
+   const ext=(profile.logo_path.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"")||"png";
+   const publicPath="sponsor-logos/"+profile.id+"."+ext;
+   const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(publicPath,logoFile,{upsert:true,contentType:logoFile.type||"image/"+ext,cacheControl:"3600"});
+   if(uploadError)throw uploadError;
+   const {data:publicLogo}=db.storage.from("sponsor-creatives").getPublicUrl(publicPath);
+   const {error:updateError}=await db.from("sponsor_profiles").update({logo_path:publicLogo.publicUrl,updated_at:new Date().toISOString()}).eq("id",profile.id);
+   if(updateError)throw updateError;
+   profile.logo_path=publicLogo.publicUrl;
+  }catch(logoError){console.warn("Sponsor logo publishing failed:",logoError.message);}
+ }
+
  for(const app of sponsorApplications){
   for(const field of ["logo_path","homepage_banner_path","news_desk_banner_path","directory_banner_path"]){
    if(app[field]){const signed=await db.storage.from("sponsor-logos").createSignedUrl(app[field],3600);app[field+"_preview"]=signed.data?.signedUrl||null;}
@@ -591,7 +611,14 @@ $("sponsorApplicationQueue").addEventListener("click",async event=>{
   }
   const slug=sponsorSlug(app.preferred_display_name||app.business_name)+"-"+id.slice(0,6);
   const {error}=await db.from("sponsor_applications").update({status:"approved",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;
-  const {error:profileError}=await db.from("sponsor_profiles").insert({application_id:id,business_name:app.business_name,display_name:app.preferred_display_name||app.business_name,slug,logo_path:app.logo_path,website:app.website,city:app.city,service_area:app.service_area,description:app.description,services:app.services,social_links:app.social_links,tier:app.sponsorship_tier,is_active:false});
+  const {data:logoFile,error:logoDownloadError}=await db.storage.from("sponsor-logos").download(app.logo_path);
+  if(logoDownloadError||!logoFile)throw logoDownloadError||new Error("The submitted company logo could not be read.");
+  const logoExt=(app.logo_path.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"")||"png";
+  const publicLogoPath="sponsor-logos/"+id+"."+logoExt;
+  const {error:logoUploadError}=await db.storage.from("sponsor-creatives").upload(publicLogoPath,logoFile,{upsert:true,contentType:logoFile.type||"image/"+logoExt,cacheControl:"3600"});
+  if(logoUploadError)throw logoUploadError;
+  const {data:publicLogo}=db.storage.from("sponsor-creatives").getPublicUrl(publicLogoPath);
+  const {error:profileError}=await db.from("sponsor_profiles").insert({application_id:id,business_name:app.business_name,display_name:app.preferred_display_name||app.business_name,slug,logo_path:publicLogo.publicUrl,website:app.website,city:app.city,service_area:app.service_area,description:app.description,services:app.services,social_links:app.social_links,tier:app.sponsorship_tier,is_active:false});
   if(profileError)throw profileError;
   sponsorMsg("Application approved. A draft profile was created and remains hidden until you activate it.");await loadSponsorCenter();
  }catch(error){sponsorMsg("Sponsor review failed: "+error.message,"error");}
