@@ -693,9 +693,9 @@ async function loadAudienceAnalytics(){
   const list=(host,map,suffix="views")=>{const entries=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);host.innerHTML=entries.map(([name,count])=>'<article class="editorial-item"><div class="editorial-item-head"><h4>'+esc(name)+'</h4><span class="editorial-status published">'+count.toLocaleString()+' '+suffix+'</span></div></article>').join("")||'<div class="empty">No data recorded for this period.</div>';};
   list(pagesHost,byPage);list($("trafficSources"),bySource,"visits");list($("trafficDevices"),byDevice,"visits");
   const days=[...byDay.entries()].reverse();dailyHost.innerHTML=days.length?days.map(([day,count])=>'<div class="editorial-item" style="display:flex;justify-content:space-between;gap:12px"><strong>'+esc(day)+'</strong><span>'+count.toLocaleString()+' page views</span></div>').join(""):'<div class="empty">No website visits recorded for this period yet.</div>';
-  const [{data:articles,error:titlesError}]=await Promise.all([db.from("editorial_updates").select("id,title,category").eq("status","published")]);if(titlesError)throw titlesError;
+  const [{data:articleRows,error:titlesError}]=await Promise.all([db.from("editorial_updates").select("id,title,category").eq("status","published")]);if(titlesError)throw titlesError;
   const counts=new Map();(articles||[]).forEach(v=>counts.set(v.article_id,(counts.get(v.article_id)||0)+1));
-  const titleMap=new Map((articles||[]).map(a=>[a.id,a]));
+  const titleMap=new Map((articleRows||[]).map(a=>[a.id,a]));
   const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8);
   $("audienceTopArticles").innerHTML=top.map(([id,count])=>'<article class="editorial-item"><div class="editorial-item-head"><h4>'+esc(titleMap.get(id)?.title||"News article")+'</h4><span>'+count+' article views</span></div></article>').join("")||'<div class="empty">No article engagement recorded yet.</div>';
  }catch(error){message.textContent="Could not load website analytics: "+error.message;message.className="msg error";dailyHost.innerHTML='<div class="empty">Analytics unavailable.</div>';}
