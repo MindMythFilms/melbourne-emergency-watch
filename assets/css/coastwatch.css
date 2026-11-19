@@ -4380,3 +4380,67 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     object-position:center !important;
   }
 }
+
+
+/* COASTWATCH_DESKTOP_PORTRAIT_SPONSOR_RENDER_FIX_V6
+   Desktop only: make the portrait creative and every wrapper occupy the complete tall ad viewport.
+   The previous cascade left the picture at its intrinsic short height, exposing the dark slide background. */
+@media (min-width:901px) {
+  #map-panel .cw-sidebar-sponsor #community-partner-ads {
+    position:relative !important;
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    flex:1 1 0% !important;
+    overflow:hidden !important;
+    background:#071a30 !important;
+  }
+  #map-panel .cw-sidebar-sponsor #community-partner-ads .cw-ad-slides {
+    position:absolute !important;
+    inset:0 0 27px 0 !important;
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  #map-panel .cw-sidebar-sponsor #community-partner-ads .cw-ad-slide,
+  #map-panel .cw-sidebar-sponsor #community-partner-ads .cw-ad-slide.is-active {
+    position:absolute !important;
+    inset:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  #map-panel .cw-sidebar-sponsor #community-partner-ads .cw-ad-slide picture {
+    position:absolute !important;
+    inset:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  #map-panel .cw-sidebar-sponsor #community-partner-ads .cw-ad-slide picture img {
+    position:absolute !important;
+    inset:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:100% !important;
+    min-height:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    object-fit:fill !important;
+    object-position:center center !important;
+    background:transparent !important;
+  }
+}
