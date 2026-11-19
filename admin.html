@@ -804,8 +804,12 @@ function findRoadCrossings(ga,gb){
 }
 async function searchRoadGeometry(road){
  const clean=road.trim();
- const escaped=clean.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
- const pattern="^"+escaped+"$";
+ const words=clean.split(/\s+/).filter(Boolean);
+ const aliases={boulevard:"(?:boulevard|blvd)",blvd:"(?:boulevard|blvd)",street:"(?:street|st)",st:"(?:street|st)",road:"(?:road|rd)",rd:"(?:road|rd)",avenue:"(?:avenue|ave)",ave:"(?:avenue|ave)",drive:"(?:drive|dr)",dr:"(?:drive|dr)",parkway:"(?:parkway|pkwy)",pkwy:"(?:parkway|pkwy)",highway:"(?:highway|hwy)",hwy:"(?:highway|hwy)"};
+ const tokenPattern=words.map(w=>aliases[w.toLowerCase()]||w.replace(/[|\\{}()[\]^$+*?.]/g,"\\$&")).join("\\s+");
+ const direction="(?:(?:north|south|east|west|n|s|e|w)\\s+)?";
+ const suffix="(?:\\s+(?:north|south|east|west|n|s|e|w))?";
+ const pattern="^"+direction+tokenPattern+suffix+"$";
  const query='[out:json][timeout:25];way["highway"]["name"~"'+pattern.replace(/"/g,'\\"')+'",i](27.7,-81.0,28.8,-80.3);out geom;';
  let geometries=[];
  try{
@@ -813,14 +817,20 @@ async function searchRoadGeometry(road){
   if(response.ok){const data=await response.json();geometries=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry&&el.geometry.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));}
  }catch(error){}
  if(!geometries.length){
-  const q=encodeURIComponent(clean+", Brevard County, Florida, USA");
-  const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+q;
-  const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
-  if(!res.ok)throw new Error("OpenStreetMap search returned "+res.status+". Please wait before trying again.");
-  const fc=await res.json();
-  geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+  const queries=[clean+", Brevard County, Florida, USA"];
+  if(/\bboulevard\b/i.test(clean))queries.push(clean.replace(/\bboulevard\b/i,"Blvd")+", Brevard County, Florida, USA");
+  if(/\bblvd\b/i.test(clean))queries.push(clean.replace(/\bblvd\b/i,"Boulevard")+", Brevard County, Florida, USA");
+  if(!/\b(north|south|east|west|n|s|e|w)\b/i.test(clean))queries.push("South "+clean+", Brevard County, Florida, USA");
+  for(const qtext of queries){
+   const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=40&q="+encodeURIComponent(qtext);
+   const res=await fetch(url,{headers:{"Accept":"application/geo+json"}});
+   if(!res.ok)continue;
+   const fc=await res.json();
+   geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
+   if(geometries.length)break;
+  }
  }
- if(!geometries.length)throw new Error('Could not find mapped road geometry for "'+clean+'". Try the full official road name.');
+ if(!geometries.length)throw new Error('Could not find mapped road geometry for "'+clean+'". Try "South John Rodes Boulevard" or the abbreviated map label.');
  return {geometry:{type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry}))},segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
