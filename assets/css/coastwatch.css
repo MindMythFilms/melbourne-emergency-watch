@@ -4268,3 +4268,38 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     max-height:none !important;
   }
 }
+
+
+/* COASTWATCH_BOTTOM_SPONSOR_FILL_SPACE_V3
+   Use the available banner slot instead of preserving the very shallow SVG ratio.
+   Stretch the animated artwork vertically so the banner fills the reserved area. */
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+  height:180px !important;
+  min-height:180px !important;
+  max-height:180px !important;
+}
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor > a {
+  width:100% !important;
+  height:100% !important;
+}
+#map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  max-height:100% !important;
+  aspect-ratio:auto !important;
+  object-fit:fill !important;
+}
+@media (max-width:900px) {
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    height:150px !important;
+    min-height:150px !important;
+    max-height:150px !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a,
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+    height:150px !important;
+    min-height:150px !important;
+    max-height:150px !important;
+  }
+}
