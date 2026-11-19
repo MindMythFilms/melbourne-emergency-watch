@@ -312,16 +312,18 @@ body:before{
 
 <div class="admin-tab-panel" id="adminTabAudience" role="tabpanel" hidden>
  <section class="panel editorial-panel"><div class="pad">
-  <div class="editorial-heading"><div><span class="editorial-kicker">PHASE 4 · AUDIENCE</span><h2>News Desk Audience Analytics</h2><p>Article views and returning readers for the last 30 days. A reader is represented by a random browser ID; no names or IP addresses are collected.</p></div><button type="button" class="gray" id="refreshAudience">Refresh analytics</button></div>
+  <div class="editorial-heading"><div><span class="editorial-kicker">COASTWATCH FL · SITE TRAFFIC</span><h2>Website Analytics</h2><p>Anonymous website traffic measurements. Visitor IDs are random browser identifiers; names and IP addresses are not collected by this dashboard.</p></div><button type="button" class="gray" id="refreshAudience">Refresh analytics</button></div>
+  <div class="field" style="max-width:220px"><label for="trafficRange">Reporting period</label><select id="trafficRange"><option value="today">Today</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select></div>
   <div id="audienceMsg" class="msg hidden" role="status" aria-live="polite"></div>
   <div class="editorial-stats">
-   <div><b id="audienceViews">—</b><span>Article views · 30 days</span></div>
-   <div><b id="audienceVisitors">—</b><span>Unique readers · 30 days</span></div>
-   <div><b id="audienceReturning">—</b><span>Returning readers · 30 days</span></div>
-   <div><b id="audienceArticles">—</b><span>Articles viewed · 30 days</span></div>
+   <div><b id="trafficPageViews">—</b><span>Page views</span></div><div><b id="trafficUnique">—</b><span>Unique visitors</span></div>
+   <div><b id="trafficSessions">—</b><span>Sessions</span></div><div><b id="trafficReturning">—</b><span>Returning visitors</span></div>
   </div>
-  <div class="editorial-queue-head"><div><h3>Most-read News Desk articles</h3><span class="meta">Ranked by recorded opens of “Read full update”. Repeat opens are counted once per reader, per article, per day.</span></div></div>
-  <div id="audienceTopArticles" aria-live="polite"><div class="empty">Select Audience Analytics to load results.</div></div>
+  <div class="editorial-queue-head"><div><h3>Traffic by day</h3><span class="meta">Page views recorded each day</span></div></div><div id="trafficDaily"></div>
+  <div class="editorial-queue-head"><div><h3>Most visited pages</h3></div></div><div id="trafficPages"></div>
+  <div class="editorial-queue-head"><div><h3>Traffic sources</h3></div></div><div id="trafficSources"></div>
+  <div class="editorial-queue-head"><div><h3>Devices</h3></div></div><div id="trafficDevices"></div>
+  <div class="editorial-queue-head"><div><h3>News Desk article engagement</h3><span class="meta">Separate from total website page views</span></div></div><div id="audienceTopArticles"></div>
  </div></section>
 </div>
 <div class="admin-tab-panel" id="adminTabSponsors" role="tabpanel" hidden>
@@ -674,41 +676,33 @@ $("sponsorCampaignQueue").addEventListener("click",async event=>{
  try{const {error}=await db.from("sponsor_campaigns").update({status:activate?"active":"paused",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;sponsorMsg(activate?"Campaign activated.":"Campaign paused.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not update campaign: "+error.message,"error");}
 });
 async function loadAudienceAnalytics(){
- const message=$("audienceMsg"),host=$("audienceTopArticles");
- if(!host)return;
- message.className="msg hidden";
- host.innerHTML='<div class="empty">Loading audience data…</div>';
+ const message=$("audienceMsg"),dailyHost=$("trafficDaily"),pagesHost=$("trafficPages");
+ if(!dailyHost)return;message.className="msg hidden";
+ [dailyHost,pagesHost,$("trafficSources"),$("trafficDevices"),$("audienceTopArticles")].forEach(h=>{if(h)h.innerHTML='<div class="empty">Loading…</div>';});
  try{
-  const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
+  const range=$("trafficRange")?.value||"30",now=new Date(),since=new Date();
+  if(range==="today")since.setHours(0,0,0,0);else since.setDate(since.getDate()-Number(range));
   const [{data:views,error:viewError},{data:articles,error:articleError}]=await Promise.all([
-   db.from("editorial_article_views").select("article_id,visitor_id,created_at").gte("created_at",since).order("created_at",{ascending:false}).limit(10000),
-   db.from("editorial_updates").select("id,title,category").eq("status","published")
+   db.from("website_page_views").select("visitor_id,session_id,page_path,traffic_source,device_type,created_at").gte("created_at",since.toISOString()).order("created_at",{ascending:false}).limit(20000),
+   db.from("editorial_article_views").select("article_id,visitor_id,created_at").gte("created_at",since.toISOString()).limit(10000)
   ]);
   if(viewError)throw viewError;if(articleError)throw articleError;
-  const rows=views||[],visitorDays=new Map(),counts=new Map();
-  rows.forEach(v=>{
-   if(!visitorDays.has(v.visitor_id))visitorDays.set(v.visitor_id,new Set());
-   visitorDays.get(v.visitor_id).add(new Date(v.created_at).toISOString().slice(0,10));
-   counts.set(v.article_id,(counts.get(v.article_id)||0)+1);
-  });
-  const returning=[...visitorDays.values()].filter(days=>days.size>1).length;
-  $("audienceViews").textContent=rows.length.toLocaleString();
-  $("audienceVisitors").textContent=visitorDays.size.toLocaleString();
-  $("audienceReturning").textContent=returning.toLocaleString();
-  $("audienceArticles").textContent=counts.size.toLocaleString();
-  const titles=new Map((articles||[]).map(a=>[a.id,a]));
-  const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  host.innerHTML=top.map(([id,count],index)=>{
-   const article=titles.get(id),title=article?article.title:"Article no longer published";
-   return '<article class="editorial-item"><div class="editorial-item-head"><div><h4>'+esc(title)+'</h4><span class="meta">'+esc(article?.category||"News Desk")+'</span></div><span class="editorial-status published">'+count.toLocaleString()+' views</span></div></article>';
-  }).join("")||'<div class="empty">No News Desk article views have been recorded in the last 30 days.</div>';
- }catch(error){
-  host.innerHTML='<div class="empty">Could not load audience analytics: '+esc(error.message)+'</div>';
-  message.textContent="Analytics could not be loaded. Check the database permissions and try again.";
-  message.className="msg error";
- }
+  const rows=views||[],visitors=new Set(rows.map(x=>x.visitor_id)),sessions=new Set(rows.map(x=>x.session_id)),visitorDays=new Map(),byDay=new Map(),byPage=new Map(),bySource=new Map(),byDevice=new Map();
+  rows.forEach(v=>{const day=new Date(v.created_at).toLocaleDateString();byDay.set(day,(byDay.get(day)||0)+1);byPage.set(v.page_path,(byPage.get(v.page_path)||0)+1);bySource.set(v.traffic_source||"Direct",(bySource.get(v.traffic_source||"Direct")||0)+1);byDevice.set(v.device_type||"Unknown",(byDevice.get(v.device_type||"Unknown")||0)+1);if(!visitorDays.has(v.visitor_id))visitorDays.set(v.visitor_id,new Set());visitorDays.get(v.visitor_id).add(new Date(v.created_at).toISOString().slice(0,10));});
+  $("trafficPageViews").textContent=rows.length.toLocaleString();$("trafficUnique").textContent=visitors.size.toLocaleString();$("trafficSessions").textContent=sessions.size.toLocaleString();$("trafficReturning").textContent=[...visitorDays.values()].filter(d=>d.size>1).length.toLocaleString();
+  const list=(host,map,suffix="views")=>{const entries=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);host.innerHTML=entries.map(([name,count])=>'<article class="editorial-item"><div class="editorial-item-head"><h4>'+esc(name)+'</h4><span class="editorial-status published">'+count.toLocaleString()+' '+suffix+'</span></div></article>').join("")||'<div class="empty">No data recorded for this period.</div>';};
+  list(pagesHost,byPage);list($("trafficSources"),bySource,"visits");list($("trafficDevices"),byDevice,"visits");
+  const days=[...byDay.entries()].reverse();dailyHost.innerHTML=days.length?days.map(([day,count])=>'<div class="editorial-item" style="display:flex;justify-content:space-between;gap:12px"><strong>'+esc(day)+'</strong><span>'+count.toLocaleString()+' page views</span></div>').join(""):'<div class="empty">No website visits recorded for this period yet.</div>';
+  const [{data:articles,error:titlesError}]=await Promise.all([db.from("editorial_updates").select("id,title,category").eq("status","published")]);if(titlesError)throw titlesError;
+  const counts=new Map();(articles||[]).forEach(v=>counts.set(v.article_id,(counts.get(v.article_id)||0)+1));
+  const titleMap=new Map((articles||[]).map(a=>[a.id,a]));
+  const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8);
+  $("audienceTopArticles").innerHTML=top.map(([id,count])=>'<article class="editorial-item"><div class="editorial-item-head"><h4>'+esc(titleMap.get(id)?.title||"News article")+'</h4><span>'+count+' article views</span></div></article>').join("")||'<div class="empty">No article engagement recorded yet.</div>';
+ }catch(error){message.textContent="Could not load website analytics: "+error.message;message.className="msg error";dailyHost.innerHTML='<div class="empty">Analytics unavailable.</div>';}
 }
 $("refreshAudience").addEventListener("click",loadAudienceAnalytics);
+$("trafficRange").addEventListener("change",loadAudienceAnalytics);
+
 async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadScanHealth();await loadLearningQueue();await loadSponsorCenter();if(["owner","admin"].includes(role))await loadModerationQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
