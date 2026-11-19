@@ -2952,7 +2952,8 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 .mew-photo-bubble-tail{position:absolute;left:33px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
 .mew-photo-bubble:focus-visible{outline:3px solid #fff;outline-offset:3px}
 
-/* Portrait report photos use a taller callout so the full vertical image is visible */
-.mew-photo-bubble-portrait{width:82px!important;height:118px!important}
-.mew-photo-bubble-portrait img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;background:#071c2b;border-radius:7px}
-.mew-photo-bubble-portrait .mew-photo-bubble-tail{left:33px;bottom:-8px}
+/* Portrait photo bubbles use a narrow, tall frame so the image fills the callout */
+.mew-photo-bubble-icon-portrait{width:84px!important;height:152px!important}
+.mew-photo-bubble-portrait{box-sizing:border-box!important;width:76px!important;height:138px!important;padding:4px!important;overflow:visible!important}
+.mew-photo-bubble-portrait img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;background:#071c2b;border-radius:7px}
+.mew-photo-bubble-portrait .mew-photo-bubble-tail{left:29px!important;bottom:-8px!important}
