@@ -572,9 +572,8 @@ let reportPlacementMode=false;
 function updateLocationConfirmation(latlng){
  const label=latlng.lat.toFixed(5)+", "+latlng.lng.toFixed(5);
  $("locationConfirmation").textContent="Location selected on map · "+label;
- $("mapReportHint").textContent="Location selected. You can drag the pin to adjust it.";
- $("mapReportBtn").textContent="＋ Change location";
- $("mapReportBtn").classList.remove("is-placing");
+ $("mapReportHint")&&($("mapReportHint").textContent="Location selected. You can drag the pin to adjust it.");
+ const mapReportButton=$("mapReportBtn");if(mapReportButton){mapReportButton.textContent="＋ Change location";mapReportButton.classList.remove("is-placing");}
 }
 function setSelectedLocation(latlng){
  $("latitude").value=latlng.lat.toFixed(6);$("longitude").value=latlng.lng.toFixed(6);
@@ -585,20 +584,22 @@ function setSelectedLocation(latlng){
  updateLocationConfirmation(latlng);selectedLocationMarker.openPopup();
  if(reportPlacementMode){
   reportPlacementMode=false;
-  $("mapReportHint").textContent="Location set. Complete the report below the map.";
+  if($("mapReportHint"))$("mapReportHint").textContent="Location set. Complete the report below the map.";
   $("report-panel").scrollIntoView({behavior:"smooth",block:"start"});
   setTimeout(()=> $("category").focus({preventScroll:true}),450);
  }
 }
-$("reportChooseLocationBtn").addEventListener("click",()=>{$("mapReportBtn").click();$("map-panel").scrollIntoView({behavior:"smooth",block:"start"});});
-$("mapReportBtn").addEventListener("click",()=>{
+const reportPlacementButton=$("mapReportBtn");
+function beginReportLocationPlacement(){
  reportPlacementMode=true;
- $("mapReportBtn").textContent="Tap map to place pin";
- $("mapReportBtn").classList.add("is-placing");
- $("mapReportHint").textContent="Now tap the map where you observed the hazard.";
+ if(reportPlacementButton){reportPlacementButton.textContent="Tap map to place pin";reportPlacementButton.classList.add("is-placing");}
+ const hint=$("mapReportHint");if(hint)hint.textContent="Now tap the map where you observed the hazard.";
  map.getContainer().classList.add("is-selecting-location");
  map.closePopup();
-});
+ $("map-panel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+const chooseReportLocationButton=$("reportChooseLocationBtn");if(chooseReportLocationButton)chooseReportLocationButton.addEventListener("click",beginReportLocationPlacement);
+if(reportPlacementButton)reportPlacementButton.addEventListener("click",beginReportLocationPlacement);
 map.on("click",e=>{
  if(reportPlacementMode){setSelectedLocation(e.latlng);map.getContainer().classList.remove("is-selecting-location");}
  else if($("latitude").value&&$("longitude").value){setSelectedLocation(e.latlng);}
@@ -926,7 +927,7 @@ const payload={category:$("category").value,title:$("category").selectedOptions[
 if(!categories.includes(payload.category)||!payload.description)throw new Error("Complete the required fields.");
 const {data:created,error}=await db.rpc("submit_public_incident_with_photo_token",{p_payload:payload});if(error)throw error;const inserted=Array.isArray(created)?created[0]:created;if(!inserted?.incident_id||!inserted?.upload_token)throw new Error("The report upload authorization could not be created.");
 for(const f of files){const blob=await jpegBlob(f);const path=`${inserted.incident_id}/${crypto.randomUUID()}.jpg`;const {error:upErr}=await db.storage.from("incident-photos").upload(path,blob,{contentType:"image/jpeg",upsert:false,metadata:{mew_upload_token:inserted.upload_token}});if(upErr)throw upErr;const {error:metaErr}=await db.from("incident_photos").insert({incident_id:inserted.incident_id,storage_path:path,status:"pending"});if(metaErr)throw metaErr}
-message(files.length?"Your report is now public as an unverified community report. Any photos remain private until an administrator reviews them.":"Your report is now public as an unverified community report.","good");e.target.reset();$("latitude").value="";$("longitude").value="";$("locationConfirmation").textContent="No location selected yet. Choose a point on the map to continue.";$("mapReportBtn").textContent="＋ Report a hazard";$("mapReportHint").textContent="Select a location directly on the map";if(selectedLocationMarker){map.removeLayer(selectedLocationMarker);selectedLocationMarker=null;}await loadReports()
+message(files.length?"Your report is now public as an unverified community report. Any photos remain private until an administrator reviews them.":"Your report is now public as an unverified community report.","good");e.target.reset();$("latitude").value="";$("longitude").value="";$("locationConfirmation").textContent="No location selected yet. Choose a point on the map to continue.";if(reportPlacementButton)reportPlacementButton.textContent="＋ Report a hazard";if($("mapReportHint"))$("mapReportHint").textContent="Select a location directly on the map";if(selectedLocationMarker){map.removeLayer(selectedLocationMarker);selectedLocationMarker=null;}await loadReports()
 }catch(err){message("Could not submit report: "+err.message,"error")}finally{btn.disabled=false}};
 $("sourceFilter").addEventListener("change",e=>{sourceMode=e.target.value;applySourceFilter()});
 $("mapFilter").addEventListener("change",e=>{mapFilter=e.target.value;loadReports()});
