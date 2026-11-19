@@ -2928,3 +2928,8 @@ body.dark #map-panel .map-report-tools .map-report-button{
 /* Respect the hidden state toggled by the authentication controller. */
 #cwi-panel .cwi-auth[hidden],
 #cwi-panel #cwi-chat[hidden]{display:none!important}
+
+
+/* Editorial freshness labels */
+.cw-editorial-expiry{display:block;margin-top:4px;color:#8a5a14;font-size:11px;font-weight:700}
+body.dark .cw-editorial-expiry{color:#ffd58a}
