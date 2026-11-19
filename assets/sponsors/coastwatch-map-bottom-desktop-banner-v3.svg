@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="180" viewBox="0 0 1200 180" role="img" aria-labelledby="t d">
+<title id="t">CoastWatch FL — support local safety</title>
+<desc id="d">Wide animated CoastWatch FL community sponsor banner with a glowing Florida coastline, lighthouse beam and sponsor call to action.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#061827"/><stop offset=".48" stop-color="#0b3851"/><stop offset="1" stop-color="#041522"/></linearGradient>
+ <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#087c9e"/><stop offset=".5" stop-color="#38e7ef"/><stop offset="1" stop-color="#087c9e"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#d49a36"/><stop offset=".5" stop-color="#ffe7a0"/><stop offset="1" stop-color="#d39a38"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#21d8e8" stop-opacity=".32"/><stop offset="1" stop-color="#21d8e8" stop-opacity="0"/></radialGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+</defs>
+<rect width="1200" height="180" rx="18" fill="url(#bg)"/>
+<rect x="2" y="2" width="1196" height="176" rx="16" fill="none" stroke="#1bb9cd" stroke-opacity=".7" stroke-width="2"/>
+<circle cx="490" cy="92" r="200" fill="url(#glow)"/>
+<!-- subtle Florida coastline / sea lights -->
+<path d="M0 136 C90 112 145 125 218 110 S350 115 425 91 S548 96 625 75 S755 85 820 57" fill="none" stroke="#0b9bb5" stroke-width="13" opacity=".22" filter="url(#soft)"/>
+<path d="M0 136 C90 112 145 125 218 110 S350 115 425 91 S548 96 625 75 S755 85 820 57" fill="none" stroke="url(#cyan)" stroke-width="3" opacity=".88">
+ <animate attributeName="stroke-dasharray" values="1 1500;520 980;1 1500" dur="7s" repeatCount="indefinite"/>
+ <animate attributeName="stroke-dashoffset" values="0;-520;-1500" dur="7s" repeatCount="indefinite"/>
+</path>
+<g fill="#f7d88e" opacity=".9">
+ <circle cx="90" cy="126" r="2"/><circle cx="162" cy="118" r="2"/><circle cx="240" cy="111" r="2"/><circle cx="330" cy="105" r="2"/><circle cx="405" cy="94" r="2"/><circle cx="495" cy="88" r="2"/><circle cx="574" cy="81" r="2"/><circle cx="660" cy="70" r="2"/>
+</g>
+<!-- compact lighthouse / coastal icon -->
+<g transform="translate(58 35)">
+ <path d="M25 42H55L62 112H18Z" fill="#e9f4f5" stroke="#a9d4dc" stroke-width="2"/>
+ <path d="M19 42H61L55 28H25Z" fill="#f3d38b" stroke="#fff0c0" stroke-width="2"/>
+ <path d="M31 28V15H49V28" fill="#f2f7f6"/>
+ <path d="M48 34L152 8L152 57Z" fill="#ffe4a1" opacity=".18"><animate attributeName="opacity" values=".06;.25;.06" dur="3s" repeatCount="indefinite"/></path>
+ <path d="M48 34L152 8L152 57Z" fill="#ffe4a1" opacity=".2" filter="url(#soft)"><animate attributeName="opacity" values=".02;.32;.02" dur="3s" repeatCount="indefinite"/></path>
+ <path d="M4 116Q40 95 76 116" fill="none" stroke="#28d4df" stroke-width="5" stroke-linecap="round"/>
+</g>
+<g font-family="Arial,Helvetica,sans-serif">
+ <text x="245" y="42" fill="#bceaf0" font-size="13" font-weight="800" letter-spacing="3">COMMUNITY PARTNER</text>
+ <text x="245" y="83" fill="#ffffff" font-size="35" font-weight="900" letter-spacing="1">COASTWATCH <tspan fill="#35dce6">FL</tspan></text>
+ <path d="M245 94H650" stroke="#1dbccc" stroke-width="2" opacity=".8"/>
+ <text x="245" y="127" fill="#ffffff" font-size="24" font-weight="900" letter-spacing=".4">SUPPORT <tspan fill="#31dce7">LOCAL SAFETY.</tspan></text>
+ <text x="245" y="151" fill="#c7e3eb" font-size="16">Help keep Brevard communities informed and prepared.</text>
+</g>
+<!-- sponsor CTA panel -->
+<g transform="translate(875 34)">
+ <rect width="280" height="58" rx="29" fill="url(#gold)" stroke="#fff0c3" stroke-width="2"/>
+ <text x="140" y="36" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="900" fill="#09243a">BECOME A SPONSOR »</text>
+ <rect x="12" y="72" width="256" height="40" rx="20" fill="#062a40" stroke="#18bed1" stroke-width="1.5"/>
+ <text x="140" y="98" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="800" letter-spacing=".5" fill="#d9f6fa">EXPLORE LOCAL SPONSORS</text>
+ <text x="140" y="136" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="800" letter-spacing="2" fill="#9dd5df">COMMUNITY PARTNERS · STRONGER TOGETHER</text>
+</g>
+<circle cx="1170" cy="20" r="5" fill="#32e0b1"><animate attributeName="opacity" values=".35;1;.35" dur="2s" repeatCount="indefinite"/></circle>
+</svg>
