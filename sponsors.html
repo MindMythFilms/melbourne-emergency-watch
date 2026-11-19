@@ -31,6 +31,13 @@ header.cws-top{position:relative;top:auto;z-index:1;display:flex;flex-direction:
 @media(max-width:900px){.cws-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){main.cws-page{width:100%;padding:12px 12px 32px}header.cws-top{padding:11px 13px;border-radius:13px}.cws-top a{font-size:12px}.cws-top a:last-child{padding:8px 10px}.cws-hero{margin:14px 0;padding:25px 21px;border-radius:18px}.cws-hero h1{font-size:31px;letter-spacing:-1px}.cws-hero p{font-size:13px;line-height:1.65}.cws-grid{grid-template-columns:1fr;gap:12px}.cws-card{padding:16px}.cws-empty{padding:28px 17px}.cws-footer{margin-top:22px}}
 @media(prefers-reduced-motion:reduce){.cws-card{transition:none}}
+
+.cws-logo-link{display:block;border-radius:14px;overflow:hidden;cursor:pointer}
+.cws-logo-link:focus-visible{outline:3px solid #12b8b0;outline-offset:3px}
+.cws-logo-link .cws-logo{transition:transform .2s ease}
+.cws-logo-link:hover .cws-logo{transform:scale(1.025)}
+.cws-card-visit{display:inline-block;text-decoration:none}
+.cws-card-visit:hover{text-decoration:underline}
 </style></head><body><main class="cws-page">
 <header class="cws-top"><a href="/">← CoastWatch FL</a><a href="/sponsor.html">Become a sponsor</a></header>
 <section class="cws-hero"><span class="cws-kicker">LOCAL PARTNERS · STRONGER COMMUNITIES</span><h1>Meet Our Sponsors</h1><p>These businesses help support CoastWatch FL and its community information resources. Sponsored partnerships do not influence hazard reports, official alerts, moderation, or editorial decisions.</p></section>
@@ -58,7 +65,9 @@ header.cws-top{position:relative;top:auto;z-index:1;display:flex;flex-direction:
    const logo=p.logo_path&&/^https:\/\//i.test(p.logo_path)?'<img class="cws-logo" src="'+esc(p.logo_path)+'" alt="'+name+' logo" loading="lazy">':'<div class="cws-logo cws-logo-fallback" aria-hidden="true">'+name+'</div>';
    const area=[p.city,p.service_area].filter(Boolean).join(" · ");
    const details='<div class="cws-card-copy"><h2>'+name+'</h2>'+(area?'<div class="cws-area">'+esc(area)+'</div>':"")+'<p>'+esc(p.description||"")+'</p>'+(p.services?'<p>'+esc(p.services)+'</p>':"")+'</div>';
-   return destination?'<a class="cws-card cws-card-link" href="'+esc(destination)+'" target="_blank" rel="noopener noreferrer">'+logo+details+'<span class="cws-card-visit">Visit website ↗</span></a>':'<article class="cws-card">'+logo+details+'</article>';
+   const clickableLogo=destination?'<a class="cws-logo-link" href="'+esc(destination)+'" target="_blank" rel="noopener noreferrer" aria-label="Visit '+name+' website in a new tab">'+logo+'</a>':logo;
+   const visit=destination?'<a class="cws-card-visit" href="'+esc(destination)+'" target="_blank" rel="noopener noreferrer">Visit website ↗</a>':"";
+   return '<article class="cws-card">'+clickableLogo+details+visit+'</article>';
   }).join("");
  }catch(error){host.innerHTML='<div class="cws-empty" style="grid-column:1/-1">Sponsor directory is temporarily unavailable. Please try again later.</div>';console.error("Sponsor directory:",error);}
 })();
