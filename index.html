@@ -136,6 +136,34 @@
  </section><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
 
  <div class="map-dashboard">
+<div class="map-stage">
+<section class="mew-gesture-overlay" id="mewGestureTutorial" role="dialog" aria-modal="true" aria-labelledby="mewGestureTitle" aria-describedby="mewGestureIntro" hidden>
+  <div class="mew-gesture-dialog">
+   <button class="mew-gesture-close" id="mewGestureClose" type="button" aria-label="Close map tutorial">×</button>
+   <div class="mew-gesture-kicker">COASTWATCH FL · QUICK GUIDE</div>
+   <h2 id="mewGestureTitle">Your map. Your control.</h2>
+   <p class="mew-gesture-intro" id="mewGestureIntro">Use two fingers on the map to move around and zoom in or out.</p>
+   <div class="mew-gesture-grid">
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-pan-art" aria-hidden="true"><div class="mew-map-mini"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-pan"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Move the map</h3><p>Place two fingers down and slide them together to explore another area.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · MOVE TOGETHER</span>
+    </article>
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-zoom-art" aria-hidden="true"><div class="mew-map-mini zoomed"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-zoom"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Zoom in</h3><p>Touch with two fingers, then spread them apart to see more detail.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · SPREAD APART</span>
+    </article>
+    <article class="mew-gesture-card">
+     <div class="mew-gesture-art mew-pinch-art" aria-hidden="true"><div class="mew-map-mini"><span class="mew-map-road"></span><span class="mew-map-water"></span><span class="mew-map-pin">⌖</span></div><div class="mew-hand mew-hand-pinch"><i class="mew-finger finger-one"><b></b></i><i class="mew-finger finger-two"><b></b></i><i class="mew-palm"></i></div><span class="mew-touch-dot dot-one"></span><span class="mew-touch-dot dot-two"></span></div>
+     <h3>Zoom out</h3><p>Bring your two fingers closer together to zoom back out.</p>
+     <span class="mew-gesture-tag">TWO FINGERS · PINCH TOGETHER</span>
+    </article>
+   </div>
+   <div class="mew-gesture-footer"><span><strong>One finger?</strong> Scroll the webpage normally.</span><button id="mewGestureGotIt" type="button">Got it — show me the map</button></div>
+  </div>
+ </section><div id="map"></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section><div class="map-report-tools"><button class="map-report-button" id="mapReportBtn" type="button">⌖ Report a Hazard</button><span id="mapReportHint" aria-live="polite">Tap the map to select a location</span></div></div>
+
   <aside class="map-sidebar" aria-label="Map controls">
    <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
    <section class="cw-sidebar-sponsor" aria-label="CoastWatch FL community sponsor">
@@ -153,7 +181,11 @@
      <a class="cw-sidebar-sponsor-secondary" href="/sponsors.html">Explore Local Sponsors</a>
     </div>
    </section>
+
   </aside>
+  <section class="cw-map-bottom-sponsor" data-cw-sponsor-placement="map_bottom" aria-label="Sponsored business below the map" hidden></section>
+ </div>
+
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
  <div class="nws-legend" id="nwsLegend" aria-label="Map legend"><div class="legend-heading"><strong>Map legend</strong><span>Colors identify the source and severity</span></div><div class="legend-items"><span><i class="legend-symbol community-symbol"></i><b>Community report</b><small>Unverified submission</small></span><span><i class="legend-symbol power-symbol" aria-hidden="true">⚡</i><b>Power outage</b><small>MassOutage utility data</small></span><span><i class="legend-symbol water-symbol" aria-hidden="true">💧</i><b>Water-level monitoring</b><small>USGS river gauges + NOAA coastal tide station</small></span><span><i class="legend-symbol extreme-symbol"></i><b>Extreme</b><small>NWS official alert</small></span><span><i class="legend-symbol severe-symbol"></i><b>Severe</b><small>NWS official alert</small></span><span><i class="legend-symbol" style="background:#facc15;border:2px solid #eab308"></i><b>Rip current risk</b><small>Approximate coastal corridor</small></span><span><i class="legend-symbol moderate-symbol"></i><b>Moderate</b><small>NWS official alert</small></span><span><i class="legend-symbol minor-symbol"></i><b>Minor</b><small>NWS official alert</small></span><span><i class="legend-symbol unknown-symbol"></i><b>Unspecified</b><small>NWS severity not provided</small></span></div><p class="legend-note">Colored outlined areas show NWS alert coverage. Circular pins show point locations. Community reports are not independently verified.</p></div>
