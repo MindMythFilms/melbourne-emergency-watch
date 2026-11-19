@@ -3103,3 +3103,30 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     font-weight: 850;
   }
 }
+
+
+/* Desktop-only: keep sponsor calls-to-action compact beneath the banner. */
+@media (min-width: 901px) {
+  header:has(> .cw-sponsor-top-cta) {
+    text-align: center;
+  }
+  header > .cw-sponsor-top-cta,
+  header > .cw-sponsor-directory-cta {
+    display: inline-flex !important;
+    width: auto !important;
+    min-height: 0 !important;
+    margin: 0 5px 8px !important;
+    padding: 0 !important;
+    vertical-align: middle;
+    background: transparent !important;
+  }
+  header > .cw-sponsor-top-cta a,
+  header > .cw-sponsor-directory-cta a {
+    min-height: 0 !important;
+    padding: 7px 15px !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .16) !important;
+  }
+}
