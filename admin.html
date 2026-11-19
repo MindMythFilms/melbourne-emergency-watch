@@ -531,7 +531,8 @@ function sponsorAppCard(app){
  const safe=esc(app.business_name),tier=esc(app.sponsorship_tier||"unspecified");
  const asset=(label,url)=>url?'<div class="sponsor-submitted-asset"><b>'+label+'</b><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(url)+'" alt="'+label+' preview" style="display:block;max-width:100%;max-height:150px;object-fit:contain;margin-top:7px;border-radius:9px;background:#102a3d"></a></div>':"";
  const logo=asset("Business logo",app.logo_path_preview)+asset("PC left banner",app.homepage_banner_path_preview)+asset("PC bottom banner",app.map_bottom_banner_path_preview)+asset("Mobile banner",app.mobile_banner_path_preview)+asset("News Desk banner",app.news_desk_banner_path_preview)+asset("Directory featured banner",app.directory_banner_path_preview);
- const actions=app.status==="pending"&&["owner","admin"].includes(role)?'<div class="actions"><button type="button" data-sponsor-approve="'+app.id+'">Approve &amp; create draft profile</button><button type="button" class="red" data-sponsor-reject="'+app.id+'">Reject application</button></div>':"";
+ const hasProfile=sponsorProfiles.some(profile=>profile.application_id===app.id);
+ const actions=["owner","admin"].includes(role)&&!hasProfile&&["pending","approved"].includes(app.status)?'<div class="actions"><button type="button" data-sponsor-approve="'+app.id+'">'+(app.status==="approved"?"Create missing draft profile":"Approve &amp; create draft profile")+'</button>'+(app.status==="pending"?'<button type="button" class="red" data-sponsor-reject="'+app.id+'">Reject application</button>':"")+'</div>':"";
  return '<article class="sponsor-admin-card"><h4>'+safe+'</h4><div class="meta">'+esc(app.created_at?new Date(app.created_at).toLocaleString():"")+' · '+tier+' · '+esc(app.status)+'</div><p>'+esc(app.description||"")+'</p><p><b>Services:</b> '+esc(app.services||"")+'</p><p><b>Contact:</b> '+esc(app.contact_name)+' · '+esc(app.email)+(app.phone?" · "+esc(app.phone):"")+'</p><p><b>Website:</b> '+(app.website?'<a href="'+esc(app.website)+'" target="_blank" rel="noopener noreferrer">'+esc(app.website)+'</a>':"Not supplied")+' · <b>Area:</b> '+esc([app.city,app.service_area].filter(Boolean).join(" / ")||"Not supplied")+'</p>'+logo+actions+'</article>';
 }
 function sponsorProfileCard(profile){
@@ -620,25 +621,41 @@ $("sponsorApplicationQueue").addEventListener("click",async event=>{
  const approve=event.target.closest("[data-sponsor-approve]"),reject=event.target.closest("[data-sponsor-reject]");
  if(!approve&&!reject)return;
  if(!["owner","admin"].includes(role)){sponsorMsg("Only an owner or administrator can approve or reject sponsor applications.","error");return;}
- const id=(approve||reject).dataset[approve?"sponsorApprove":"sponsorReject"],app=sponsorApplications.find(x=>x.id===id);if(!app)return;
+ const button=approve||reject,id=button.dataset[approve?"sponsorApprove":"sponsorReject"],app=sponsorApplications.find(x=>x.id===id);if(!app)return;
+ button.disabled=true;
  try{
   if(reject){
    const {error}=await db.from("sponsor_applications").update({status:"rejected",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;
    sponsorMsg("Application rejected. The record was retained.");await loadSponsorCenter();return;
   }
-  const slug=sponsorSlug(app.preferred_display_name||app.business_name)+"-"+id.slice(0,6);
-  const {error}=await db.from("sponsor_applications").update({status:"approved",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;
+  // Make approval repeatable: if the profile already exists, don't create a duplicate.
+  const {data:existingProfile,error:existingError}=await db.from("sponsor_profiles").select("id").eq("application_id",id).maybeSingle();
+  if(existingError)throw existingError;
+  if(existingProfile){
+   if(app.status!=="approved"){const {error}=await db.from("sponsor_applications").update({status:"approved",reviewed_at:new Date().toISOString()}).eq("id",id);if(error)throw error;}
+   sponsorMsg("This application already has a draft sponsor profile.");await loadSponsorCenter();return;
+  }
+  if(!app.logo_path)throw new Error("This application has no uploaded business logo.");
   const {data:logoFile,error:logoDownloadError}=await db.storage.from("sponsor-logos").download(app.logo_path);
   if(logoDownloadError||!logoFile)throw logoDownloadError||new Error("The submitted company logo could not be read.");
   const logoExt=(app.logo_path.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"")||"png";
   const publicLogoPath="sponsor-logos/"+id+"."+logoExt;
   const {error:logoUploadError}=await db.storage.from("sponsor-creatives").upload(publicLogoPath,logoFile,{upsert:true,contentType:logoFile.type||"image/"+logoExt,cacheControl:"3600"});
-  if(logoUploadError)throw logoUploadError;
+  if(logoUploadError)throw new Error("Could not publish the sponsor logo: "+logoUploadError.message);
   const {data:publicLogo}=db.storage.from("sponsor-creatives").getPublicUrl(publicLogoPath);
-  const {error:profileError}=await db.from("sponsor_profiles").insert({application_id:id,business_name:app.business_name,display_name:app.preferred_display_name||app.business_name,slug,logo_path:publicLogo.publicUrl,website:app.website,city:app.city,service_area:app.service_area,description:app.description,services:app.services,social_links:app.social_links,tier:app.sponsorship_tier,is_active:false});
-  if(profileError)throw profileError;
+  if(!publicLogo?.publicUrl)throw new Error("Could not create a public logo URL.");
+  const slug=sponsorSlug(app.preferred_display_name||app.business_name)+"-"+id.slice(0,6);
+  const {error:profileError}=await db.from("sponsor_profiles").insert({application_id:id,business_name:app.business_name,display_name:app.preferred_display_name||app.business_name,slug,logo_path:publicLogo.publicUrl,website:app.website||null,city:app.city||null,service_area:app.service_area||null,description:app.description||"",services:app.services||"",social_links:app.social_links||null,tier:app.sponsorship_tier||"community_100",is_active:false});
+  if(profileError)throw new Error("Logo published, but draft profile creation failed: "+profileError.message);
+  // Mark the application approved only after its draft profile has been created.
+  const {error:statusError}=await db.from("sponsor_applications").update({status:"approved",reviewed_at:new Date().toISOString()}).eq("id",id);
+  if(statusError)throw new Error("Draft profile was created, but application status could not be updated: "+statusError.message);
   sponsorMsg("Application approved. A draft profile was created and remains hidden until you activate it.");await loadSponsorCenter();
- }catch(error){sponsorMsg("Sponsor review failed: "+error.message,"error");}
+ }catch(error){
+  console.error("Sponsor review failed:",error);
+  sponsorMsg("Sponsor review failed: "+(error?.message||String(error)),"error");
+  button.disabled=false;
+ }
 });
 $("sponsorProfileQueue").addEventListener("click",async event=>{
  const button=event.target.closest("[data-sponsor-toggle]");if(!button)return;
