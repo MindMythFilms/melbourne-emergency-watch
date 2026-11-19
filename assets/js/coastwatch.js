@@ -16,6 +16,21 @@ window.mewAcceptConsent=async function(){
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="coastwatch-fl-terms-2026-11-03-v2";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+/* CoastWatch website traffic analytics: anonymous browser/session IDs only. */
+(()=>{try{
+ let visitor=localStorage.getItem("cw_analytics_visitor_v1");if(!visitor){visitor=crypto.randomUUID();localStorage.setItem("cw_analytics_visitor_v1",visitor);}
+ let session=sessionStorage.getItem("cw_analytics_session_v1");if(!session){session=crypto.randomUUID();sessionStorage.setItem("cw_analytics_session_v1",session);}
+ const path=location.pathname+(location.search||"");
+ const key="cw_pageview_"+session+"_"+path;
+ if(sessionStorage.getItem(key))return;
+ const ref=document.referrer;let host="";try{host=ref?new URL(ref).hostname:"";}catch(_){}
+ const own=location.hostname;
+ let source="Direct";
+ if(host){source=host===own?"Internal":(/google\./i.test(host)?"Google":/facebook\.|fb\.com|instagram\./i.test(host)?"Facebook / Instagram":/bing\./i.test(host)?"Bing":/t\.co|x\.com|twitter\./i.test(host)?"X":/nextdoor\./i.test(host)?"Nextdoor":"Other referral");}
+ const ua=navigator.userAgent||"",device=/ipad|tablet/i.test(ua)?"Tablet":/mobile|android|iphone/i.test(ua)?"Mobile":"Desktop";
+ db.from("website_page_views").insert({visitor_id:visitor,session_id:session,page_path:path.slice(0,500),referrer_host:host.slice(0,255)||null,traffic_source:source,device_type:device}).then(({error})=>{if(!error)sessionStorage.setItem(key,"1");});
+ }catch(error){console.debug("Website analytics unavailable:",error);}})();
+
 const themeButton=document.getElementById("themeToggle");
 function applyTheme(theme){document.body.classList.toggle("dark",theme==="dark");themeButton.textContent=theme==="dark"?"☀️ Light mode":"🌙 Dark mode";themeButton.setAttribute("aria-pressed",String(theme==="dark"));}
 applyTheme(localStorage.getItem("mew-theme")||"dark");
