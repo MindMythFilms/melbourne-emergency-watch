@@ -305,7 +305,7 @@ body:before{
     <div><b id="researchLastScan">Never</b><span>Last scan</span></div>
    </div>
    <div id="researchMsg" class="msg hidden" role="status" aria-live="polite"></div>
-   <div class="msg">Current source: National Weather Service active alerts for Florida, filtered to Brevard County. Drafts are automatically written from the official alert details. This first release does not scrape FOX 35 or other publishers.</div>
+   <div class="msg">Automated source: National Weather Service active alerts for Florida, filtered to Brevard County. Drafts are automatically prepared from the official alert details. News publishers are not scraped. Use these links to check additional leads manually: <a href="https://www.brevardfl.gov/eahome" target="_blank" rel="noopener noreferrer">Brevard Emergency Activation</a> · <a href="https://www.fox35orlando.com/" target="_blank" rel="noopener noreferrer">FOX 35 Orlando</a> · <a href="https://fl511.com/" target="_blank" rel="noopener noreferrer">FL511</a>.</div>
    <div class="editorial-queue-head"><div><h3>Research results</h3><span class="meta">Review the source, generated draft, timing and confidence before publishing.</span></div><button type="button" class="gray" id="refreshResearch">Refresh results</button></div>
    <div id="researchQueue" aria-live="polite"><div class="empty">Research results will appear here after a scan.</div></div>
   </div>
@@ -695,7 +695,7 @@ async function loadResearchQueue(){
  host.innerHTML=items.map(item=>{
   const confidence=item.confidence==="official_alert"?"Official alert":item.confidence==="verified_multiple"?"Verified by multiple sources":item.confidence==="outdated"?"Outdated":"Unverified";
   const canPublish=["owner","admin"].includes(role)&&item.status==="pending";
-  return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original NWS alert ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Approve &amp; Publish</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
+  return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original NWS alert ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Send to News &amp; Updates</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
  }).join("")||'<div class="empty">No research results yet. Run a scan to check active NWS alerts for Brevard County.</div>';
 }
 $("refreshResearch").addEventListener("click",loadResearchQueue);
@@ -729,7 +729,7 @@ $("researchQueue").addEventListener("click",async e=>{
    const {data:editorial,error:insertError}=await db.from("editorial_updates").insert({title:item.title,summary:item.summary,body:item.body,category:item.category,source_name:item.source_name,source_url:item.source_url,source_published_at:item.source_published_at,expires_at:expiry,status:"pending",created_by:user?.id||null,updated_by:user?.id||null}).select("id").single();
    if(insertError)throw insertError;
    const {error:updateError}=await db.from("research_scan_items").update({status:"published",editorial_update_id:editorial.id}).eq("id",id);if(updateError)throw updateError;
-   researchMessage("Draft moved into News & Updates as a private pending item. It is not public until you approve it there.");
+   researchMessage("Draft sent to News & Updates as a private pending item. Open that tab and choose Approve & Publish when you are ready to make it public.");
    await loadResearchQueue();await loadEditorialQueue();
   }catch(error){researchMessage("Could not prepare publication: "+error.message,"error");button.disabled=false;}
  }
