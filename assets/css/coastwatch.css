@@ -3056,3 +3056,14 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 #community-partner-ads .cw-ad-slide.cw-ad-sponsor .cw-home-sponsor-overlay{
  z-index:2!important;
 }
+
+
+/* Persistent safety reminder directly beside the live hazard map. */
+.mew-map-safety-note{display:flex;align-items:flex-start;gap:11px;margin:0 0 12px;padding:12px 14px;border:1px solid #e6b85c;border-left:5px solid #d97706;border-radius:11px;background:#fff8e8;color:#49351b;font-size:13px;line-height:1.5}
+.mew-map-safety-note p{margin:0;min-width:0}
+.mew-map-safety-note strong{color:#7c3518}
+.mew-map-safety-icon{display:grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border-radius:8px;background:#b45309;color:#fff;font-weight:900;font-size:16px;line-height:1}
+body.dark .mew-map-safety-note{background:#332b1d;border-color:#80602d;border-left-color:#f2b84b;color:#f5e9cf}
+body.dark .mew-map-safety-note strong{color:#ffd38a}
+body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
+@media(max-width:700px){.mew-map-safety-note{gap:9px;margin-bottom:9px;padding:10px 11px;border-radius:9px;font-size:12px;line-height:1.45}.mew-map-safety-icon{flex-basis:23px;width:23px;height:23px}}
