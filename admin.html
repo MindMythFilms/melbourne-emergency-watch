@@ -275,7 +275,7 @@ body:before{
      <div class="field"><label for="newsSourceName">Source name</label><input id="newsSourceName" required placeholder="Official agency or publisher"></div>
      <div class="field"><label for="newsSourceUrl">Original source URL (HTTPS)</label><input id="newsSourceUrl" type="url" pattern="https://.*" required placeholder="https://..."></div>
      <div class="field editorial-wide"><label for="newsSourceDate">Source publication time (optional)</label><input id="newsSourceDate" type="datetime-local"></div>
-     <div class="field editorial-wide"><label for="newsExpiresAt">Display until (optional)</label><input id="newsExpiresAt" type="datetime-local"><small>Expired updates are hidden from the public feed. Set an end time for alerts, forecasts, closures and temporary services.</small></div>
+     <div class="field editorial-wide"><label for="newsExpiresAt">Display until (required)</label><input id="newsExpiresAt" type="datetime-local" required><small>Every update must have an end time. Alerts, forecasts, closures and temporary services should use short expiry windows.</small></div>
     </div>
     <div class="actions"><button type="submit" id="createEditorial">Save as pending</button></div>
    </form>
@@ -610,6 +610,21 @@ document.addEventListener("click",async e=>{const edit=e.target.closest("[data-z
 
 const editorialCategories=["Emergency Alerts","Flood Recovery","Road Closures","Water Advisories","Local News","Weather & Safety"];
 function editorialMsg(text,kind){const el=$("newsMsg");el.textContent=text;el.className="msg "+(kind||"");}
+function setupEditorialExpiry(){
+ const category=$("newsCategory"),field=$("newsExpiresAt");
+ if(!category||!field)return;
+ const hoursByCategory={"Emergency Alerts":48,"Weather & Safety":72,"Road Closures":72,"Water Advisories":168,"Flood Recovery":720,"Local News":720};
+ const setDefault=()=>{
+  if(!field.dataset.userEdited){
+   const end=new Date(Date.now()+(hoursByCategory[category.value]||720)*3600000);
+   field.value=new Date(end.getTime()-end.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  }
+ };
+ field.addEventListener("input",()=>{field.dataset.userEdited="true";});
+ category.addEventListener("change",()=>{field.dataset.userEdited="";setDefault();});
+ setDefault();
+}
+setupEditorialExpiry();
 function editorialStatusLabel(status){return status==="published"?"Published":status==="rejected"?"Rejected":status==="archived"?"Archived":"Awaiting review";}
 function editorialCard(item){
  const canEdit=role==="owner"||role==="admin";
@@ -626,7 +641,7 @@ function editorialCard(item){
    '<div class="wide"><label>Full update</label><textarea data-news-field="body" maxlength="12000" '+(canEdit?'':'disabled')+'>'+esc(item.body)+'</textarea></div>'+
    '<div><label>Source name</label><input data-news-field="source_name" value="'+esc(item.source_name)+'" '+(canEdit?'':'disabled')+'></div>'+
    '<div><label>Source URL</label><input data-news-field="source_url" type="url" value="'+esc(item.source_url)+'" '+(canEdit?'':'disabled')+'></div>'+
-   '<div class="wide"><label>Display until (optional)</label><input data-news-field="expires_at" type="datetime-local" value="'+esc(expiryDate)+'" '+(canEdit?'':'disabled')+'><small>After this time, the update is automatically hidden from the public feed.</small></div>'+
+   '<div class="wide"><label>Display until (required before publishing)</label><input data-news-field="expires_at" type="datetime-local" required value="'+esc(expiryDate)+'" '+(canEdit?'':'disabled')+'><small>After this time, the update is automatically hidden from the public feed.</small></div>'+
   '</div><a class="editorial-source" href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original source ↗</a>'+
   (item.rejection_reason?'<p class="editorial-readonly">Review note: '+esc(item.rejection_reason)+'</p>':'')+
   (canEdit?'<div class="actions"><button type="button" class="gray" data-news-save>Save edits</button>'+
@@ -672,6 +687,7 @@ $("editorialQueue").addEventListener("click",async e=>{
  const id=card.dataset.newsId;
  const value=name=>card.querySelector('[data-news-field="'+name+'"]').value.trim();
  const rawExpiry=value("expires_at");
+ if(card.dataset.newsStatus!=="archived"&&!button.hasAttribute("data-news-archive")&&!rawExpiry){editorialMsg("Set a display-until date before saving or publishing this update.","error");return;}
  const changes={title:value("title"),category:value("category"),summary:value("summary"),body:value("body"),source_name:value("source_name"),source_url:value("source_url"),expires_at:rawExpiry?new Date(rawExpiry).toISOString():null,updated_by:null,updated_at:new Date().toISOString()};
  if(!changes.source_url.startsWith("https://")){editorialMsg("Source URL must begin with https://.","error");return;}
  const {data:{user}}=await db.auth.getUser();changes.updated_by=user?user.id:null;
