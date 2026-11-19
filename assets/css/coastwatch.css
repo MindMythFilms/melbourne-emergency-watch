@@ -3954,3 +3954,18 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     font-size: 9px !important;
   }
 }
+
+
+/* Fill the tall blue sponsor slot from top to bottom with vertical creative. */
+@media (min-width: 901px) {
+  #map-panel #community-partner-ads .cw-ad-slide:not(.cw-ad-sponsor) picture,
+  #map-panel #community-partner-ads .cw-ad-slide:not(.cw-ad-sponsor) picture img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slide:not(.cw-ad-sponsor) picture img {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
