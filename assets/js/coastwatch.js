@@ -508,7 +508,7 @@ async function loadNwsAlerts(){
   const nwsZones=["FLC009","FLZ141","FLZ154","FLZ159","FLZ164","FLZ247","FLZ347","FLZ447","FLZ647","FLZ747"];
   // A single unavailable forecast zone must never suppress every other NWS alert.
   const zoneResults=await Promise.allSettled(nwsZones.map(async zone=>{
-   const response=await fetch("https://api.weather.gov/alerts/active?zone="+encodeURIComponent(zone),{headers:{Accept:"application/geo+json"},cache:"no-store"});
+   const response=await fetch("https://api.weather.gov/alerts/active?zone="+encodeURIComponent(zone),{headers:{Accept:"application/geo+json"},cache:"no-store",signal:AbortSignal.timeout(8000)});
    if(!response.ok)throw new Error("NWS API returned HTTP "+response.status+" for "+zone);
    return {zone,body:await response.json()};
   }));
@@ -682,7 +682,8 @@ async function loadPublicZones(){
   // in this ArcGIS layer, so query broadly and filter the returned attributes client-side.
   try{
    const gisUrl="https://gis.palmbayflorida.org/arcgis/rest/services/BWN_Alert/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&outSR=4326&f=geojson";
-   const gisResponse=await fetch(gisUrl,{headers:{Accept:"application/geo+json,application/json"}});
+   // Do not let the optional city GIS overlay hold the saved public hazards hostage.
+   const gisResponse=await fetch(gisUrl,{headers:{Accept:"application/geo+json,application/json"},signal:AbortSignal.timeout(6000)});
    if(!gisResponse.ok)throw new Error("Palm Bay GIS HTTP "+gisResponse.status);
    const gisData=await gisResponse.json();
    if(gisData.error)throw new Error(gisData.error.message||"Palm Bay GIS error");
