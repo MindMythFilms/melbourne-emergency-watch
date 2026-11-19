@@ -2937,3 +2937,10 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 
 /* Ensure expired notices stay hidden even when component styles set display values. */
 [data-expires-at][hidden]{display:none!important}
+
+/* Small approved-photo callouts anchored beside community hazard pins */
+.mew-photo-bubble-icon{background:transparent!important;border:0!important}
+.mew-photo-bubble{position:relative;display:block;width:68px;height:54px;padding:4px;background:rgba(9,35,51,.96);border:2px solid #75e4e7;border-radius:13px;box-shadow:0 4px 14px #00131f88;cursor:pointer;overflow:visible}
+.mew-photo-bubble img{display:block;width:100%;height:100%;object-fit:cover;border-radius:8px}
+.mew-photo-bubble-tail{position:absolute;left:8px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
+.mew-photo-bubble:focus-visible{outline:3px solid #fff;outline-offset:3px}
