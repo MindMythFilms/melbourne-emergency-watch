@@ -2952,8 +2952,8 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 .mew-photo-bubble-tail{position:absolute;left:33px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
 .mew-photo-bubble:focus-visible{outline:3px solid #fff;outline-offset:3px}
 
-/* Portrait photo bubbles use a narrow, tall frame so the image fills the callout */
-.mew-photo-bubble-icon-portrait{width:84px!important;height:152px!important}
-.mew-photo-bubble-portrait{box-sizing:border-box!important;width:76px!important;height:138px!important;padding:4px!important;overflow:visible!important}
-.mew-photo-bubble-portrait img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;background:#071c2b;border-radius:7px}
-.mew-photo-bubble-portrait .mew-photo-bubble-tail{left:29px!important;bottom:-8px!important}
+/* Compact translucent portrait photo callout to avoid obscuring map detail */
+.mew-photo-bubble-icon-portrait{width:64px!important;height:110px!important}
+.mew-photo-bubble-portrait{box-sizing:border-box!important;width:56px!important;height:96px!important;padding:3px!important;overflow:visible!important;background:rgba(9,35,51,.76)!important;border:1.5px solid rgba(117,228,231,.88)!important;border-radius:10px!important;box-shadow:0 2px 8px rgba(0,12,22,.42)!important;backdrop-filter:blur(2px)}
+.mew-photo-bubble-portrait img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;background:rgba(7,28,43,.35)!important;border-radius:6px}
+.mew-photo-bubble-portrait .mew-photo-bubble-tail{left:20px!important;bottom:-7px!important;width:11px!important;height:11px!important;background:rgba(9,35,51,.88)!important;border-right:1.5px solid rgba(117,228,231,.88)!important;border-bottom:1.5px solid rgba(117,228,231,.88)!important}
