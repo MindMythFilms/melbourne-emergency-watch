@@ -157,7 +157,7 @@ function applySourceFilter(){
  if(communityList)communityList.hidden=!showCommunity;
  const status=$("nwsAlertStatus");if(status)status.hidden=!showOfficial;
   const powerStatus=$("powerOutageStatus");if(powerStatus)powerStatus.hidden=!showPower;
-  const waterStatus=$("usgsWaterStatus");if(waterStatus)waterStatus.hidden=!showWater;
+  const waterStatus=$("usgsWaterStatus");if(waterStatus)waterStatus.hidden=!showWater;const tideStatus=$("noaaTideStatus");if(tideStatus)tideStatus.hidden=!showWater;
  const radarStatus=$("rainRadarStatus");if(radarStatus)radarStatus.hidden=!showRadar;
  const evacStatus=$("evacuationStatus");if(evacStatus)evacStatus.hidden=!showEvacuation;
 }
