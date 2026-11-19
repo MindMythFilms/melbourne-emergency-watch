@@ -2945,9 +2945,9 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 .mew-photo-bubble-tail{position:absolute;left:8px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
 .mew-photo-bubble:focus-visible{outline:3px solid #fff;outline-offset:3px}
 
-/* Compact hazard photo callout; tail is shifted toward the incident pin */
-.mew-photo-bubble-icon{background:transparent!important;border:0!important;width:76px!important;height:66px!important}
-.mew-photo-bubble{position:relative;display:block;box-sizing:border-box;width:68px;height:54px;padding:4px;background:#092333;border:2px solid #75e4e7;border-radius:13px;box-shadow:0 4px 14px #00131f99;cursor:pointer;overflow:visible;transform:translateX(-53px)}
-.mew-photo-bubble img{display:block;box-sizing:border-box;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:8px}
-.mew-photo-bubble-tail{position:absolute;left:8px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
+/* Compact photo callout centered above its hazard pin, with a downward pointer */
+.mew-photo-bubble-icon{background:transparent!important;border:0!important;width:90px!important;height:78px!important}
+.mew-photo-bubble{position:relative;display:block;box-sizing:border-box;width:82px;height:64px;padding:4px;background:#092333;border:2px solid #75e4e7;border-radius:12px;box-shadow:0 4px 14px #00131f99;cursor:pointer;overflow:visible}
+.mew-photo-bubble img{display:block;box-sizing:border-box;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:7px}
+.mew-photo-bubble-tail{position:absolute;left:33px;bottom:-8px;width:13px;height:13px;background:#092333;border-right:2px solid #75e4e7;border-bottom:2px solid #75e4e7;transform:rotate(45deg)}
 .mew-photo-bubble:focus-visible{outline:3px solid #fff;outline-offset:3px}
