@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1000" viewBox="0 0 640 1000" role="img" aria-labelledby="title desc">
+<title id="title">CoastWatch FL community sponsor</title>
+<desc id="desc">Animated coastal Florida sponsor artwork supporting local safety information, weather awareness and community preparedness.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#08223a"/><stop offset=".52" stop-color="#0d4664"/><stop offset="1" stop-color="#06192b"/></linearGradient>
+ <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#087fa6"/><stop offset=".5" stop-color="#24d8df"/><stop offset="1" stop-color="#087fa6"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#d49a39"/><stop offset=".5" stop-color="#fff0b5"/><stop offset="1" stop-color="#d7a342"/></linearGradient>
+ <radialGradient id="halo"><stop stop-color="#1bd5df" stop-opacity=".23"/><stop offset="1" stop-color="#1bd5df" stop-opacity="0"/></radialGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="640" height="1000" fill="url(#bg)"/>
+<rect x="10" y="10" width="620" height="980" rx="26" fill="none" stroke="#22cbd8" stroke-opacity=".48" stroke-width="3"/>
+<circle cx="320" cy="310" r="270" fill="url(#halo)"><animate attributeName="r" values="240;285;240" dur="6s" repeatCount="indefinite"/></circle>
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <text x="320" y="92" fill="#ffffff" font-size="42" font-weight="900" letter-spacing="5">COASTWATCH <tspan fill="#27d8e1">FL</tspan></text>
+ <text x="320" y="140" fill="#a9dfe7" font-size="19" font-weight="700" letter-spacing="5">COMMUNITY • AWARENESS • PREPAREDNESS</text>
+</g>
+<!-- Animated coastal beacon -->
+<g transform="translate(320 355)">
+ <circle r="176" fill="#0a4563" fill-opacity=".3" stroke="#21cbd7" stroke-opacity=".35" stroke-width="3"/>
+ <circle r="145" fill="none" stroke="#1acbd7" stroke-opacity=".28" stroke-width="3"><animate attributeName="r" values="125;158;125" dur="5s" repeatCount="indefinite"/></circle>
+ <path d="M-145 48Q-75 -10 0 42T145 34" fill="none" stroke="url(#aqua)" stroke-width="13" stroke-linecap="round"/>
+ <path d="M-128 82Q-60 26 8 77T132 70" fill="none" stroke="#16b5d0" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+ <path d="M-112 111Q-55 74 2 108T116 104" fill="none" stroke="#0b84aa" stroke-width="5" stroke-linecap="round" opacity=".75"/>
+ <path d="M-20 -85H20L31 38H-31Z" fill="#eaf5f5" stroke="#9fcbd2" stroke-width="4"/>
+ <path d="M-26 -94H26L17 -119H-17Z" fill="#f4d38a" stroke="#fff0c1" stroke-width="3"/>
+ <path d="M-12 -120H12V-145H-12Z" fill="#eaf5f5"/>
+ <path d="M-24 -92L-190 -160L-190 -35Z" fill="#f5d48a" opacity=".16"><animate attributeName="opacity" values=".06;.25;.06" dur="3.5s" repeatCount="indefinite"/></path>
+ <path d="M24 -92L190 -160L190 -35Z" fill="#f5d48a" opacity=".16"><animate attributeName="opacity" values=".25;.06;.25" dur="3.5s" repeatCount="indefinite"/></path>
+ <path d="M-40 -45Q0 -72 40 -45" fill="none" stroke="#20d0dc" stroke-width="7" stroke-linecap="round"/>
+ <circle cx="-9" cy="-18" r="7" fill="#fce5a7"><animate attributeName="opacity" values=".35;1;.35" dur="2.2s" repeatCount="indefinite"/></circle>
+ <circle cx="9" cy="-18" r="7" fill="#fce5a7"><animate attributeName="opacity" values="1;.35;1" dur="2.2s" repeatCount="indefinite"/></circle>
+</g>
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <text x="320" y="600" fill="#ffffff" font-size="42" font-weight="900">SUPPORT LOCAL SAFETY.</text>
+ <text x="320" y="651" fill="#d0e8ef" font-size="27">Help keep Brevard communities</text>
+ <text x="320" y="690" fill="#d0e8ef" font-size="27">informed and prepared.</text>
+</g>
+<!-- Weather, roads, and shelters -->
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <g transform="translate(55 745)"><rect width="160" height="126" rx="18" fill="#082c45" stroke="#20bdcc" stroke-width="2"/><path d="M48 55Q48 33 70 33Q91 33 92 53Q113 55 110 77H43Q32 69 39 58Z" fill="#24d2dc"/><path d="M85 58L68 83H83L76 104L103 71H87L96 58Z" fill="#f3d38a"/><text x="80" y="115" fill="#e6f7fa" font-size="16" font-weight="800">WEATHER</text></g>
+ <g transform="translate(240 745)"><rect width="160" height="126" rx="18" fill="#082c45" stroke="#20bdcc" stroke-width="2"/><path d="M80 27L117 91H43Z" fill="#e6a43c" stroke="#ffe4a6" stroke-width="3"/><path d="M61 67H99M54 80H106" stroke="#fff6df" stroke-width="8"/><text x="80" y="115" fill="#e6f7fa" font-size="16" font-weight="800">ROAD</text></g>
+ <g transform="translate(425 745)"><rect width="160" height="126" rx="18" fill="#082c45" stroke="#20bdcc" stroke-width="2"/><path d="M42 66L80 34L118 66V96H91V72H69V96H42Z" fill="none" stroke="#25d1dc" stroke-width="8" stroke-linejoin="round"/><text x="80" y="115" fill="#e6f7fa" font-size="16" font-weight="800">SHELTERS</text></g>
+</g>
+<path d="M0 900Q120 855 240 900T480 900T640 888V1000H0Z" fill="#05263f"/>
+<path d="M0 908Q120 863 240 908T480 908T640 896" fill="none" stroke="url(#aqua)" stroke-width="7"><animate attributeName="d" values="M0 908Q120 863 240 908T480 908T640 896;M0 908Q120 940 240 900T480 925T640 896;M0 908Q120 863 240 908T480 908T640 896" dur="7s" repeatCount="indefinite"/></path>
+<text x="320" y="958" fill="#b5e9ef" font-family="Arial,sans-serif" font-size="20" font-weight="800" text-anchor="middle" letter-spacing="2">LOCAL PARTNERS · STRONGER COMMUNITIES</text>
+</svg>
