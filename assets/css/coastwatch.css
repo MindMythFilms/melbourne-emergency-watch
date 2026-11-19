@@ -3013,3 +3013,46 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 
 #community-partner-ads[data-sponsor-loading="true"] .cw-ad-slides{visibility:hidden!important}
 #community-partner-ads[data-sponsor-loading="false"] .cw-ad-slides{visibility:visible!important}
+
+
+/* Fix: the sponsor slide must occupy the carousel's full height.
+   Keep it absolutely positioned so its full-bleed link/image has a real containing box. */
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor,
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor.is-active{
+ position:absolute!important;
+ inset:0!important;
+ width:100%!important;
+ height:100%!important;
+ min-height:100%!important;
+ display:block!important;
+ opacity:0;
+ visibility:hidden;
+ transform:none!important;
+}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor.is-active{
+ opacity:1!important;
+ visibility:visible!important;
+ z-index:2!important;
+}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor .cw-home-sponsor-link{
+ position:absolute!important;
+ inset:0!important;
+ z-index:3!important;
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor .cw-home-sponsor-link img{
+ position:absolute!important;
+ inset:0!important;
+ z-index:1!important;
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ min-height:100%!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor .cw-home-sponsor-overlay{
+ z-index:2!important;
+}
