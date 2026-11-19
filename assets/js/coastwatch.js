@@ -89,6 +89,8 @@ const nwsAlertLayer=L.featureGroup().addTo(map);
 const powerOutageLayer=L.featureGroup().addTo(map);
 const powerOutageAreaLayer=L.featureGroup();
 const usgsWaterLayer=L.featureGroup().addTo(map);
+const noaaTideLayer=L.featureGroup().addTo(map);
+let noaaTideFetchInProgress=false;
 const evacuationZoneLayer=L.featureGroup();
 map.createPane("mewShelterPane");map.getPane("mewShelterPane").style.zIndex="450";
 const shelterLayer=L.featureGroup();
@@ -146,7 +148,7 @@ function applySourceFilter(){
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});photoBubbleMarkers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageAreaLayer))powerOutageAreaLayer.addTo(map);if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else{if(map.hasLayer(powerOutageAreaLayer))map.removeLayer(powerOutageAreaLayer);if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer)}
-  if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map)}else if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);
+  if(showWater){if(!map.hasLayer(usgsWaterLayer))usgsWaterLayer.addTo(map);if(!map.hasLayer(noaaTideLayer))noaaTideLayer.addTo(map)}else{if(map.hasLayer(usgsWaterLayer))map.removeLayer(usgsWaterLayer);if(map.hasLayer(noaaTideLayer))map.removeLayer(noaaTideLayer)}
  if(showRadar){if(!map.hasLayer(rainRadarLayer))rainRadarLayer.addTo(map)}else if(map.hasLayer(rainRadarLayer))map.removeLayer(rainRadarLayer);
  if(showEvacuation){if(!map.hasLayer(evacuationZoneLayer))evacuationZoneLayer.addTo(map)}else if(map.hasLayer(evacuationZoneLayer))map.removeLayer(evacuationZoneLayer);
  if(showShelters){if(!map.hasLayer(shelterLayer))shelterLayer.addTo(map)}else if(map.hasLayer(shelterLayer))map.removeLayer(shelterLayer);
@@ -284,6 +286,38 @@ async function loadUSGSWaterLevels(){
   if(count)count.textContent="Water data unavailable";
   if(updated)updated.textContent="USGS feed unavailable · Try again later";
  }finally{usgsWaterFetchInProgress=false;}
+}
+
+async function loadNoaaTideLevel(){
+ if(noaaTideFetchInProgress||document.visibilityState==="hidden")return;
+ noaaTideFetchInProgress=true;
+ const count=$("noaaTideCount"),updated=$("noaaTideUpdated");
+ try{
+  const stationResponse=await fetch("https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/8721604.json",{headers:{Accept:"application/json"},cache:"no-store"});
+  if(!stationResponse.ok)throw new Error("NOAA station metadata HTTP "+stationResponse.status);
+  const stationPayload=await stationResponse.json();
+  const station=(stationPayload.stations||[])[0];
+  if(!station||!Number.isFinite(Number(station.lat))||!Number.isFinite(Number(station.lng)))throw new Error("NOAA station coordinates unavailable");
+  const params=new URLSearchParams({date:"latest",station:"8721604",product:"water_level",datum:"MLLW",time_zone:"lst_ldt",units:"english",format:"json"});
+  const dataResponse=await fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?"+params.toString(),{headers:{Accept:"application/json"},cache:"no-store"});
+  if(!dataResponse.ok)throw new Error("NOAA tide data HTTP "+dataResponse.status);
+  const payload=await dataResponse.json();
+  if(payload.error)throw new Error(payload.error.message||"NOAA tide data unavailable");
+  const reading=(payload.data||[]).filter(x=>x.v!==undefined).slice(-1)[0];
+  noaaTideLayer.clearLayers();
+  if(!reading)throw new Error("No latest NOAA water-level observation returned");
+  const value=Number(reading.v),time=reading.t||"Time not reported";
+  const status=reading.q==="p"?"Preliminary":"Verified / quality-controlled";
+  const icon=L.divIcon({className:"mew-noaa-tide-icon",html:'<span style="display:block;color:#67e8f9;font-size:25px;line-height:30px;text-shadow:-1px -1px 0 #064e5b,1px 1px 0 #064e5b,0 2px 4px #000b">🌊</span>',iconSize:[30,30],iconAnchor:[15,15]});
+  const popup='<div style="min-width:210px"><strong>🌊 NOAA coastal water-level station</strong><div style="margin-top:5px"><b>'+esc(station.name||"Trident Pier")+'</b></div><div><b>Latest water level:</b> '+esc(Number.isFinite(value)?value.toFixed(2):reading.v)+' ft</div><div><b>Reading time:</b> '+esc(new Date(time).toLocaleString())+'</div><div><b>Data status:</b> '+esc(status)+'</div><small>Source: NOAA Center for Operational Oceanographic Products and Services. Datum: Mean Lower Low Water (MLLW). This is a coastal water-level observation, not a flood warning or forecast.</small><p><a href="https://tidesandcurrents.noaa.gov/stationhome.html?id=8721604" target="_blank" rel="noopener noreferrer">Open official NOAA station ↗</a></p></div>';
+  L.marker([Number(station.lat),Number(station.lng)],{icon,zIndexOffset:320}).bindPopup(popup).addTo(noaaTideLayer);
+  if(count)count.textContent=Number.isFinite(value)?value.toFixed(2)+" ft · latest reading":"Latest reading available";
+  if(updated)updated.textContent="NOAA Trident Pier · "+new Date(time).toLocaleString()+" · MLLW";
+ }catch(error){
+  console.warn("CoastWatch NOAA tide feed unavailable:",error);
+  if(count)count.textContent="NOAA tide data unavailable";
+  if(updated)updated.textContent="NOAA CO-OPS feed unavailable · Try again later";
+ }finally{noaaTideFetchInProgress=false;}
 }
 
 let powerOutageAreasFetchInProgress=false;
@@ -882,7 +916,7 @@ function openMewPhoto(src,alt){if(!src)return;const viewer=$("photoViewer"),imag
 function closeMewPhoto(){const viewer=$("photoViewer");viewer.classList.remove("open");$("photoViewerImage").removeAttribute("src");document.body.style.overflow="";}
 document.addEventListener("click",e=>{const photo=e.target.closest("img.mew-photo-zoom");if(photo){e.preventDefault();openMewPhoto(photo.currentSrc||photo.src,photo.alt);return;}if(e.target.id==="photoViewer"||e.target.id==="photoViewerClose")closeMewPhoto();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("photoViewer").classList.contains("open"))closeMewPhoto();if((e.key==="Enter"||e.key===" ")&&e.target.matches("img.mew-photo-zoom")){e.preventDefault();openMewPhoto(e.target.currentSrc||e.target.src,e.target.alt);}});
-loadReports();loadPublicZones();loadPowerOutages();loadPowerOutageAreas();loadUSGSWaterLevels();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadPowerOutageAreas,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadEvacuationZones,3600000);
+loadReports();loadPublicZones();loadPowerOutages();loadPowerOutageAreas();loadUSGSWaterLevels();loadNoaaTideLevel();loadEvacuationZones();loadShelters();setInterval(loadShelters,300000);setInterval(loadReports,45000);setInterval(loadPublicZones,60000);setInterval(loadPowerOutages,300000);setInterval(loadPowerOutageAreas,300000);setInterval(loadUSGSWaterLevels,900000);setInterval(loadNoaaTideLevel,900000);setInterval(loadEvacuationZones,3600000);
 loadNwsAlerts();setInterval(loadNwsAlerts,60000);
 
 // Align the report action with the actual map canvas on small screens.
