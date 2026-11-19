@@ -658,7 +658,7 @@ $("sponsorCampaignForm").addEventListener("submit",async event=>{
   const {data:file,error:downloadError}=await db.storage.from("sponsor-logos").download(sourcePath);
   if(downloadError)throw downloadError;
   if(!file||file.size>5*1024*1024)throw new Error("The selected artwork is missing or exceeds the 5 MB campaign limit.");
-  const mime=file.type||"image/jpeg",ext=mime==="image/png"?"png":mime==="image/webp"?"webp":"jpg";
+  const mime=file.type||"image/jpeg",ext=mime==="image/gif"?"gif":mime==="image/png"?"png":mime==="image/webp"?"webp":"jpg";
   const path="campaigns/"+sponsorId+"/"+crypto.randomUUID()+"."+ext;
   const {error:uploadError}=await db.storage.from("sponsor-creatives").upload(path,file,{cacheControl:"3600",upsert:false,contentType:mime});
   if(uploadError)throw uploadError;
