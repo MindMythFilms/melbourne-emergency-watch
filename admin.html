@@ -812,37 +812,34 @@ async function searchRoadGeometry(road){
  const routeMatch=clean.match(/\b(?:us|u\.s\.|sr|state route|cr|county road|i)\s*[-#]?\s*(\d+[a-z]?)\b/i);
  const routeRef=routeMatch?routeMatch[1]:null;
  const namePattern="^"+direction+tokenPattern+suffix+"$";
- const clauses=[];
+ const selectors=[];
  if(routeRef){
-  clauses.push('way["highway"]["ref"~"(^|[^0-9])'+routeRef+'([^0-9]|$)",i]');
-  clauses.push('way["highway"]["name"~"(^|[^0-9])'+routeRef+'([^0-9]|$)",i]');
+  selectors.push('way["highway"]["ref"~"'+routeRef+'",i](27.7,-81.0,28.8,-80.3);');
+  selectors.push('way["highway"]["name"~"'+routeRef+'",i](27.7,-81.0,28.8,-80.3);');
  }
- clauses.push('way["highway"]["name"~"'+namePattern.replace(/"/g,'\\"')+'",i]');
- const query='[out:json][timeout:8];('+clauses.join(";")+';)(27.7,-81.0,28.8,-80.3);out geom;';
+ selectors.push('way["highway"]["name"~"'+namePattern.replace(/"/g,'\\"')+'",i](27.7,-81.0,28.8,-80.3);');
+ const query='[out:json][timeout:8];('+selectors.join('')+');out geom;';
+ const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
  let geometries=[];
- const fetchWithTimeout=async(url,options,ms)=>{
-  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);
-  try{return await fetch(url,{...options,signal:controller.signal});}finally{clearTimeout(timer);}
- };
- try{
-  const response=await fetchWithTimeout("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)},9000);
-  if(response.ok){
+ const fetchBounded=async(url,options,ms)=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);try{return await fetch(url,{...options,signal:controller.signal});}finally{clearTimeout(timer);}};
+ for(const endpoint of endpoints){
+  try{
+   const response=await fetchBounded(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)},9000);
+   if(!response.ok)continue;
    const data=await response.json();
    geometries=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry&&el.geometry.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));
-  }
- }catch(error){}
- if(!geometries.length){
-  const qtext=(routeRef?(clean+" "+(routeRef==="192"?"US Highway 192":"")):clean)+", West Melbourne, Florida, USA";
-  try{
-   const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=15&q="+encodeURIComponent(qtext);
-   const res=await fetchWithTimeout(url,{headers:{"Accept":"application/geo+json"}},4500);
-   if(res.ok){
-    const fc=await res.json();
-    geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));
-   }
+   if(geometries.length)break;
   }catch(error){}
  }
- if(!geometries.length)throw new Error('No mapped geometry found for "'+clean+'" after a quick search. Try the road number/name shown on the map, or use Locate single road and place the pin manually.');
+ if(!geometries.length){
+  const qtext=clean+", West Melbourne, Florida, USA";
+  try{
+   const url="https://nominatim.openstreetmap.org/search?format=geojson&polygon_geojson=1&dedupe=0&limit=15&q="+encodeURIComponent(qtext);
+   const res=await fetchBounded(url,{headers:{"Accept":"application/geo+json"}},4500);
+   if(res.ok){const fc=await res.json();geometries=(fc.features||[]).flatMap(f=>roadLineParts(f.geometry)).filter(line=>line.length>1).map(coordinates=>({type:"LineString",coordinates}));}
+  }catch(error){}
+ }
+ if(!geometries.length)throw new Error('No mapped geometry found for "'+clean+'". You can still click the visible road on the map to place the marker manually.');
  return {geometry:{type:"FeatureCollection",features:geometries.map((geometry,index)=>({type:"Feature",properties:{segment:index+1},geometry}))},segmentCount:geometries.length};
 }
 $("locateIntersectionBtn").addEventListener("click",async()=>{
