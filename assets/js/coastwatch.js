@@ -1022,51 +1022,32 @@ setInterval(checkForSiteUpdates,180000);
 
 ;
 
-/* Reliable CoastWatch FL partner-ad rotation with working slide indicators. */
+/* Reliable CoastWatch FL partner-ad rotation; supports a sponsor slide added after campaign lookup. */
 (function(){
  const init=()=>{
   const root=document.getElementById('community-partner-ads');
   if(!root||root.dataset.carouselReady==='true')return;
-  const slides=Array.from(root.querySelectorAll('.cw-ad-slide'));
-  const dots=Array.from(root.querySelectorAll('.cw-ad-progress i'));
-  if(slides.length<2)return;
   root.dataset.carouselReady='true';
-  let current=Math.max(0,slides.findIndex(s=>s.classList.contains('is-active')));
-  let timer=null;
-  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let current=0,timer=null,dotsBound=new WeakSet();
+  const slides=()=>Array.from(root.querySelectorAll('.cw-ad-slide'));
+  const dots=()=>Array.from(root.querySelectorAll('.cw-ad-progress i'));
   function show(index){
-   current=(index+slides.length)%slides.length;
-   slides.forEach((slide,i)=>{
-    const active=i===current;
-    slide.classList.toggle('is-active',active);
-    slide.setAttribute('aria-hidden',String(!active));
-   });
-   dots.forEach((dot,i)=>{
-    const active=i===current;
-    dot.classList.toggle('is-active',active);
-    dot.setAttribute('role','button');
-    dot.setAttribute('tabindex','0');
-    dot.setAttribute('aria-label','Show advertisement '+(i+1));
-    dot.setAttribute('aria-current',String(active));
-   });
+   const all=slides();if(!all.length)return;
+   current=(index+all.length)%all.length;
+   all.forEach((slide,i)=>{const active=i===current;slide.classList.toggle('is-active',active);slide.setAttribute('aria-hidden',String(!active));});
+   dots().forEach((dot,i)=>{const active=i===current;dot.classList.toggle('is-active',active);dot.setAttribute('role','button');dot.setAttribute('tabindex','0');dot.setAttribute('aria-label','Show advertisement '+(i+1));dot.setAttribute('aria-current',String(active));});
   }
   function stop(){if(timer!==null){window.clearInterval(timer);timer=null;}}
-  function start(){stop();if(!document.hidden)timer=window.setInterval(()=>show(current+1),5000);}
-  dots.forEach((dot,i)=>{
-   dot.style.cursor='pointer';
-   dot.addEventListener('click',()=>{show(i);start();});
-   dot.addEventListener('keydown',e=>{
-    if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);start();}
-   });
-  });
-  /* Do not pause on hover: the desktop banner must keep rotating. */
+  function start(){stop();if(!document.hidden&&slides().length>1)timer=window.setInterval(()=>show(current+1),5000);}
+  function bindDots(){dots().forEach((dot,i)=>{if(dotsBound.has(dot))return;dotsBound.add(dot);dot.style.cursor='pointer';dot.addEventListener('click',()=>{show(i);start();});dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);start();}});});}
+  function refresh(){const all=slides();const active=all.findIndex(s=>s.classList.contains('is-active'));current=active>=0?active:0;bindDots();show(current);start();}
+  root.addEventListener('cw:sponsor-carousel-updated',refresh);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start();});
-  show(current);
-  start();
+  refresh();
  };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
- else init();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
 ;
 (function(){var d=document.getElementById("mapAdvancedControls");if(d&&window.matchMedia&&window.matchMedia("(max-width: 700px)").matches)d.open=false;})();
 ;

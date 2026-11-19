@@ -2990,3 +2990,26 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 @media(max-width:620px){
  .cw-live-sponsor-news,.cw-live-sponsor-directory{width:calc(100% - 20px);margin:12px auto 16px}
 }
+
+
+/* Homepage sponsor creative occupies the entire top carousel slide. */
+#community-partner-ads .cw-ad-slides{height:clamp(180px,22vw,270px)!important;min-height:180px!important;position:relative!important;overflow:hidden!important}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor{position:absolute!important;inset:0!important;padding:0!important;overflow:hidden!important;background:#061a29!important}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor.is-active{position:relative!important}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor .cw-home-sponsor-link{position:absolute;inset:0;display:block;overflow:hidden;color:#fff;text-decoration:none}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor img{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important}
+#community-partner-ads .cw-home-sponsor-overlay{position:absolute;inset:auto 0 0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:28px 20px 16px;background:linear-gradient(0deg,rgba(2,13,24,.92),rgba(2,13,24,.55) 62%,transparent);text-shadow:0 2px 8px #000}
+#community-partner-ads .cw-home-sponsor-overlay small{font-size:10px;font-weight:900;letter-spacing:.14em;color:#8ff4ef}
+#community-partner-ads .cw-home-sponsor-overlay strong{font:800 clamp(18px,2.5vw,28px) Manrope,sans-serif;color:#fff}
+#community-partner-ads .cw-home-sponsor-overlay>span{font-size:12px;color:#e2f7fb}
+#community-partner-ads .cw-ad-slide.cw-ad-sponsor:after{display:none!important}
+@media(max-width:620px){
+ #community-partner-ads .cw-ad-slides{height:190px!important;min-height:190px!important}
+ #community-partner-ads .cw-home-sponsor-overlay{padding:25px 13px 12px}
+ #community-partner-ads .cw-home-sponsor-overlay small{font-size:8px}
+ #community-partner-ads .cw-home-sponsor-overlay strong{font-size:18px}
+ #community-partner-ads .cw-home-sponsor-overlay>span{font-size:11px}
+}
+
+#community-partner-ads[data-sponsor-loading="true"] .cw-ad-slides{visibility:hidden!important}
+#community-partner-ads[data-sponsor-loading="false"] .cw-ad-slides{visibility:visible!important}
