@@ -4155,3 +4155,37 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     white-space:nowrap !important;
   }
 }
+
+
+/* Exact edge-to-edge alignment: sponsor art and map share the same grid-row height.
+   Keep the My Location control floating over the art instead of consuming vertical space. */
+@media (min-width:901px) {
+  #map-panel > .map-dashboard > .map-sidebar {
+    position:relative !important;
+    display:block !important;
+    height:100% !important;
+    min-height:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar > .map-location-button {
+    position:absolute !important;
+    z-index:8 !important;
+    top:12px !important;
+    left:12px !important;
+    right:12px !important;
+    width:calc(100% - 24px) !important;
+    margin:0 !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar > .cw-sponsor-fullheight {
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+  }
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-overlay-links {
+    bottom:16px !important;
+  }
+}
