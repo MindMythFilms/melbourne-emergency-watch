@@ -3993,3 +3993,47 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     object-position:center !important;
   }
 }
+
+
+/* COASTWATCH MAP-FIRST DESKTOP CANVAS V1
+   Give the interactive map the vertical space that was previously left unused.
+   Keep zones and the banner below it; the map itself is the primary feature. */
+@media (min-width:901px) {
+  #map-panel > .map-dashboard {
+    grid-template-rows:minmax(780px, calc(100vh - 150px)) auto auto !important;
+    align-items:stretch !important;
+  }
+  #map-panel > .map-dashboard > .map-stage {
+    display:block !important;
+    position:relative !important;
+    width:100% !important;
+    height:clamp(780px, calc(100vh - 150px), 1120px) !important;
+    min-height:780px !important;
+    max-height:1120px !important;
+    overflow:hidden !important;
+  }
+  #map-panel > .map-dashboard > .map-stage > #map {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+    max-height:none !important;
+  }
+  #map-panel > .map-dashboard > #mapZonesCard {
+    grid-column:2 !important;
+    grid-row:2 !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    grid-column:2 !important;
+    grid-row:3 !important;
+  }
+}
+@media (min-width:901px) and (max-height:850px) {
+  #map-panel > .map-dashboard {
+    grid-template-rows:minmax(680px, calc(100vh - 125px)) auto auto !important;
+  }
+  #map-panel > .map-dashboard > .map-stage {
+    height:clamp(680px, calc(100vh - 125px), 900px) !important;
+    min-height:680px !important;
+  }
+}
