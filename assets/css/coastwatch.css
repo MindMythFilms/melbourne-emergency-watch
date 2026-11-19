@@ -4082,3 +4082,76 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     grid-template-rows:minmax(680px, calc(100vh - 125px)) auto auto !important;
   }
 }
+
+
+/* FULL-HEIGHT LEFT SPONSOR ARTWORK — artwork runs the full height of the map column */
+@media (min-width:901px) {
+  #map-panel > .map-dashboard > .map-sidebar > .cw-sponsor-fullheight {
+    position:relative !important;
+    flex:1 1 0% !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(34,205,220,.55) !important;
+    border-radius:18px !important;
+    background:#041624 !important;
+  }
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-art-frame {
+    position:absolute !important;
+    inset:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:0 !important;
+    border-radius:inherit !important;
+    background:#041624 !important;
+  }
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-art-frame picture,
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-art-frame img {
+    position:absolute !important;
+    inset:0 !important;
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:100% !important;
+    min-height:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    object-fit:fill !important;
+    object-position:center !important;
+  }
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-overlay-links {
+    position:absolute !important;
+    z-index:5 !important;
+    left:14px !important;
+    right:14px !important;
+    bottom:16px !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  #map-panel .cw-sponsor-fullheight .cw-sponsor-overlay-links a {
+    min-height:42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
+    border-radius:10px !important;
+    font:850 11px/1.2 "DM Sans",sans-serif !important;
+    text-decoration:none !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+}
