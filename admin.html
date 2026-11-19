@@ -681,7 +681,7 @@ function editorialCard(item){
 }
 let editorialRows=[];
 
-// CoastWatch FL Research Center: official-alert scan and admin-controlled publishing.
+// CoastWatch FL Research Center: approved government data feeds and admin-controlled publishing.
 function researchMessage(message,type="good"){const el=$("researchMsg");el.textContent=message;el.className="msg "+(type==="error"?"error":"good");}
 async function loadResearchQueue(){
  const host=$("researchQueue");if(!host)return;
@@ -695,8 +695,8 @@ async function loadResearchQueue(){
  host.innerHTML=items.map(item=>{
   const confidence=item.confidence==="official_alert"?"Official alert":item.confidence==="verified_multiple"?"Verified by multiple sources":item.confidence==="outdated"?"Outdated":"Unverified";
   const canPublish=["owner","admin"].includes(role)&&item.status==="pending";
-  return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original NWS alert ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Send to News &amp; Updates</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
- }).join("")||'<div class="empty">No research results yet. Run a scan to check active NWS alerts for Brevard County.</div>';
+  return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original source ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Send to News &amp; Updates</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
+ }).join("")||'<div class="empty">No research results yet. Run a scan to check approved NWS, USGS, and NOAA sources for Brevard County.</div>';
 }
 $("refreshResearch").addEventListener("click",loadResearchQueue);
 $("runResearchScan").addEventListener("click",async()=>{
@@ -705,7 +705,7 @@ $("runResearchScan").addEventListener("click",async()=>{
   const {data,error}=await db.functions.invoke("coastwatch-research-scan",{body:{}});
   if(error)throw error;
   if(!data?.ok)throw new Error(data?.error||"The research scan did not complete.");
-  researchMessage("Scan complete. Checked "+data.checked+" active Florida NWS alerts; found "+data.brevard_matches+" Brevard match(es), added "+data.added+" new draft(s), refreshed "+data.refreshed+". "+data.note);
+  researchMessage("Scan complete. "+(data.sources||[]).map(s=>s.source+": "+(s.ok?(s.checked+" checked, "+s.queued+" queued"):"not available ("+s.error+")")).join(" · ")+". Added "+(data.totals?.added||0)+", refreshed "+(data.totals?.refreshed||0)+". "+data.note);
   await loadResearchQueue();
  }catch(error){researchMessage("Research scan failed: "+(error.message||"Unknown error"),"error");}
  finally{button.disabled=false;button.textContent="Run Research Scan";}
