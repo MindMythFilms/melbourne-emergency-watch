@@ -4037,3 +4037,48 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     min-height:680px !important;
   }
 }
+
+
+/* COASTWATCH DESKTOP SIDEBAR HEIGHT MATCH — align left sponsor column to map canvas */
+@media (min-width:901px) {
+  #map-panel > .map-dashboard {
+    grid-template-rows:minmax(780px, calc(100vh - 150px)) auto auto !important;
+    align-items:stretch !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar {
+    grid-column:1 !important;
+    grid-row:1 !important;
+    align-self:stretch !important;
+    display:flex !important;
+    flex-direction:column !important;
+    height:clamp(780px, calc(100vh - 150px), 1120px) !important;
+    min-height:780px !important;
+    max-height:1120px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  #map-panel > .map-dashboard > .map-stage {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    height:clamp(780px, calc(100vh - 150px), 1120px) !important;
+    min-height:780px !important;
+    max-height:1120px !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar > .cw-sponsor-panel {
+    flex:1 1 0% !important;
+    min-height:0 !important;
+    height:auto !important;
+    overflow:hidden !important;
+  }
+}
+@media (min-width:901px) and (max-height:850px) {
+  #map-panel > .map-dashboard > .map-sidebar,
+  #map-panel > .map-dashboard > .map-stage {
+    height:clamp(680px, calc(100vh - 125px), 900px) !important;
+    min-height:680px !important;
+    max-height:900px !important;
+  }
+  #map-panel > .map-dashboard {
+    grid-template-rows:minmax(680px, calc(100vh - 125px)) auto auto !important;
+  }
+}
