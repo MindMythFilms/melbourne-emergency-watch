@@ -596,7 +596,7 @@ function populateSponsorArtworkOptions(){
  const sponsorId=$("sponsorCampaignSponsor").value,profile=sponsorProfiles.find(p=>p.id===sponsorId);
  const app=profile&&sponsorApplications.find(a=>a.id===profile.application_id);
  const select=$("sponsorCampaignImage"),preview=$("sponsorCampaignImagePreview");
- const labels={logo_path:"Business logo",homepage_banner_path:"Homepage banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
+ const labels={logo_path:"Business logo",homepage_banner_path:"Left map sponsor artwork",map_bottom_banner_path:"Map bottom banner",news_desk_banner_path:"News Desk banner",directory_banner_path:"Directory featured banner"};
  const options=app?Object.entries(labels).filter(([field])=>app[field]).map(([field,label])=>({path:app[field],label})): [];
  select.innerHTML='<option value="">Choose an uploaded sponsor image</option>'+options.map(item=>'<option value="'+esc(item.path)+'">'+esc(item.label)+'</option>').join("");
  preview.innerHTML="";
@@ -653,7 +653,7 @@ $("sponsorCampaignForm").addEventListener("submit",async event=>{
  const button=$("createSponsorCampaign");button.disabled=true;
  try{
   const selectedApp=sponsorApplications.find(a=>a.id===sponsorProfiles.find(p=>p.id===sponsorId)?.application_id);
-  const allowedPaths=[selectedApp?.logo_path,selectedApp?.homepage_banner_path,selectedApp?.news_desk_banner_path,selectedApp?.directory_banner_path].filter(Boolean);
+  const allowedPaths=[selectedApp?.logo_path,selectedApp?.homepage_banner_path,selectedApp?.map_bottom_banner_path,selectedApp?.news_desk_banner_path,selectedApp?.directory_banner_path].filter(Boolean);
   if(!allowedPaths.includes(sourcePath))throw new Error("That image does not belong to the selected sponsor application. Refresh the Sponsor Center and try again.");
   const {data:file,error:downloadError}=await db.storage.from("sponsor-logos").download(sourcePath);
   if(downloadError)throw downloadError;
