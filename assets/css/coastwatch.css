@@ -3969,3 +3969,75 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     object-position: center center !important;
   }
 }
+
+
+/* Final full-bleed correction: the slide viewport itself must fill the blue frame.
+   Absolute-fill the viewport and every layer inside it; reserve only the caption strip. */
+@media (min-width: 901px) {
+  #map-panel .cw-sidebar-sponsor {
+    min-height: 0 !important;
+  }
+  #map-panel #community-partner-ads {
+    position: relative !important;
+    flex: 1 1 0% !important;
+    height: auto !important;
+    min-height: 480px !important;
+    display: block !important;
+    overflow: hidden !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slides {
+    position: absolute !important;
+    inset: 0 0 27px 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slide,
+  #map-panel #community-partner-ads .cw-ad-slide.is-active {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slide picture {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slide picture img,
+  #map-panel #community-partner-ads .cw-ad-slide > img {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: fill !important;
+    object-position: center !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-caption {
+    position: absolute !important;
+    inset: auto 0 0 !important;
+    z-index: 20 !important;
+    display: flex !important;
+    min-height: 27px !important;
+    height: 27px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+}
