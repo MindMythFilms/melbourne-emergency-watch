@@ -275,10 +275,11 @@ body:before{
      <div class="field"><label for="newsSourceName">Source name</label><input id="newsSourceName" required placeholder="Official agency or publisher"></div>
      <div class="field"><label for="newsSourceUrl">Original source URL (HTTPS)</label><input id="newsSourceUrl" type="url" pattern="https://.*" required placeholder="https://..."></div>
      <div class="field editorial-wide"><label for="newsSourceDate">Source publication time (optional)</label><input id="newsSourceDate" type="datetime-local"></div>
+     <div class="field editorial-wide"><label for="newsExpiresAt">Display until (optional)</label><input id="newsExpiresAt" type="datetime-local"><small>Expired updates are hidden from the public feed. Set an end time for alerts, forecasts, closures and temporary services.</small></div>
     </div>
     <div class="actions"><button type="submit" id="createEditorial">Save as pending</button></div>
    </form>
-   <div class="editorial-queue-head"><div><h3>Review queue</h3><span class="meta">Edit the copy, verify the source, then publish or reject.</span></div><select id="editorialFilter" aria-label="Filter updates"><option value="pending">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="all">All updates</option></select></div>
+   <div class="editorial-queue-head"><div><h3>Review queue</h3><span class="meta">Edit the copy, verify the source, then publish or reject.</span></div><select id="editorialFilter" aria-label="Filter updates"><option value="pending">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="archived">Archived</option><option value="all">All updates</option></select></div>
    <div id="editorialQueue" aria-live="polite"><div class="empty">Loading editorial updates…</div></div>
   </div>
  </section>
@@ -614,7 +615,8 @@ function editorialCard(item){
  const canEdit=role==="owner"||role==="admin";
  const opts=editorialCategories.map(c=>'<option value="'+esc(c)+'" '+(item.category===c?'selected':'')+'>'+esc(c)+'</option>').join("");
  const sourceDate=item.source_published_at?new Date(item.source_published_at).toLocaleString():"Not supplied";
- const statusClass=item.status==="published"||item.status==="rejected"?item.status:"pending";
+ const expiryDate=item.expires_at?(()=>{const d=new Date(item.expires_at);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)})():"";
+ const statusClass=["published","rejected","archived"].includes(item.status)?item.status:"pending";
  return '<article class="editorial-item" data-news-id="'+esc(item.id)+'" data-news-status="'+esc(item.status)+'">'+
   '<div class="editorial-item-head"><div><h4>'+esc(item.title)+'</h4><div class="meta">Created '+new Date(item.created_at).toLocaleString()+' · Source date: '+esc(sourceDate)+'</div></div><span class="editorial-status '+statusClass+'">'+esc(editorialStatusLabel(item.status))+'</span></div>'+
   '<div class="editorial-item-grid">'+
@@ -624,19 +626,21 @@ function editorialCard(item){
    '<div class="wide"><label>Full update</label><textarea data-news-field="body" maxlength="12000" '+(canEdit?'':'disabled')+'>'+esc(item.body)+'</textarea></div>'+
    '<div><label>Source name</label><input data-news-field="source_name" value="'+esc(item.source_name)+'" '+(canEdit?'':'disabled')+'></div>'+
    '<div><label>Source URL</label><input data-news-field="source_url" type="url" value="'+esc(item.source_url)+'" '+(canEdit?'':'disabled')+'></div>'+
+   '<div class="wide"><label>Display until (optional)</label><input data-news-field="expires_at" type="datetime-local" value="'+esc(expiryDate)+'" '+(canEdit?'':'disabled')+'><small>After this time, the update is automatically hidden from the public feed.</small></div>'+
   '</div><a class="editorial-source" href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original source ↗</a>'+
-  (item.rejection_reason?'<p class="editorial-readonly">Rejection note: '+esc(item.rejection_reason)+'</p>':'')+
+  (item.rejection_reason?'<p class="editorial-readonly">Review note: '+esc(item.rejection_reason)+'</p>':'')+
   (canEdit?'<div class="actions"><button type="button" class="gray" data-news-save>Save edits</button>'+
    (item.status==="published"?'<button type="button" class="gray" data-news-pending>Return to review</button>':'')+
-   (item.status!=="published"?'<button type="button" class="green" data-news-publish>Approve &amp; Publish</button>':'')+
+   (item.status!=="published"&&item.status!=="archived"?'<button type="button" class="green" data-news-publish>Approve &amp; Publish</button>':'')+
    (item.status==="pending"?'<button type="button" class="red" data-news-reject>Reject</button>':'')+
+   (item.status!=="archived"?'<button type="button" class="gray" data-news-archive>Archive</button>':'')+
    '</div>':'<div class="editorial-readonly">Read-only access. An owner or administrator must approve or edit this item.</div>')+
  '</article>';
 }
 let editorialRows=[];
 async function loadEditorialQueue(){
  const host=$("editorialQueue");if(!host)return;
- const {data,error}=await db.from("editorial_updates").select("id,title,summary,body,category,source_name,source_url,source_published_at,status,created_at,published_at,rejection_reason").order("created_at",{ascending:false}).limit(100);
+ const {data,error}=await db.from("editorial_updates").select("id,title,summary,body,category,source_name,source_url,source_published_at,expires_at,status,created_at,published_at,rejection_reason").order("created_at",{ascending:false}).limit(100);
  if(error){host.innerHTML='<div class="empty">Could not load editorial queue: '+esc(error.message)+'</div>';return;}
  editorialRows=data||[];
  const pending=editorialRows.filter(x=>x.status==="pending").length,published=editorialRows.filter(x=>x.status==="published").length,rejected=editorialRows.filter(x=>x.status==="rejected").length;
@@ -654,30 +658,33 @@ $("editorialComposer").addEventListener("submit",async e=>{
  try{
   const {data:{user}}=await db.auth.getUser();
   const rawDate=$("newsSourceDate").value;
-  const row={title:$("newsTitle").value.trim(),category:$("newsCategory").value,summary:$("newsSummary").value.trim(),body:$("newsBody").value.trim(),source_name:$("newsSourceName").value.trim(),source_url:$("newsSourceUrl").value.trim(),source_published_at:rawDate?new Date(rawDate).toISOString():null,status:"pending",created_by:user?user.id:null,updated_by:user?user.id:null};
+  const rawExpiry=$("newsExpiresAt").value;
+  const row={title:$("newsTitle").value.trim(),category:$("newsCategory").value,summary:$("newsSummary").value.trim(),body:$("newsBody").value.trim(),source_name:$("newsSourceName").value.trim(),source_url:$("newsSourceUrl").value.trim(),source_published_at:rawDate?new Date(rawDate).toISOString():null,expires_at:rawExpiry?new Date(rawExpiry).toISOString():null,status:"pending",created_by:user?user.id:null,updated_by:user?user.id:null};
   const {error}=await db.from("editorial_updates").insert(row);if(error)throw error;
   $("editorialComposer").reset();$("editorialFilter").value="pending";editorialMsg("Update saved privately. It will not appear publicly until approved.","good");await loadEditorialQueue();
  }catch(error){editorialMsg("Could not save update: "+error.message,"error");}
  finally{button.disabled=false;button.textContent="Save as pending";}
 });
 $("editorialQueue").addEventListener("click",async e=>{
- const button=e.target.closest("button[data-news-save],button[data-news-publish],button[data-news-reject],button[data-news-pending]");if(!button)return;
+ const button=e.target.closest("button[data-news-save],button[data-news-publish],button[data-news-reject],button[data-news-pending],button[data-news-archive]");if(!button)return;
  if(!["owner","admin"].includes(role)){editorialMsg("Only an owner or administrator can change publication status.","error");return;}
  const card=button.closest("[data-news-id]");if(!card)return;
  const id=card.dataset.newsId;
  const value=name=>card.querySelector('[data-news-field="'+name+'"]').value.trim();
- const changes={title:value("title"),category:value("category"),summary:value("summary"),body:value("body"),source_name:value("source_name"),source_url:value("source_url"),updated_by:null,updated_at:new Date().toISOString()};
+ const rawExpiry=value("expires_at");
+ const changes={title:value("title"),category:value("category"),summary:value("summary"),body:value("body"),source_name:value("source_name"),source_url:value("source_url"),expires_at:rawExpiry?new Date(rawExpiry).toISOString():null,updated_by:null,updated_at:new Date().toISOString()};
  if(!changes.source_url.startsWith("https://")){editorialMsg("Source URL must begin with https://.","error");return;}
  const {data:{user}}=await db.auth.getUser();changes.updated_by=user?user.id:null;
  if(button.hasAttribute("data-news-publish")){changes.status="published";changes.published_at=new Date().toISOString();changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=null;}
  else if(button.hasAttribute("data-news-reject")){const reason=window.prompt("Optional reason for rejecting this update:");if(reason===null)return;changes.status="rejected";changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason=reason.trim()||null;}
  else if(button.hasAttribute("data-news-pending")){changes.status="pending";changes.published_at=null;changes.reviewed_at=null;changes.reviewed_by=null;changes.rejection_reason=null;}
+ else if(button.hasAttribute("data-news-archive")){changes.status="archived";changes.reviewed_at=new Date().toISOString();changes.reviewed_by=user?user.id:null;changes.rejection_reason="Archived by an administrator."; }
  const editingPublished=button.hasAttribute("data-news-save")&&card.dataset.newsStatus==="published";
  if(editingPublished){changes.status="pending";changes.published_at=null;changes.reviewed_at=null;changes.reviewed_by=null;changes.rejection_reason=null;}
  button.disabled=true;
  try{
   const {error}=await db.from("editorial_updates").update(changes).eq("id",id);if(error)throw error;
-  editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":editingPublished?"Published copy edited and returned to the private review queue for re-approval.":"Edits saved.","good");
+  editorialMsg(button.hasAttribute("data-news-publish")?"Approved and published. The update is now visible on the public website.":button.hasAttribute("data-news-reject")?"Update rejected and kept off the public website.":button.hasAttribute("data-news-pending")?"Update returned to the private review queue.":button.hasAttribute("data-news-archive")?"Update archived and removed from the public feed.":editingPublished?"Published copy edited and returned to the private review queue for re-approval.":"Edits saved.","good");
   await loadEditorialQueue();
  }catch(error){button.disabled=false;editorialMsg("Could not update editorial item: "+error.message,"error");}
 });
