@@ -95,7 +95,7 @@ body.dark .cw-sponsor-application{border-color:rgba(151,224,230,.22)}
 <label>Areas you serve<input name="service_area" maxlength="200" placeholder="e.g. Brevard County, Central Florida"></label>
 <label>Preferred sponsorship level <span>*</span><select name="sponsorship_tier" required><option value="community_100">$100/month — Community Founding Sponsor</option><option value="local_250">$250/month — Local Founding Partner</option><option value="regional_500">$500/month — Regional Founding Partner</option><option value="presenting_1000_plus">$1,000+/month — Presenting Founding Partner</option><option value="custom">I'd like to discuss a custom partnership</option></select></label>
 <label class="cw-form-full">Business logo <small>Upload your logo · PNG, JPG or WebP · maximum 2 MB</small><input name="logo" type="file" accept="image/png,image/jpeg,image/webp" required></label>
-<label class="cw-form-full">Homepage advertising banner <small>Upload the banner you want displayed on the CoastWatch FL homepage · PNG, JPG or WebP · maximum 5 MB</small><input name="homepage_banner" type="file" accept="image/png,image/jpeg,image/webp" required></label>
+<label class="cw-form-full">Homepage advertising image <small>Required exact dimensions: 900 × 2400 pixels (portrait, 3:8 ratio). PNG, JPG or WebP · maximum 5 MB. This image fills the tall sponsor display on the homepage.</small><input name="homepage_banner" type="file" accept="image/png,image/jpeg,image/webp" required></label>
 <label class="cw-form-full">News Desk advertising banner <small>Optional separate artwork for the News Desk placement · PNG, JPG or WebP · maximum 5 MB</small><input name="news_desk_banner" type="file" accept="image/png,image/jpeg,image/webp"></label>
 <label class="cw-form-full">Featured sponsor directory banner <small>Optional separate artwork for the featured placement on the Sponsors directory · PNG, JPG or WebP · maximum 5 MB</small><input name="directory_banner" type="file" accept="image/png,image/jpeg,image/webp"></label>
 <label class="cw-form-full">Short business description <span>*</span><small>Tell residents who you are and what your business does. This may appear on your sponsor profile.</small><textarea name="description" required minlength="20" maxlength="600" rows="3" placeholder="A short introduction to your business..."></textarea></label>
@@ -132,9 +132,16 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:f
    const limits={logo:2*1024*1024,homepage_banner:5*1024*1024,news_desk_banner:5*1024*1024,directory_banner:5*1024*1024};
    const paths={};
    for(const [key,uploadFile] of Object.entries(files)){
-    if(!uploadFile||!uploadFile.size){if(key==="logo"||key==="homepage_banner")throw new Error("Please upload your business logo and homepage banner.");continue;}
+    if(!uploadFile||!uploadFile.size){if(key==="logo"||key==="homepage_banner")throw new Error("Please upload your business logo and homepage advertising image.");continue;}
     if(!["image/png","image/jpeg","image/webp"].includes(uploadFile.type))throw new Error("Use PNG, JPG or WebP files for all sponsor artwork.");
     if(uploadFile.size>limits[key])throw new Error((key==="logo"?"Logo":"Banner")+" exceeds its file-size limit.");
+    if(key==="homepage_banner"){
+     let dimensions;
+     try{dimensions=await createImageBitmap(uploadFile);}catch{throw new Error("We couldn't read your homepage image. Please upload a valid PNG, JPG or WebP.");}
+     const correctSize=dimensions.width===900&&dimensions.height===2400;
+     dimensions.close?.();
+     if(!correctSize)throw new Error("Your homepage advertising image must be exactly 900 × 2400 pixels (portrait). Please resize the image to those dimensions before uploading.");
+    }
     const ext=uploadFile.type==="image/png"?"png":uploadFile.type==="image/webp"?"webp":"jpg";
     const path="applications/"+crypto.randomUUID()+"-"+key+"."+ext;
     const upload=await db.storage.from("sponsor-logos").upload(path,uploadFile,{contentType:uploadFile.type,upsert:false});
