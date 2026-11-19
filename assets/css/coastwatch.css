@@ -4303,3 +4303,37 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     max-height:150px !important;
   }
 }
+
+
+/* COASTWATCH_MOBILE_SPONSOR_ARTWORK_V4
+   Dedicated 1200x480 artwork uses the full mobile banner slot without empty bands. */
+@media (max-width:900px) {
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a,
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a > picture {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    line-height:0 !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:1200 / 480 !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
