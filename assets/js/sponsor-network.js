@@ -37,7 +37,7 @@
   slide.querySelector("a").addEventListener("click",()=>track(campaignId,"click"),{once:true});
   carousel.querySelectorAll(".cw-ad-slide").forEach((s,i)=>{s.classList.toggle("is-active",i===0);s.setAttribute("aria-hidden",String(i!==0));});
   const caption=carousel.querySelector(".cw-ad-caption");
-  if(caption){const label=caption.firstChild;if(label&&label.nodeType===3)label.textContent=" Sponsored partner · "; }
+  if(caption)caption.innerHTML='<span class="cw-ad-pulse"></span> Sponsored partner <span class="cw-ad-progress" aria-hidden="true"></span>';
   refreshCarouselDots();
  }
  function render(host,campaign){
@@ -59,6 +59,7 @@
     .or("starts_at.is.null,starts_at.lte."+new Date().toISOString())
     .order("created_at",{ascending:false}).limit(100);
    if(error)throw error;
+   if(carousel)carousel.dataset.sponsorLoading="false";
    const now=Date.now(),active=(data||[]).filter(c=>(!c.starts_at||Date.parse(c.starts_at)<=now)&&(!c.ends_at||Date.parse(c.ends_at)>now)&&c.sponsor_profiles);
    const decks={};
    placements.forEach(placement=>{
@@ -87,7 +88,7 @@
      });
     },12000);
    }
-  }catch(error){console.warn("CoastWatch sponsor network unavailable:",error.message);}
+  }catch(error){if(carousel)carousel.dataset.sponsorLoading="false";console.warn("CoastWatch sponsor network unavailable:",error.message);}
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
