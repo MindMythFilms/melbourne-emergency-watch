@@ -4151,3 +4151,81 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
  #map-panel>.map-dashboard {display:contents!important}
  #map-panel>.map-dashboard>.cw-map-bottom-sponsor {display:none!important}
 }
+
+
+/* Mobile map repair: one map instance, zones beneath it, sponsor banner reserved below. */
+@media (max-width: 900px) {
+  #map-panel > .map-dashboard {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+  }
+  #map-panel > .map-dashboard > .map-stage {
+    display: block !important;
+    position: relative !important;
+    order: 1 !important;
+    width: 100% !important;
+    height: clamp(360px, 55vh, 560px) !important;
+    min-height: 360px !important;
+    max-height: 560px !important;
+    overflow: hidden !important;
+  }
+  #map-panel > .map-dashboard > .map-stage > #map {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 360px !important;
+  }
+  #map-panel > .map-dashboard > #mapZonesCard {
+    display: block !important;
+    position: relative !important;
+    order: 2 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    display: block !important;
+    position: relative !important;
+    order: 3 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 88px !important;
+    max-height: 110px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    background: #061a29 !important;
+    border-top: 1px solid #1b536a !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a,
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+    display: block !important;
+    width: 100% !important;
+    height: 88px !important;
+    min-height: 88px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar { display: none !important; }
+  #map-panel .map-report-tools { display: none !important; }
+}
+@media (min-width: 901px) {
+  #map-panel > .map-dashboard {
+    grid-template-columns: 340px minmax(0,1fr) !important;
+    grid-template-rows: minmax(460px,62vh) auto auto !important;
+  }
+  #map-panel > .map-dashboard > .map-sidebar {
+    grid-row: 1 / span 3 !important;
+  }
+  #map-panel > .map-dashboard > #mapZonesCard {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+  }
+}
