@@ -1295,3 +1295,7 @@ if(!session&&starting){const button=$("cwi-send");button.disabled=true;button.te
  client.auth.onAuthStateChange((_event,s)=>{session=s;});
  mode(true);
 })();
+
+
+/* Hide time-limited static notices once their published end time has passed. */
+(()=>{const now=Date.now();document.querySelectorAll("[data-expires-at]").forEach(el=>{const expiry=Date.parse(el.dataset.expiresAt||"");if(Number.isFinite(expiry)&&expiry<=now)el.hidden=true;});})();
