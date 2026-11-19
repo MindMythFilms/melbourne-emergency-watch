@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="/assets/css/coastwatch.css?v=20261119-sponsor-showcase">
+<link rel="stylesheet" href="/assets/css/coastwatch.css?v=20261119-sponsor-sidebar">
  
 
 
@@ -62,24 +62,7 @@
    <a class="nav-report" href="#report-panel">＋ Report Hazard</a>
   </nav>
  </div>
- <div class="cw-sponsor-showcase">
-  <section class="cw-ad-carousel" id="community-partner-ads" aria-label="CoastWatch FL business advertising" data-sponsor-loading="true">
-   <div class="cw-ad-slides">
-    <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></picture></article>
-    <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-stronger-communities-mobile.svg"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></picture></article>
-   </div>
-   <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Community partners <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
-  </section>
-  <div class="cw-sponsor-actions" aria-label="Sponsorship links">
-   <div class="cw-sponsor-cta-copy">
-    <span class="cw-sponsor-kicker">COASTWATCH COMMUNITY PARTNERS</span>
-    <strong>Help keep our communities informed.</strong>
-    <p>Your support helps keep CoastWatch FL free and accessible to everyone.</p>
-   </div>
-   <div class="cw-sponsor-top-cta"><a href="/sponsor.html">Become a Sponsor</a></div>
-   <div class="cw-sponsor-directory-cta"><a href="/sponsors.html">Explore Local Sponsors</a></div>
-  </div>
- </div>
+
   
 </header>
 <main>
@@ -155,6 +138,21 @@
  <div class="map-dashboard">
   <aside class="map-sidebar" aria-label="Map controls">
    <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
+   <section class="cw-sidebar-sponsor" aria-label="CoastWatch FL community sponsor">
+    <div class="cw-sidebar-sponsor-heading"><span>COMMUNITY PARTNER</span><i aria-hidden="true"></i></div>
+    <div class="cw-sidebar-sponsor-media" id="community-partner-ads" aria-label="CoastWatch FL business advertising" data-sponsor-loading="true">
+     <div class="cw-ad-slides">
+      <article class="cw-ad-slide cw-ad-one is-active" aria-hidden="false"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-support-local-safety-mobile.svg"><img src="/assets/sponsors/coastwatch-support-local-safety.svg" alt="Support local safety — help keep Florida communities informed and prepared" fetchpriority="high"></picture></article>
+      <article class="cw-ad-slide cw-ad-three" aria-hidden="true"><picture><source media="(max-width:760px)" srcset="/assets/sponsors/coastwatch-stronger-communities-mobile.svg"><img src="/assets/sponsors/coastwatch-stronger-communities.svg" alt="Stronger communities start here — your sponsorship helps keep vital local information accessible" loading="lazy"></picture></article>
+     </div>
+     <div class="cw-ad-caption"><span class="cw-ad-pulse"></span> Community partners <span class="cw-ad-progress" aria-hidden="true"><i class="is-active"></i><i></i><i></i></span></div>
+    </div>
+    <div class="cw-sidebar-sponsor-copy"><strong>Help keep our communities informed.</strong><p>Your support keeps CoastWatch FL free and accessible.</p></div>
+    <div class="cw-sidebar-sponsor-links">
+     <a class="cw-sidebar-sponsor-primary" href="/sponsor.html">Become a Sponsor</a>
+     <a class="cw-sidebar-sponsor-secondary" href="/sponsors.html">Explore Local Sponsors</a>
+    </div>
+   </section>
   </aside>
  </div>
  <button class="mobile-legend-toggle" id="mobileLegendToggle" type="button" aria-expanded="false">＋ Map legend</button>
