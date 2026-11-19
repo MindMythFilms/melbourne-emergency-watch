@@ -274,6 +274,7 @@ body:before{
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="audience">Audience Analytics</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="sponsors">Sponsor Center <span id="tabSponsorCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="research">Official Sources <span id="tabResearchCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="learning">AI Learning <span id="tabLearningCount">0</span></button>
@@ -309,6 +310,20 @@ body:before{
  </section>
 </div>
 
+<div class="admin-tab-panel" id="adminTabAudience" role="tabpanel" hidden>
+ <section class="panel editorial-panel"><div class="pad">
+  <div class="editorial-heading"><div><span class="editorial-kicker">PHASE 4 · AUDIENCE</span><h2>News Desk Audience Analytics</h2><p>Article views and returning readers for the last 30 days. A reader is represented by a random browser ID; no names or IP addresses are collected.</p></div><button type="button" class="gray" id="refreshAudience">Refresh analytics</button></div>
+  <div id="audienceMsg" class="msg hidden" role="status" aria-live="polite"></div>
+  <div class="editorial-stats">
+   <div><b id="audienceViews">—</b><span>Article views · 30 days</span></div>
+   <div><b id="audienceVisitors">—</b><span>Unique readers · 30 days</span></div>
+   <div><b id="audienceReturning">—</b><span>Returning readers · 30 days</span></div>
+   <div><b id="audienceArticles">—</b><span>Articles viewed · 30 days</span></div>
+  </div>
+  <div class="editorial-queue-head"><div><h3>Most-read News Desk articles</h3><span class="meta">Ranked by recorded opens of “Read full update”. Repeat opens are counted once per reader, per article, per day.</span></div></div>
+  <div id="audienceTopArticles" aria-live="polite"><div class="empty">Select Audience Analytics to load results.</div></div>
+ </div></section>
+</div>
 <div class="admin-tab-panel" id="adminTabSponsors" role="tabpanel" hidden>
  <section class="panel editorial-panel"><div class="pad">
   <div class="editorial-heading"><div><span class="editorial-kicker">BUSINESS PARTNERSHIPS</span><h2>Sponsor Center</h2><p>Review applications, activate approved business profiles, and manage sponsored placements. Sponsors never influence public-safety information.</p></div><button type="button" class="gray" id="refreshSponsors">Refresh sponsor data</button></div>
@@ -472,7 +487,7 @@ let role=null,rows=[],map=L.map("map").setView([28.0836,-80.6081],11),markers=[]
  original.remove();
  const tabs=[...document.querySelectorAll("[data-admin-tab]")];
  function activate(name){tabs.forEach(t=>{const on=t.dataset.adminTab===name;t.classList.toggle("active",on);t.setAttribute("aria-selected",String(on));});document.querySelectorAll(".admin-tab-panel").forEach(p=>{const on=p.id==="adminTab"+name.charAt(0).toUpperCase()+name.slice(1);p.hidden=!on;p.classList.toggle("active",on);});if(name==="map"){requestAnimationFrame(()=>{map.invalidateSize({pan:true,debounceMoveend:true});const bounds=map.getBounds();if(!bounds.isValid()||Math.abs(map.getCenter().lat)>60||map.getZoom()<5){map.setView([28.0836,-80.6081],11,{animate:false});}map.eachLayer(layer=>{if(layer instanceof L.TileLayer)layer.redraw();});});setTimeout(()=>{map.invalidateSize({pan:true});if(markers.length){const valid=markers.filter(m=>m.getLatLng&&Number.isFinite(m.getLatLng().lat));if(valid.length)map.fitBounds(L.featureGroup(valid).getBounds().pad(.18),{maxZoom:13,animate:false});}else{map.setView([28.0836,-80.6081],11,{animate:false});}},180);setTimeout(()=>map.invalidateSize({pan:true}),500);}}
- tabs.forEach(t=>t.addEventListener("click",()=>{activate(t.dataset.adminTab);if(t.dataset.adminTab==="learning"&&window.loadCoastWatchLearning)window.loadCoastWatchLearning();if(t.dataset.adminTab==="moderation"&&window.loadCoastWatchModeration)window.loadCoastWatchModeration();if(t.dataset.adminTab==="sponsors")loadSponsorCenter()}));
+ tabs.forEach(t=>t.addEventListener("click",()=>{activate(t.dataset.adminTab);if(t.dataset.adminTab==="learning"&&window.loadCoastWatchLearning)window.loadCoastWatchLearning();if(t.dataset.adminTab==="moderation"&&window.loadCoastWatchModeration)window.loadCoastWatchModeration();if(t.dataset.adminTab==="sponsors")loadSponsorCenter();if(t.dataset.adminTab==="audience")loadAudienceAnalytics()}));
  window.mewAdminActivateTab=activate;
 })();
 const streets=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19});streets.addTo(map);
@@ -658,6 +673,42 @@ $("sponsorCampaignQueue").addEventListener("click",async event=>{
  const id=(activate||pause).dataset[activate?"campaignActivate":"campaignPause"];
  try{const {error}=await db.from("sponsor_campaigns").update({status:activate?"active":"paused",updated_at:new Date().toISOString()}).eq("id",id);if(error)throw error;sponsorMsg(activate?"Campaign activated.":"Campaign paused.");await loadSponsorCenter();}catch(error){sponsorMsg("Could not update campaign: "+error.message,"error");}
 });
+async function loadAudienceAnalytics(){
+ const message=$("audienceMsg"),host=$("audienceTopArticles");
+ if(!host)return;
+ message.className="msg hidden";
+ host.innerHTML='<div class="empty">Loading audience data…</div>';
+ try{
+  const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
+  const [{data:views,error:viewError},{data:articles,error:articleError}]=await Promise.all([
+   db.from("editorial_article_views").select("article_id,visitor_id,created_at").gte("created_at",since).order("created_at",{ascending:false}).limit(10000),
+   db.from("editorial_updates").select("id,title,category").eq("status","published")
+  ]);
+  if(viewError)throw viewError;if(articleError)throw articleError;
+  const rows=views||[],visitorDays=new Map(),counts=new Map();
+  rows.forEach(v=>{
+   if(!visitorDays.has(v.visitor_id))visitorDays.set(v.visitor_id,new Set());
+   visitorDays.get(v.visitor_id).add(new Date(v.created_at).toISOString().slice(0,10));
+   counts.set(v.article_id,(counts.get(v.article_id)||0)+1);
+  });
+  const returning=[...visitorDays.values()].filter(days=>days.size>1).length;
+  $("audienceViews").textContent=rows.length.toLocaleString();
+  $("audienceVisitors").textContent=visitorDays.size.toLocaleString();
+  $("audienceReturning").textContent=returning.toLocaleString();
+  $("audienceArticles").textContent=counts.size.toLocaleString();
+  const titles=new Map((articles||[]).map(a=>[a.id,a]));
+  const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  host.innerHTML=top.map(([id,count],index)=>{
+   const article=titles.get(id),title=article?article.title:"Article no longer published";
+   return '<article class="editorial-item"><div class="editorial-item-head"><div><h4>'+esc(title)+'</h4><span class="meta">'+esc(article?.category||"News Desk")+'</span></div><span class="editorial-status published">'+count.toLocaleString()+' views</span></div></article>';
+  }).join("")||'<div class="empty">No News Desk article views have been recorded in the last 30 days.</div>';
+ }catch(error){
+  host.innerHTML='<div class="empty">Could not load audience analytics: '+esc(error.message)+'</div>';
+  message.textContent="Analytics could not be loaded. Check the database permissions and try again.";
+  message.className="msg error";
+ }
+}
+$("refreshAudience").addEventListener("click",loadAudienceAnalytics);
 async function checkSession(){const {data:{session}}=await db.auth.getSession();if(!session){setAuth(false);return}const {data:r,error}=await db.rpc("get_my_admin_role");if(error||!["owner","admin","moderator"].includes(r)){await db.auth.signOut();$("loginMsg").textContent="This account is not authorized for CoastWatch FL administration.";$("loginMsg").classList.remove("hidden");setAuth(false);return}role=r;setAuth(true);await load();await loadEditorialQueue();await loadResearchQueue();await loadScanHealth();await loadLearningQueue();await loadSponsorCenter();if(["owner","admin"].includes(role))await loadModerationQueue()}
 $("signout").onclick=async()=>{await db.auth.signOut();setAuth(false)};
 $("refresh").onclick=load;$("statusFilter").onchange=render;
