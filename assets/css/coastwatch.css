@@ -2981,3 +2981,12 @@ body.dark .cw-editorial-expiry{color:#ffd58a}
 .cw-live-sponsor-copy strong{display:block;margin:4px 0;color:#fff;font:800 16px Manrope,sans-serif}
 .cw-live-sponsor-copy span{display:block;color:#c4dce6;font-size:12px;line-height:1.5}
 @media(max-width:620px){.cw-live-sponsor-placement{width:calc(100% - 20px);margin:8px auto 14px}.cw-live-sponsor-placement a{grid-template-columns:92px minmax(0,1fr);gap:11px}.cw-live-sponsor-placement img{max-height:88px}.cw-live-sponsor-copy strong{font-size:13px}.cw-live-sponsor-copy span{font-size:11px}}
+
+/* Phase 4 sponsor network placements. Kept outside emergency alerts and incident controls. */
+.cw-live-sponsor-news,.cw-live-sponsor-directory{margin:18px auto 22px}
+.cw-live-sponsor-news{width:min(100% - 28px,1120px)}
+.cw-live-sponsor-directory{width:min(100% - 28px,1080px)}
+.cw-live-sponsor-news .cw-live-sponsor-copy small,.cw-live-sponsor-directory .cw-live-sponsor-copy small{letter-spacing:.12em}
+@media(max-width:620px){
+ .cw-live-sponsor-news,.cw-live-sponsor-directory{width:calc(100% - 20px);margin:12px auto 16px}
+}
