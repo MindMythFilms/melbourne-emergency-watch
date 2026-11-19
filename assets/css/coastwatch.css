@@ -4107,3 +4107,47 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     min-height: 27px !important;
   }
 }
+
+
+/* Desktop sponsor workspace: true left rail, map, and a dedicated banner row. */
+@media (min-width: 901px) {
+ #map-panel>.map-dashboard {
+  display:grid!important;
+  grid-template-columns:340px minmax(0,1fr)!important;
+  grid-template-rows:minmax(460px,62vh) auto!important;
+  align-items:stretch!important;
+  gap:0!important;
+ }
+ #map-panel>.map-dashboard>.map-sidebar {
+  grid-column:1!important;grid-row:1 / span 2!important;
+  width:auto!important;min-width:0!important;min-height:0!important;
+  box-sizing:border-box!important;
+ }
+ #map-panel>.map-dashboard>.map-stage {
+  grid-column:2!important;grid-row:1!important;
+  width:100%!important;height:clamp(460px,62vh,660px)!important;
+  min-height:460px!important;max-height:660px!important;
+ }
+ #map-panel>.map-dashboard>.map-stage>#map {
+  width:100%!important;height:100%!important;min-height:0!important;max-height:660px!important;
+ }
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor {
+  grid-column:2!important;grid-row:2!important;
+  display:block!important;position:relative!important;
+  width:100%!important;min-height:140px!important;max-height:180px!important;
+  overflow:hidden!important;background:#061a29!important;
+  border-top:1px solid #1b536a!important;
+ }
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor[hidden]{display:none!important}
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor>a,
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor img {
+  display:block!important;width:100%!important;height:140px!important;
+ }
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor img{object-fit:cover!important;object-position:center!important}
+ #map-panel .cw-sidebar-sponsor {min-height:0!important}
+ #map-panel #community-partner-ads {min-height:0!important;flex:1 1 auto!important}
+}
+@media (max-width:900px) {
+ #map-panel>.map-dashboard {display:contents!important}
+ #map-panel>.map-dashboard>.cw-map-bottom-sponsor {display:none!important}
+}
