@@ -4337,3 +4337,46 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
     object-position:center !important;
   }
 }
+
+
+/* COASTWATCH_DESKTOP_SPONSOR_ARTWORK_V5
+   Desktop-only creatives are composed for their actual map sidebar and map-bottom slots. */
+@media (min-width:901px) {
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:1200 / 240 !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a,
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor > a > picture {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    line-height:0 !important;
+  }
+  #map-panel > .map-dashboard > .cw-map-bottom-sponsor img {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    object-fit:fill !important;
+  }
+  #map-panel #community-partner-ads .cw-ad-slide picture img,
+  #map-panel #community-partner-ads .cw-ad-slide > img {
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    object-fit:fill !important;
+    object-position:center !important;
+  }
+}
