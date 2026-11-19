@@ -73,7 +73,7 @@
    if(homepageDeck.length)renderHomepageCampaign(homepageDeck[0]);
    hosts.forEach(host=>{
     const placement=host.dataset.cwSponsorPlacement,deck=decks[placement]||[];
-    if(!deck.length){host.hidden=true;return;}
+    if(!deck.length){if(placement!=="map_bottom")host.hidden=true;return;}
     positions[placement]=positions[placement]||0;
     render(host,deck[0]);
    });
