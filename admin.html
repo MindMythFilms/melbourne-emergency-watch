@@ -259,7 +259,7 @@ body:before{
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="clearance">Clearance review</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="flags">Community flags</button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="news">News &amp; Updates <span id="tabNewsCount">0</span></button>
-<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="research">Research Scan <span id="tabResearchCount">0</span></button>
+<button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="research">Official Sources <span id="tabResearchCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="learning">AI Learning <span id="tabLearningCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="moderation" id="moderationTab">AI Moderation <span id="tabModerationCount">0</span></button>
 <button type="button" class="admin-tab" role="tab" aria-selected="false" data-admin-tab="map">Map operations</button>
@@ -296,8 +296,7 @@ body:before{
  <section class="panel editorial-panel">
   <div class="pad">
    <div class="editorial-heading">
-    <div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Research Center</h2><p>Scan approved NWS alerts, USGS water observations, and NOAA coastal water levels. Automatically prepare private CoastWatch drafts. Nothing is published without your approval.</p></div>
-    <button type="button" class="green" id="runResearchScan">Run Research Scan</button>
+    <div><span class="editorial-kicker">COASTWATCH INTELLIGENCE</span><h2>Automatic Source Review</h2><p>Official NWS alerts are checked automatically every 30 minutes. Review the generated source records below; nothing is published without your approval.</p></div>
    </div>
    <div class="editorial-stats">
     <div><b id="researchPendingCount">0</b><span>Drafts awaiting review</span></div>
@@ -306,7 +305,7 @@ body:before{
    </div>
    <div id="researchMsg" class="msg hidden" role="status" aria-live="polite"></div>
    <div class="msg">Approved automated sources: National Weather Service alerts, USGS government-produced water observations, and NOAA Tides &amp; Currents observations. Results are prepared as private drafts. USGS and NOAA readings are measurements, not flood warnings, and preliminary or provisional data may be revised. Nothing is published without administrator review and approval.</div>
-   <div class="editorial-queue-head"><div><h3>Research results</h3><span class="meta">Review the source, generated draft, timing and confidence before publishing.</span></div><button type="button" class="gray" id="refreshResearch">Refresh results</button></div>
+   <div class="editorial-queue-head"><div><h3>Research results</h3><span class="meta">Automatically collected source records. Review before sending any item to News &amp; Updates.</span></div><button type="button" class="gray" id="refreshResearch">Refresh results</button></div>
    <div id="researchQueue" aria-live="polite"><div class="empty">Research results will appear here after a scan.</div></div>
   </div>
  </section>
@@ -696,30 +695,10 @@ async function loadResearchQueue(){
   const confidence=item.confidence==="official_alert"?"Official alert":item.confidence==="verified_multiple"?"Verified by multiple sources":item.confidence==="outdated"?"Outdated":"Unverified";
   const canPublish=["owner","admin"].includes(role)&&item.status==="pending";
   return '<article class="research-card" data-research-id="'+esc(item.id)+'"><div class="row"><span class="research-confidence">'+esc(confidence)+'</span><span class="tag">'+esc(item.status)+'</span></div><h3>'+esc(item.title)+'</h3><div class="research-meta">'+esc(item.source_name)+' · '+esc(item.area||"Brevard County")+' · '+(item.source_published_at?new Date(item.source_published_at).toLocaleString():"Time not supplied")+'</div><p>'+esc(item.summary)+'</p><div class="research-draft">'+esc(item.body)+'</div><p class="research-source"><a href="'+esc(item.source_url)+'" target="_blank" rel="noopener noreferrer">Open original source ↗</a></p><div class="actions">'+(canPublish?'<button type="button" class="green" data-research-publish>Send to News &amp; Updates</button><button type="button" class="red" data-research-dismiss>Dismiss</button>':'')+'</div></article>';
- }).join("")||'<div class="empty">No research results yet. Run a scan to check approved NWS, USGS, and NOAA sources for Brevard County.</div>';
+ }).join("")||'<div class="empty">No source records are waiting for review. Automatic checks run every 30 minutes.</div>';
 }
 $("refreshResearch").addEventListener("click",loadResearchQueue);
-$("runResearchScan").addEventListener("click",async()=>{
- const button=$("runResearchScan");button.disabled=true;button.textContent="Scanning official sources…";
- try{
-  const {data:{session},error:sessionError}=await db.auth.getSession();
-  if(sessionError)throw new Error("Could not read the administrator session: "+sessionError.message);
-  if(!session?.access_token)throw new Error("Your administrator session has expired. Sign out and sign in again.");
-  const {data,error}=await db.functions.invoke("coastwatch-research-scan",{
-   body:{},
-   headers:{Authorization:"Bearer "+session.access_token}
-  });
-  if(error){
-   let detail=error.message||"Unknown function error";
-   try{const response=error.context;if(response&&typeof response.json==="function"){const payload=await response.json();detail=payload.error||payload.message||detail;}}catch(_){}
-   throw new Error(detail);
-  }
-  if(!data?.ok)throw new Error(data?.error||"The research scan did not complete.");
-  researchMessage("Scan complete. "+(data.sources||[]).map(s=>s.source+": "+(s.ok?(s.checked+" checked, "+s.queued+" queued"):"not available ("+(typeof s.error==="string"?s.error:JSON.stringify(s.error)) +")")).join(" · ")+". Added "+(data.totals?.added||0)+", refreshed "+(data.totals?.refreshed||0)+". "+data.note);
-  await loadResearchQueue();
- }catch(error){researchMessage("Research scan failed: "+(error.message||"Unknown error"),"error");}
- finally{button.disabled=false;button.textContent="Run Research Scan";}
-});
+
 $("researchQueue").addEventListener("click",async e=>{
  const card=e.target.closest("[data-research-id]");if(!card)return;
  const id=card.dataset.researchId;
