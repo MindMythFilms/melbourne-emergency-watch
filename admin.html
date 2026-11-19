@@ -702,8 +702,18 @@ $("refreshResearch").addEventListener("click",loadResearchQueue);
 $("runResearchScan").addEventListener("click",async()=>{
  const button=$("runResearchScan");button.disabled=true;button.textContent="Scanning official sources…";
  try{
-  const {data,error}=await db.functions.invoke("coastwatch-research-scan",{body:{}});
-  if(error)throw error;
+  const {data:{session},error:sessionError}=await db.auth.getSession();
+  if(sessionError)throw new Error("Could not read the administrator session: "+sessionError.message);
+  if(!session?.access_token)throw new Error("Your administrator session has expired. Sign out and sign in again.");
+  const {data,error}=await db.functions.invoke("coastwatch-research-scan",{
+   body:{},
+   headers:{Authorization:"Bearer "+session.access_token}
+  });
+  if(error){
+   let detail=error.message||"Unknown function error";
+   try{const response=error.context;if(response&&typeof response.json==="function"){const payload=await response.json();detail=payload.error||payload.message||detail;}}catch(_){}
+   throw new Error(detail);
+  }
   if(!data?.ok)throw new Error(data?.error||"The research scan did not complete.");
   researchMessage("Scan complete. "+(data.sources||[]).map(s=>s.source+": "+(s.ok?(s.checked+" checked, "+s.queued+" queued"):"not available ("+s.error+")")).join(" · ")+". Added "+(data.totals?.added||0)+", refreshed "+(data.totals?.refreshed||0)+". "+data.note);
   await loadResearchQueue();
