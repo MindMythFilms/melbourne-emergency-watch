@@ -819,13 +819,13 @@ async function searchRoadGeometry(road){
   selectors.push('way["highway"]["name"~"'+routeRef+'",i](27.7,-81.0,28.8,-80.3);');
  }
  selectors.push('way["highway"]["name"~"'+namePattern.replace(/"/g,'\\"')+'",i](27.7,-81.0,28.8,-80.3);');
- const query='[out:json][timeout:8];('+selectors.join('')+');out geom;';
+ const query='[out:json][timeout:20];('+selectors.join('')+');out geom;';
  const endpoints=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
  let geometries=[];
  const fetchBounded=async(url,options,ms)=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);try{return await fetch(url,{...options,signal:controller.signal});}finally{clearTimeout(timer);}};
  for(const endpoint of endpoints){
   try{
-   const response=await fetchBounded(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)},9000);
+   const response=await fetchBounded(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:"data="+encodeURIComponent(query)},22000);
    if(!response.ok)continue;
    const data=await response.json();
    geometries=(data.elements||[]).filter(el=>el.type==="way"&&el.geometry&&el.geometry.length>1).map(el=>({type:"LineString",coordinates:el.geometry.map(p=>[p.lon,p.lat])}));
