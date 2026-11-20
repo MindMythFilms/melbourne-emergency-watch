@@ -1132,35 +1132,7 @@ setInterval(checkForSiteUpdates,180000);
 
 ;
 
-(()=>{
- const root=document.getElementById("mew-home-quick-actions");
- if(!root)return;
- const goTo=id=>{
-  const target=document.getElementById(id);
-  if(!target)return;
-  target.scrollIntoView({behavior:"smooth",block:"start"});
- };
- root.addEventListener("click",event=>{
-  const button=event.target.closest("button[data-mew-action]");
-  if(!button)return;
-  const action=button.dataset.mewAction;
-  if(action==="location"){
-   document.getElementById("locateBtn")?.click();
-   goTo("map-panel");
-  }else if(action==="shelters"){
-   const toggle=document.getElementById("shelterToggleBtn");
-   if(toggle&&toggle.getAttribute("aria-pressed")!=="true")toggle.click();
-   const source=document.getElementById("sourceFilter");
-   if(source){source.value="shelters";source.dispatchEvent(new Event("change",{bubbles:true}))}
-   goTo("map-panel");
-  }else if(action==="alerts"){
-   goTo("official-alerts-panel");
-  }else if(action==="report"){
-   goTo("report-panel");
-   window.setTimeout(()=>document.getElementById("category")?.focus({preventScroll:true}),450);
-  }
- });
-})();
+
 
 ;
 
