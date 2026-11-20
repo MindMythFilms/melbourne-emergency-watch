@@ -164,7 +164,7 @@ function syncShelterToggle(){if(!shelterToggleButton)return;shelterToggleButton.
 if(shelterToggleButton)shelterToggleButton.addEventListener("click",()=>{sheltersVisible=!sheltersVisible;syncShelterToggle();applySourceFilter();});
 function applySourceFilter(){
  const mode=sourceMode;
- const showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official",showPower=mode==="both"||mode==="power",showWater=mode==="both"||mode==="water",showRadar=mode==="both"||mode==="radar",showEvacuation=mode==="evacuation";const showShelters=sheltersVisible&&(mode==="both"||mode==="shelters");
+ const detected=mode==="detected",showCommunity=mode==="both"||mode==="community",showOfficial=mode==="both"||mode==="official"||detected,showPower=mode==="both"||mode==="power"||detected,showWater=mode==="both"||mode==="water"||detected,showRadar=mode==="both"||mode==="radar"||detected,showEvacuation=mode==="evacuation";const showShelters=sheltersVisible&&(mode==="both"||mode==="shelters");
  markers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});photoBubbleMarkers.forEach(marker=>{if(showCommunity){if(!map.hasLayer(marker))marker.addTo(map)}else if(map.hasLayer(marker))map.removeLayer(marker)});
  if(showOfficial){if(!map.hasLayer(nwsAlertLayer))nwsAlertLayer.addTo(map)}else if(map.hasLayer(nwsAlertLayer))map.removeLayer(nwsAlertLayer);
   if(showPower){if(!map.hasLayer(powerOutageAreaLayer))powerOutageAreaLayer.addTo(map);if(!map.hasLayer(powerOutageLayer))powerOutageLayer.addTo(map)}else{if(map.hasLayer(powerOutageAreaLayer))map.removeLayer(powerOutageAreaLayer);if(map.hasLayer(powerOutageLayer))map.removeLayer(powerOutageLayer)}
