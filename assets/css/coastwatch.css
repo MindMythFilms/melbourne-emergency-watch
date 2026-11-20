@@ -4196,3 +4196,21 @@ body.dark .mew-map-safety-icon{background:#a65b12;color:#fff}
 
 /* Compass is shared by public and admin Leaflet maps; keep admin placement map visible above map layers. */
 #map .mew-admin-map-compass{z-index:1000;}
+
+/* Map-mounted My Location control */
+.map-location-overlay-button{
+ position:absolute;z-index:650;top:12px;right:12px;
+ display:flex;align-items:center;gap:8px;
+ padding:10px 14px;border-radius:12px;
+ border:1px solid rgba(255,255,255,.32);
+ background:rgba(5,28,43,.92);color:#eaf7ff;
+ font:700 14px/1.2 inherit;cursor:pointer;
+ box-shadow:0 4px 18px rgba(0,0,0,.28);
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+}
+.map-location-overlay-button span{font-size:19px;color:#36e1d1}
+.map-location-overlay-button:disabled{opacity:.7;cursor:wait}
+.map-location-overlay-button:hover{background:rgba(9,50,67,.96)}
+@media(max-width:600px){
+ .map-location-overlay-button{top:10px;right:10px;padding:9px 11px;font-size:13px}
+}
