@@ -128,10 +128,11 @@
    </div>
    <div class="mew-gesture-footer"><span><strong>One finger?</strong> Scroll the webpage normally.</span><button id="mewGestureGotIt" type="button">Got it — show me the map</button></div>
   </div>
- </section><div id="map"></div></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section>
+ </section><div id="map"></div>
+<button class="map-location-overlay-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span aria-hidden="true">◎</span> My Location</button></div><section class="map-zones-card" id="mapZonesCard" aria-label="Active map zones"><div class="map-zones-heading"><strong>Active map zones</strong><span id="mapZonesCount">Loading…</span><button type="button" id="mapZonesToggle" class="map-zones-toggle" aria-expanded="true">Hide list</button></div><div id="publicZoneList" class="map-zone-list"><span class="map-zone-empty">Loading designated areas…</span></div></section>
 
   <aside class="map-sidebar" aria-label="Map controls">
-   <button class="map-location-button" id="locateBtn" type="button" aria-label="Center map on your current location"><span>◎</span> My Location</button>
+   
    <section class="cw-sidebar-sponsor cw-sponsor-panel cw-sponsor-fullheight" aria-label="CoastWatch FL community sponsor">
  <div class="cw-sponsor-art-frame" id="community-partner-ads" aria-label="Full-height animated CoastWatch FL sponsor artwork">
   <picture><img src="/assets/sponsors/coastwatch-sidebar-panel-animated-v1.svg?v=20261119-mapheight-v3" alt="CoastWatch FL — Support local safety. Help keep Brevard communities informed and prepared." fetchpriority="high"></picture>
@@ -192,15 +193,7 @@
 </section>
 
 
-<section class="mew-home-quick-actions" id="mew-home-quick-actions" aria-label="Quick emergency actions">
- <div class="mew-quick-heading"><strong>Quick access</strong><span>Important tools, one tap away</span></div>
- <div class="mew-quick-grid">
-  <button type="button" data-mew-action="location"><span aria-hidden="true">◎</span><b>My Location</b><small>Center the map on you</small></button>
-  <button type="button" data-mew-action="shelters"><span aria-hidden="true">⌂</span><b>Open Shelters</b><small>Show shelter locations</small></button>
-  <button type="button" data-mew-action="alerts"><span aria-hidden="true">⚠</span><b>Weather Alerts</b><small>Read official NWS alerts</small></button>
-  <button type="button" data-mew-action="report"><span aria-hidden="true">＋</span><b>Report a Hazard</b><small>Share an observation</small></button>
- </div>
-</section>
+
 
 <section class="mew-recovery-updates" aria-label="Local flood recovery support">
  <article class="mew-recovery-card">
