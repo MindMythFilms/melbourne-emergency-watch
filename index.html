@@ -44,6 +44,51 @@
 
  
 
+
+<style id="coastwatch-phase1-public-cleanup">
+/* Phase 1 — public homepage refinement. Keep the existing content, sponsors, reporting, and mobile layout. */
+:root{--cw-page-gap:clamp(14px,2.2vw,26px)}
+@media(min-width:651px){main{margin:clamp(18px,2.5vw,30px) auto!important;padding-left:clamp(16px,2.3vw,32px)!important;padding-right:clamp(16px,2.3vw,32px)!important}}
+main{display:flex!important;flex-direction:column!important;gap:var(--cw-page-gap)!important}
+main>.layout,main>section,main>div:not(.layout){margin-top:0!important;margin-bottom:0!important}
+.site-header-inner{width:100%;max-width:1800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.site-nav{display:flex;align-items:center;justify-content:flex-end;gap:clamp(6px,1vw,14px);flex-wrap:wrap}
+.site-nav .nav-link{padding:8px 11px;border-radius:9px;transition:background .18s ease,color .18s ease}
+.site-nav .nav-link:hover,.site-nav .nav-link.active{background:#ffffff16;color:#fff}
+.site-nav .nav-report{background:#168e91;border:1px solid #55c6c0;padding:9px 13px;border-radius:10px;color:#fff!important}
+.site-nav .theme-toggle{margin:0}
+.mew-safety-compact{box-shadow:none!important}
+#map-panel,.panel,#latest-news-panel,.mew-recovery-updates,.mew-home-quick-actions,.cw-editorial-feed{scroll-margin-top:100px}
+#map-panel{border-radius:20px!important}
+.map-workspace-head{gap:12px!important}
+.mew-emergency-status-strip{gap:10px!important}
+.mew-status-item{border-radius:12px!important}
+#report-panel{margin-top:0!important}
+#latest-news-panel,.mew-recovery-card,.mew-official-resources,.mew-about-panel{border-radius:18px!important}
+.mew-recovery-updates{gap:14px!important}
+.mew-recovery-card{padding:clamp(16px,2vw,24px)!important}
+.mew-home-quick-actions,.cw-editorial-feed{border-radius:18px!important}
+.cw-editorial-head{margin-bottom:12px}
+.cw-map-bottom-sponsor{margin-top:0!important}
+.cw-sidebar-sponsor{border-radius:14px!important;overflow:hidden}
+#latest-news-panel .panelhead,#report-panel .panelhead{align-items:center}
+#official-resources .mew-resources-details>summary,#about .mew-about-details>summary{padding:16px 18px}
+#official-resources .resource-grid,#about>details>div{padding:clamp(12px,1.6vw,20px)!important}
+@media(max-width:650px){
+ main{gap:10px!important}
+ .site-header-inner{align-items:flex-start;gap:7px;flex-direction:column}
+ .site-nav{width:100%;justify-content:flex-start;gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding:2px 0 5px}
+ .site-nav .nav-link{font-size:13px!important;padding:6px 7px!important;white-space:nowrap}
+ .site-nav .nav-report{white-space:nowrap}
+ #map-panel,.panel,#latest-news-panel,.mew-recovery-updates,.mew-home-quick-actions,.cw-editorial-feed{scroll-margin-top:12px}
+ #map-panel{border-radius:14px!important}
+ .mew-recovery-updates{gap:9px!important}
+ .mew-recovery-card{padding:13px!important}
+ #official-resources .mew-resources-details>summary,#about .mew-about-details>summary{padding:13px}
+}
+@media(prefers-reduced-motion:reduce){.site-nav .nav-link{transition:none}}
+</style>
+
 </head>
 <body>
 <header class="site-header">
