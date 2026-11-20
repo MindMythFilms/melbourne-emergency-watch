@@ -1,18 +1,3 @@
-
-window.mewDeclineConsent=function(){const overlay=document.getElementById("consentOverlay");overlay.innerHTML='<div class="dialog"><h2>No problem</h2><p>You chose not to accept the terms, so the site will remain unavailable. You can close this page.</p></div>';};
-window.mewAcceptConsent=async function(){
- const accept=document.getElementById("acceptBtn"),error=document.getElementById("consentError");error.classList.add("hidden");
- if(!document.getElementById("termsCheck").checked){error.textContent="Please check the agreement box before continuing.";error.classList.remove("hidden");return;}
- accept.disabled=true;accept.textContent="Saving…";
- const version="coastwatch-fl-terms-2026-11-03-v2",key="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",url="https://lqzxzlaxvfjuklyzxbex.supabase.co";
- let sid=localStorage.getItem("mew_browser_session")||sessionStorage.getItem("mew_browser_session");if(!sid){sid=crypto.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random();}localStorage.setItem("mew_browser_session",sid);
- try{const response=await fetch(url+"/rest/v1/rpc/record_mew_terms_acceptance",{method:"POST",headers:{"apikey":key,"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({p_terms_version:version,p_browser_session_id:sid,p_age_attested:false})});if(!response.ok)throw new Error("HTTP "+response.status);localStorage.setItem("mew_accepted_version",version);sessionStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}
- catch(e){error.textContent="We couldn't save your agreement. Please try again.";error.classList.remove("hidden");accept.disabled=false;accept.textContent="I agree — continue";}
-};
-(()=>{const version="coastwatch-fl-terms-2026-11-03-v2";const previouslyAccepted=localStorage.getItem("mew_accepted_version")||sessionStorage.getItem("mew_accepted_version");if(previouslyAccepted===version){localStorage.setItem("mew_accepted_version",version);document.getElementById("consentOverlay").remove();}})();
-
-;
-
 const SUPABASE_URL="https://lqzxzlaxvfjuklyzxbex.supabase.co",SUPABASE_KEY="sb_publishable_Lg56W-Uj-4-_CcQHBLguDg_trvtoqIO",TERMS_VERSION="coastwatch-fl-terms-2026-11-03-v2";
 // browser login token. Public reads/submissions remain governed by the existing RLS policies.
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
